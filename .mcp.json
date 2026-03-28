@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "-e",
+        "SONARQUBE_URL",
+        "-e",
+        "SONARQUBE_IDE_PORT",
+        "mcp/sonarqube"
+      ],
+      "env": {
+        "SONARQUBE_URL": "https://sonar.sdrcolombia.com:9000",
+        "SONARQUBE_TOKEN": "squ_21e77107c9768262f25686f8d2d0572b99379da7",
+        "SONARQUBE_IDE_PORT": "64121"
+      }
+    }
+  }
+}

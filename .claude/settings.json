@@ -13,6 +13,9 @@
       "Bash(git push *)",
       "Bash(git reset --hard *)",
       "Bash(rm -rf *)"
+    ],
+    "allow": [
+      "mcp__sonarqube"
     ]
   },
   "teammateMode": "in-process",

@@ -2,184 +2,185 @@
 applyTo: "src/projects/**/*.{ts,html,scss}"
 ---
 
-> **Scope**: Se aplica al frontend Angular de `genesis-gestorfactel-webapp`. Arquitectura Micro Frontend (Module Federation). UI SAP Fiori con Fundamental NGX.
+> **Scope**: Se aplica al frontend React del proyecto `cotizador-webapp`. Arquitectura FSD (Feature-Sliced Design).
 
-# Instrucciones para Archivos de Frontend (Angular 13)
+# Instrucciones para Archivos de Frontend (React 18)
 
 ## Stack Tecnológico
 
 | Capa | Tecnología |
 |---|---|
-| Framework | Angular 13 + TypeScript 4.4 |
-| UI library | `@fundamental-ngx/core` + `@fundamental-ngx/platform` (SAP Fiori 3) |
-| Estilos | SCSS por componente + tokens SAP Fiori (`@sap-theming/theming-base-content`) |
-| Auth (identidad) | Keycloak (`keycloak-angular` + `keycloak-js 16`) |
-| Autorización | CASL (`@casl/ability` + `@casl/angular`) |
-| HTTP | `HttpClient` de `@angular/common/http` |
-| Formularios | Reactive Forms (`FormBuilder`, `FormGroup`) + Template-driven según complejidad |
-| Internacionalización | `@ngx-translate/core` + `@ngx-translate/http-loader` |
-| Observables | RxJS 7.5 (`Observable`, `lastValueFrom`, operadores pipeable) |
-| Gráficos | `@swimlane/ngx-charts` |
-| Utilidades | `lodash-es`, `file-saver`, `xlsx` |
-| Build | `ngx-build-plus` + Webpack personalizado + Module Federation |
-| Tests | Karma + Jasmine; cobertura con `karma-coverage` |
-| Linting | TSLint 6 |
+| Framework | React 18 + TypeScript |
+| UI State | Redux Toolkit (wizard de cotización, alertas de folio) |
+| Server State | TanStack Query (folio, catálogos, cálculo) |
+| Formularios | React Hook Form + Zod (validación tipada) |
+| Arquitectura | FSD (Feature-Sliced Design) |
+| Rutas | React Router v6 |
+| Estilos | CSS Modules por componente |
+| HTTP | `fetch` nativo o cliente tipado en `shared/api/` |
+| Tests | Vitest + Testing Library |
+| Build | Vite |
 
-## Convenciones Obligatorias
+## Arquitectura FSD
 
-- **Estilos**: SIEMPRE SCSS en archivo separado por componente (`styleUrls: ['./component.scss']`). NUNCA estilos inline ni CSS globales. Usar tokens de SAP Fiori para colores, espaciado y tipografía.
-- **Nombres de archivos**: `kebab-case` para todos los archivos. Sufijos obligatorios: `.component.ts`, `.service.ts`, `.module.ts`, `.model.ts`, `.guard.ts`, `.pipe.ts`, `.spec.ts`.
-- **Nombres de clases**: PascalCase para clases, interfaces y tipos. Sufijo obligatorio en la clase (ej. `HomeComponent`, `AuthService`, `AuthGuardService`).
-- **Configuración runtime**: SIEMPRE leer de `ConfigService` (que carga `assets/app.config.json`). NUNCA hardcodear URLs ni IDs de aplicación.
-- **Variables de entorno build-time**: usar `environment.ts` / `environment.qa.ts` / `environment.prod.ts` — SOLO para valores que cambian por entorno (ej. `url_assets`). No exponer secretos.
-- **Encapsulación**: usar `ViewEncapsulation.None` únicamente cuando sea estrictamente necesario para estilos de Fundamental NGX que no penetran Shadow DOM.
-
-## Estructura de Archivos
+El proyecto sigue **Feature-Sliced Design**. Cada capa solo puede importar capas inferiores:
 
 ```
 src/
-  app/
-    core/
-      models/         ← interfaces y modelos de dominio (.model.ts)
-      services/       ← servicios compartidos (HTTP, utilidades)
-    facturacionelec/  ← módulo de feature (lazy load)
-      <feature>/
-        <feature>.component.ts
-        <feature>.component.html
-        <feature>.component.scss
-        <feature>.component.spec.ts
-    services/
-      auth.service.ts         ← autorización por recurso (lee sessionStorage)
-      auth-guard.service.ts   ← CanActivate basado en AuthService
-      config.service.ts       ← carga app.config.json (APP_INITIALIZER)
-      app.ability.ts          ← definición de reglas CASL
-    pipes/
-    shared/
-      shared.module.ts
-      components/
-  assets/
-    app.config.json           ← configuración runtime (URLs de APIs)
-    i18n/
-      es.json
-      en.json
-  environments/
-    environment.ts
-    environment.qa.ts
-    environment.prod.ts
+├── app/         # Providers, router, store, estilos globales
+├── pages/       # Componentes de ruta (ensamblado de widgets/features)
+├── widgets/     # Bloques UI compuestos reutilizables entre páginas
+├── features/    # Interacciones de usuario (wizard de cotización, búsqueda de folio)
+├── entities/    # Entidades de negocio (folio, catálogos, cotización)
+├── shared/      # UI kit, utilidades, cliente HTTP, tipos base
+│   ├── api/     # Instancia HTTP y helpers de fetch
+│   ├── ui/      # Componentes primitivos reutilizables
+│   ├── lib/     # Utilidades puras (formateo, validaciones genéricas)
+│   └── types/   # Tipos y enums compartidos
 ```
 
-## Llamadas a la API Backend
+### Regla de dependencias FSD
 
-Usar siempre `HttpClient` (NUNCA `fetch` ni Axios). Las llamadas van en servicios dentro de `core/services/` o del módulo de feature correspondiente, NUNCA directamente en componentes.
+```
+app → pages → widgets → features → entities → shared
+```
+
+- **Nunca** importar una capa superior desde una capa inferior.
+- Cada slice tiene su propio `index.ts` (public API). Solo importar desde el `index.ts` del slice, nunca rutas internas.
+- Si dos features necesitan compartir algo, moverlo a `entities/` o `shared/`.
+
+## Convenciones Obligatorias
+
+- **Estilos**: SIEMPRE CSS Modules (`.module.css` o `.module.scss`) por componente. NUNCA estilos inline ni clases CSS globales salvo reset/variables en `app/styles/`.
+- **Nombres de archivos**: `PascalCase` para componentes (`QuoteWizard.tsx`), `camelCase` para hooks, servicios y utilidades (`useQuoteForm.ts`, `folioApi.ts`).
+- **Sufijos**: componentes sin sufijo (`QuoteWizard.tsx`), hooks con prefijo `use` (`useQuoteForm.ts`), stores con sufijo `Slice` (`quoteSlice.ts`), schemas Zod con sufijo `Schema` (`quoteSchema.ts`).
+- **Exports**: cada carpeta expone un `index.ts`; no importar archivos internos del slice directamente.
+- **Tipado estricto**: `strict: true` en `tsconfig.json`. NUNCA usar `any`; preferir tipos inferidos de Zod o TanStack Query.
+- **Variables de entorno**: leer siempre desde `import.meta.env.VITE_*`. NUNCA hardcodear URLs.
+
+## Server State — TanStack Query
+
+Usar TanStack Query para **todo** estado que venga del servidor (folio, catálogos, resultado de cálculo).
 
 ```typescript
-// core/services/electronic-document/electronic-document.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ConfigService } from '../../../services/config.service';
-import { ElectronicDocument } from '../../models/electronic-document/electronic-document.model';
+// entities/folio/api/folioApi.ts
+export const getFolio = async (id: string): Promise<Folio> => {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/folios/${id}`);
+  if (!res.ok) throw new Error('Error al obtener folio');
+  return res.json();
+};
 
-@Injectable({ providedIn: 'root' })
-export class ElectronicDocumentService {
-  constructor(
-    private http: HttpClient,
-    private configService: ConfigService
-  ) {}
+// entities/folio/model/useFolioQuery.ts
+import { useQuery } from '@tanstack/react-query';
+import { getFolio } from '../api/folioApi';
 
-  getDocuments(params: any): Observable<ElectronicDocument[]> {
-    const url = this.configService.getConfig.api_baseUrl;
-    return this.http.get<ElectronicDocument[]>(`${url}/documents`, { params });
-  }
-
-  rejectDocument(id: string, body: any): Observable<any> {
-    const url = this.configService.getConfig.api_baseUrl;
-    return this.http.post(`${url}/documents/${id}/reject`, body);
-  }
-}
+export const useFolioQuery = (id: string) =>
+  useQuery({ queryKey: ['folio', id], queryFn: () => getFolio(id), enabled: !!id });
 ```
 
-El token de Keycloak es inyectado automáticamente por el interceptor de `keycloak-angular`. No añadir cabeceras `Authorization` manualmente en los servicios.
+- Keys de query: array tipado `['entidad', params]`.
+- Mutaciones con `useMutation`; invalidar queries relacionadas en `onSuccess`.
+- NUNCA mezclar TanStack Query con Redux para el mismo dato del servidor.
 
-## Auth y Autorización
+## UI State — Redux Toolkit
 
-**Keycloak** gestiona la identidad. El flujo se inicializa en `APP_INITIALIZER` y el guard de Keycloak (`KeycloakAuthGuard`) protege las rutas.
-
-**CASL** gestiona la autorización por recurso. Consumir siempre desde el `AppAbility` inyectado:
+Usar Redux Toolkit para **estado de UI** que debe persistir entre pasos o componentes no relacionados jerárquicamente: pasos del wizard, alertas globales de folio, selecciones transversales.
 
 ```typescript
-// En un componente
-import { AppAbility } from '../services/app.ability';
+// features/quote-wizard/model/quoteWizardSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-@Component({ ... })
-export class MiComponent {
-  constructor(private ability: AppAbility) {}
+interface QuoteWizardState { currentStep: number; }
+const initialState: QuoteWizardState = { currentStep: 0 };
 
-  canEdit(): boolean {
-    return this.ability.can('update', 'MiRecurso');
-  }
-}
-```
-
-Para verificaciones más simples de recurso/acción usar `AuthService.isAuthorized(resource)`.
-
-## Internacionalización (i18n)
-
-Usar siempre `TranslateModule` y la pipe `| translate`. NUNCA texto literal en templates.
-
-```html
-<!-- template -->
-<span>{{ 'FEATURE.LABEL_KEY' | translate }}</span>
-<fd-button [label]="'COMMON.SAVE' | translate"></fd-button>
-```
-
-Las claves viven en `assets/i18n/es.json` y `assets/i18n/en.json` con estructura de namespacing por feature.
-
-## Rutas (Angular Router)
-
-Las rutas del módulo raíz se definen en `app.routes.ts` con lazy loading obligatorio para módulos de feature:
-
-```typescript
-// app.routes.ts
-export const APP_ROUTES: Routes = [
-  { path: '', redirectTo: 'gestorfactel', pathMatch: 'full' },
-  {
-    path: 'gestorfactel',
-    loadChildren: () =>
-      import('./facturacionelec/facturacionelec.module').then(m => m.gestorfactelModule),
+export const quoteWizardSlice = createSlice({
+  name: 'quoteWizard',
+  initialState,
+  reducers: {
+    nextStep: (state) => { state.currentStep += 1; },
+    goToStep: (state, action: PayloadAction<number>) => { state.currentStep = action.payload; },
   },
-];
+});
+
+export const { nextStep, goToStep } = quoteWizardSlice.actions;
 ```
 
-Las rutas internas del feature se definen en `<feature>.routes.ts`. Proteger rutas con `AuthGuardService` cuando se requiere control por recurso:
+- Store configurado en `app/store/`. Un slice por feature de UI.
+- Acceder al store SIEMPRE con typed hooks (`useAppSelector`, `useAppDispatch`) definidos en `app/store/hooks.ts`.
+- NUNCA poner estado del servidor en Redux; para eso está TanStack Query.
+
+## Formularios — React Hook Form + Zod
+
+Usar React Hook Form + Zod para **todos** los formularios. El schema Zod es la fuente de verdad de la validación.
 
 ```typescript
-{
-  path: 'nueva-ruta',
-  component: NuevaRutaComponent,
-  canActivate: [AuthGuardService],
-  data: { expectedResource: 'NOMBRE_RECURSO' },
-}
+// features/quote-form/model/quoteSchema.ts
+import { z } from 'zod';
+
+export const quoteSchema = z.object({
+  locationId: z.string().min(1, 'Selecciona una ubicación'),
+  coverageType: z.enum(['basic', 'full']),
+  insuredValue: z.number().positive('El valor debe ser mayor a 0'),
+});
+
+export type QuoteFormData = z.infer<typeof quoteSchema>;
+
+// features/quote-form/ui/QuoteForm.tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const { register, handleSubmit, formState: { errors } } = useForm<QuoteFormData>({
+  resolver: zodResolver(quoteSchema),
+});
 ```
+
+- Un archivo `<feature>Schema.ts` por formulario.
+- Inferir siempre el tipo del formulario desde `z.infer<typeof schema>`.
+- NUNCA validar campos manualmente con `if`; toda la lógica de validación vive en el schema Zod.
+
+## Rutas — React Router v6
+
+Las rutas se definen en `app/router/`. Usar `createBrowserRouter` con rutas anidadas según las rutas funcionales del reto.
+
+```typescript
+// app/router/router.tsx
+import { createBrowserRouter } from 'react-router-dom';
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: 'cotizar', element: <QuotePage /> },
+      { path: 'folio/:id', element: <FolioPage /> },
+    ],
+  },
+]);
+```
+
+- Páginas en `pages/`; son ensamblados, no tienen lógica propia.
+- Lazy loading con `React.lazy` + `Suspense` para páginas pesadas.
+- Parámetros de ruta tipados con `useParams` + aserción de tipo o validación Zod.
 
 ## Componentes
 
 - Un componente por archivo.
-- No lógica de negocio en los componentes — delegar siempre a servicios.
-- Usar `OnPush` change detection en componentes de listado / alto rendimiento cuando sea posible.
-- Desuscribirse de Observables en `ngOnDestroy` (usar `takeUntil` con un `Subject` o `AsyncPipe` en template).
-- Inputs/Outputs tipados explícitamente en TypeScript.
+- No lógica de negocio en componentes; delegar a hooks (`use<Feature>.ts`) o al store.
+- Props tipadas explícitamente con `interface Props { ... }`.
+- Preferir composición sobre herencia. Componentes primitivos en `shared/ui/`.
+- Limpiar efectos y suscripciones en el cleanup de `useEffect`.
 
-## Formularios
+## Nunca hacer
 
-Preferir **Reactive Forms** para formularios complejos o con validaciones dinámicas. Template-driven solo para formularios simples de una o dos campos.
+- Importar entre slices del mismo nivel FSD (ej. `features/a` → `features/b`); usar `entities/` o `shared/`.
+- Importar rutas internas de un slice (solo desde su `index.ts`).
+- Estado del servidor en Redux.
+- Estado de UI propio del wizard en TanStack Query.
+- Validaciones manuales fuera de Zod en formularios.
+- URLs hardcodeadas; siempre `import.meta.env.VITE_*`.
+- Usar `any` en TypeScript.
 
-```typescript
-this.form = this.fb.group({
-  campo: [null, [Validators.required, Validators.maxLength(100)]],
-});
-```
+---
 
-## Module Federation
-
-Este proyecto es un **Remote MFE**. Expone `./Component` y `./Module` en `remoteEntry.js`. Las dependencias compartidas (`@angular/core`, `@angular/common`, `@fundamental-ngx/core`, `keycloak-angular`) se declaran como `singleton: true` en `webpack.config.js`. No modificar la configuración de Module Federation sin validar impacto en el shell anfitrión.
+> Para estándares de código limpio, naming, API REST y seguridad, ver `.github/docs/lineamientos/dev-guidelines.md`.
