@@ -11,7 +11,7 @@ tools:
 agents: []
 handoffs:
   - label: Volver al Orchestrator
-    agent: Orchestrator
+    agent: orchestrator
     prompt: Documentación técnica generada. Revisa el estado del flujo ASDD.
     send: false
 ---

@@ -168,6 +168,128 @@ public class QuoteControllerTest
 }
 ```
 
+### Patrón para Repositorios MongoDB
+
+#### Setup: cadena completa de mocks
+
+Siempre mockear la cadena `IMongoClient → IMongoDatabase → IMongoCollection<T> → IAsyncCursor<T>`:
+
+```csharp
+public class QuoteRepositoryTest
+{
+    private readonly Mock<IMongoCollection<QuoteDocument>> _mockCollection = new();
+    private readonly Mock<IAsyncCursor<QuoteDocument>> _mockCursor = new();
+    private readonly Mock<ISettings> _mockSettings = new();
+
+    private QuoteRepository Sut { get; }
+
+    public QuoteRepositoryTest()
+    {
+        var mockClient = new Mock<IMongoClient>();
+        var mockDatabase = new Mock<IMongoDatabase>();
+
+        _mockSettings.Setup(x => x.MongoSettings)
+            .Returns(new MongoConnection
+            {
+                MongoDbName = "testdb",
+                MongoCollectionName = "cotizaciones_danos"
+            });
+
+        mockClient.Setup(x => x.GetDatabase(It.IsAny<string>(), It.IsAny<MongoDatabaseSettings>()))
+            .Returns(mockDatabase.Object);
+
+        mockDatabase.Setup(x => x.GetCollection<QuoteDocument>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
+            .Returns(_mockCollection.Object);
+
+        Sut = new QuoteRepository(mockClient.Object, _mockSettings.Object);
+    }
+}
+```
+
+#### Lectura: patrón cursor (FindAsync)
+
+Todo `FindAsync` requiere configurar el cursor en dos pasos: `Current` (datos) y `MoveNextAsync` (`true` → `false`):
+
+```csharp
+// Con resultados
+_mockCursor.SetupSequence(x => x.Current)
+    .Returns(documentList);
+
+_mockCursor.SetupSequence(x => x.MoveNextAsync(It.IsAny<CancellationToken>()))
+    .ReturnsAsync(true)
+    .ReturnsAsync(false);
+
+_mockCollection.Setup(x => x.FindAsync(
+    It.IsAny<FilterDefinition<QuoteDocument>>(),
+    It.IsAny<FindOptions<QuoteDocument, QuoteDocument>>(),
+    It.IsAny<CancellationToken>()))
+    .ReturnsAsync(_mockCursor.Object);
+
+// Sin resultados: mismo patrón, Current retorna new List<QuoteDocument>()
+```
+
+#### Escritura: Insert / Update
+
+```csharp
+// InsertOneAsync
+_mockCollection.Setup(x => x.InsertOneAsync(
+    It.IsAny<QuoteDocument>(),
+    It.IsAny<InsertOneOptions>(),
+    It.IsAny<CancellationToken>()))
+    .Returns(Task.CompletedTask);
+
+// UpdateOneAsync
+_mockCollection.Setup(x => x.UpdateOneAsync(
+    It.IsAny<FilterDefinition<QuoteDocument>>(),
+    It.IsAny<UpdateDefinition<QuoteDocument>>(),
+    It.IsAny<UpdateOptions>(),
+    It.IsAny<CancellationToken>()))
+    .ReturnsAsync(new UpdateResult.Acknowledged(1, 1, null));
+```
+
+#### Verificación de llamadas
+
+```csharp
+_mockCollection.Verify(x => x.FindAsync(
+    It.IsAny<FilterDefinition<QuoteDocument>>(),
+    It.IsAny<FindOptions<QuoteDocument, QuoteDocument>>(),
+    It.IsAny<CancellationToken>()),
+    Times.Once);
+
+_mockCollection.Verify(x => x.InsertOneAsync(
+    It.IsAny<QuoteDocument>(),
+    It.IsAny<InsertOneOptions>(),
+    It.IsAny<CancellationToken>()),
+    Times.Once);
+```
+
+#### Datos de prueba
+
+- **Objetos simples** (< 5 propiedades): crear inline en el test o en método helper privado
+- **Objetos complejos** (entidades con estructuras anidadas): cargar desde JSON en `Mocks/*.json`
+- Los archivos JSON deben tener `CopyToOutputDirectory: PreserveNewest` en el `.csproj`:
+  ```xml
+  <ItemGroup>
+    <None Update="Mocks\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  ```
+
+```csharp
+// Objeto simple — inline
+var doc = new QuoteDocument
+{
+    Id = ObjectId.GenerateNewId(),
+    NumeroFolio = "COT-2025-000001",
+    EstadoCotizacion = "en_proceso"
+};
+
+// Objeto complejo — desde JSON
+var json = File.ReadAllText("Mocks/CotizacionCompleta.json");
+var doc = JsonConvert.DeserializeObject<QuoteDocument>(json);
+```
+
 ---
 
 ## Frontend — Vitest + Testing Library
