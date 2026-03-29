@@ -580,3 +580,96 @@ function useFormPersist<T>(key: string, form: UseFormReturn<T>) {
 > - Backend: add `lastWizardStep` field to the `metadata` subdocument of `cotizaciones_danos`. Update in each write Use Case.
 > - Frontend: implement `useFormPersist` hook in `shared/lib/`. Integrate in every wizard form. Initialize `quoteWizardSlice` from `GET /state`.
 > - Spec: this requirement must have its own spec or be integrated into the quote wizard spec.
+
+---
+
+### ADR-008: Idioma del Frontend — Código en inglés, UI en español
+
+**Estado:** Accepted
+**Fecha:** 2026-03-29
+
+**Contexto:** El sistema es un cotizador de seguros operado por usuarios hispanohablantes en Colombia. Se necesita definir una política clara de idioma que separe las responsabilidades del código fuente de la experiencia visible por el usuario final. La política aplica a **todos los componentes del sistema** (`cotizador-webapp`, `cotizador-backend`, `cotizador-core-mock`).
+
+**Decisión:** Separación estricta de idioma en dos planos, con alcance global:
+
+| Plano | Idioma | Aplica a |
+|---|---|---|
+| **Código fuente** | Inglés | Nombres de clases, métodos, variables, funciones, componentes, hooks, slices, tipos, interfaces, archivos, rutas de módulos, comentarios técnicos — en todos los proyectos |
+| **Contenido visible al usuario** | Español | Labels, placeholders, mensajes de error HTTP (`message`), títulos, botones, tooltips, textos de validación, alertas, mensajes de éxito, textos vacíos (_empty states_), logs de negocio legibles por operadores |
+
+**Reglas obligatorias (aplican a todos los agentes):**
+
+1. **Ningún texto visible al usuario puede estar en inglés.** Todo string que el usuario lea (UI o mensaje de error HTTP) debe estar en español.
+2. **Ningún identificador de código puede estar en español.** Clases, métodos, variables, props, funciones, tipos, archivos y carpetas se nombran en inglés — sin excepción en ningún proyecto.
+3. **Frontend — strings de UI:** se definen como constantes en español en archivos `strings.ts` por feature/entity, o en `shared/lib/strings.ts` para mensajes globales. No se usa ninguna librería i18n (innecesario para un solo idioma).
+4. **Backend — campo `message` del error response:** siempre en español, legible por el usuario final. El `type` (e.g., `folioNotFound`) permanece en inglés porque es un identificador de código. Ejemplo: `{ "type": "folioNotFound", "message": "El folio no existe" }`.
+5. **Backend — logs de Serilog:** los mensajes de log técnicos pueden estar en inglés (son para desarrolladores). Si un log incluye un mensaje de negocio que un operador pudiera leer en un dashboard, debe estar en español.
+6. **Comentarios en el código:** los comentarios técnicos pueden ser en inglés o español — preferencia del desarrollador. Los comentarios de documentación XML (C#) y JSDoc (TS) van en inglés para consistencia con los identificadores.
+
+**Ejemplos de aplicación:**
+
+```typescript
+// FRONTEND ✅ — identificador en inglés, texto en español
+const submitButton = 'Calcular cotización';
+const errorMessages = {
+  required: 'Este campo es obligatorio',
+  zipCodeNotFound: 'El código postal no existe en el catálogo',
+  versionConflict: 'El folio fue modificado, recarga para continuar',
+  networkError: 'Error de conexión. Intenta de nuevo.',
+};
+
+// FRONTEND ✅ — componente en inglés, contenido en español
+export function EmptyFolioState() {
+  return <p>No hay cotizaciones activas. Crea una nueva.</p>;
+}
+
+// FRONTEND ❌ — identificador en español
+const mensajeError = 'Campo requerido';
+
+// FRONTEND ❌ — texto en inglés visible al usuario
+<button>Submit</button>
+<p>No results found</p>
+```
+
+```csharp
+// BACKEND ✅ — clase y método en inglés, message en español
+public class FolioNotFoundException : Exception
+{
+    public FolioNotFoundException(string folioNumber)
+        : base($"El folio {folioNumber} no existe") { }
+}
+
+// BACKEND ✅ — type en inglés (identificador), message en español
+return Results.NotFound(new ErrorResponse
+{
+    Type = "folioNotFound",
+    Message = "El folio solicitado no existe"
+});
+
+// BACKEND ❌ — método en español
+public async Task ObtenerFolioAsync(string numero) { } // ❌
+
+// BACKEND ❌ — message en inglés
+Message = "Folio not found" // ❌
+```
+
+**Estructura recomendada para strings:**
+
+```
+shared/
+└── lib/
+    └── strings.ts          # Mensajes globales: errores de red, alertas genéricas
+features/
+└── quote-wizard/
+    └── strings.ts          # Strings del wizard: pasos, validaciones del formulario
+entities/
+└── folio/
+    └── strings.ts          # Strings de entidad folio: estados, etiquetas
+```
+
+**Consecuencias:**
+- Los revisores de código deben rechazar cualquier PR que tenga strings visibles al usuario en inglés (en JSX/TSX o en el campo `message` del backend).
+- Los revisores deben rechazar cualquier PR con identificadores de código (clases, métodos, variables, funciones, tipos) en español — en cualquier proyecto.
+- No se instala ninguna librería de internacionalización (zero overhead).
+- La política aplica a **todos los proyectos**: `cotizador-webapp`, `cotizador-backend` y `cotizador-core-mock`.
+- El agente `backend-developer` es responsable de que todos los campos `message` de las excepciones de dominio y las respuestas de error estén en español desde su creación.

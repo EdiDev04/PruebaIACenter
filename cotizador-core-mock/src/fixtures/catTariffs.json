@@ -1,0 +1,5 @@
+[
+  { "zone": "A", "tevFactor": 0.0035, "fhmFactor": 0.0028 },
+  { "zone": "B", "tevFactor": 0.0022, "fhmFactor": 0.0018 },
+  { "zone": "C", "tevFactor": 0.0015, "fhmFactor": 0.0012 }
+]

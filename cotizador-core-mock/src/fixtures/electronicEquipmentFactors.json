@@ -1,0 +1,8 @@
+[
+  { "equipmentClass": "A", "zoneLevel": 1, "factor": 0.0045 },
+  { "equipmentClass": "A", "zoneLevel": 2, "factor": 0.0052 },
+  { "equipmentClass": "B", "zoneLevel": 1, "factor": 0.0038 },
+  { "equipmentClass": "B", "zoneLevel": 2, "factor": 0.0044 },
+  { "equipmentClass": "C", "zoneLevel": 1, "factor": 0.0030 },
+  { "equipmentClass": "C", "zoneLevel": 2, "factor": 0.0036 }
+]

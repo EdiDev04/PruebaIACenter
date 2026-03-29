@@ -7,6 +7,7 @@ tools:
   - read
   - search
   - agent
+  - edit/editFiles
 agents:
   - architect
   - ux-designer

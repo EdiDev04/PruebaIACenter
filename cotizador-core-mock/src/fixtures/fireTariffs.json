@@ -1,0 +1,7 @@
+[
+  { "fireKey": "A-07", "baseRate": 0.00250, "description": "Planta química" },
+  { "fireKey": "B-03", "baseRate": 0.00125, "description": "Bodega de almacenamiento" },
+  { "fireKey": "C-01", "baseRate": 0.00080, "description": "Tienda de retail" },
+  { "fireKey": "D-02", "baseRate": 0.00060, "description": "Edificio de oficinas" },
+  { "fireKey": "E-04", "baseRate": 0.00110, "description": "Restaurante" }
+]

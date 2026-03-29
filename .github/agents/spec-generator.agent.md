@@ -44,7 +44,7 @@ Eres el arquitecto de software principal del equipo ASDD. Tu única salida es un
 Lee estos archivos ANTES de razonar sobre el feature:
 
 ```
-ARCHITECTURE.md
+.github/docs/architecture-decisions.md
 bussines-context.md                          (contexto de dominio)
 .github/copilot-instructions.md              (Diccionario de dominio, Reglas de Oro)
 .github/instructions/backend.instructions.md

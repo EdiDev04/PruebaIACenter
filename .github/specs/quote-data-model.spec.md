@@ -1,6 +1,6 @@
 ---
 id: SPEC-002
-status: DRAFT
+status: IMPLEMENTED
 feature: quote-data-model
 feature_type: backend-only
 requires_design_spec: false
@@ -8,9 +8,9 @@ has_calculation_logic: false
 affects_database: true
 consumes_core_ohs: false
 created: 2026-03-28
-updated: 2026-03-28
+updated: 2026-03-29
 author: spec-generator
-version: "1.0"
+version: "1.1"
 related-specs: ["SPEC-001"]
 priority: alta
 estimated-complexity: L
@@ -104,12 +104,12 @@ Design and implement the core domain model, persistence layer (MongoDB repositor
 
 | Campo | Regla de validación | Mensaje de error | Bloquea guardado |
 |---|---|---|---|
-| `folioNumber` | Non-null, matches regex `^DAN-\d{4}-\d{5}$` | "Invalid folio number format" | Sí |
-| `version` | Must be > 0 on updates, must match persisted version | "Version conflict" | Sí (409) |
-| `quoteStatus` | Must be one of: `draft`, `in_progress`, `calculated`, `finalized` | "Invalid quote status" | Sí |
-| `insuredData.name` | Non-empty string, max 200 chars (when provided) | "Insured name is required" | Sí |
-| `insuredData.taxId` | RFC format (when provided) | "Invalid tax ID format" | Sí |
-| `agentCode` | Non-empty string matching `^AGT-\d{3}$` (when provided) | "Invalid agent code" | Sí |
+| `folioNumber` | Non-null, matches regex `^DAN-\d{4}-\d{5}$` | "Formato de número de folio inválido" | Sí |
+| `version` | Must be > 0 on updates, must match persisted version | "Conflicto de versión" | Sí (409) |
+| `quoteStatus` | Must be one of: `draft`, `in_progress`, `calculated`, `finalized` | "Estado de cotización inválido" | Sí |
+| `insuredData.name` | Non-empty string, max 200 chars (when provided) | "El nombre del asegurado es obligatorio" | Sí |
+| `insuredData.taxId` | RFC format (when provided) | "Formato de RFC inválido" | Sí |
+| `agentCode` | Non-empty string matching `^AGT-\d{3}$` (when provided) | "Código de agente inválido" | Sí |
 
 ---
 
@@ -263,7 +263,7 @@ public class FolioNotFoundException : Exception
 {
     public string FolioNumber { get; }
     public FolioNotFoundException(string folioNumber)
-        : base($"Folio '{folioNumber}' not found") => FolioNumber = folioNumber;
+        : base($"El folio '{folioNumber}' no existe") => FolioNumber = folioNumber;
 }
 
 // Cotizador.Domain/Exceptions/VersionConflictException.cs
@@ -272,7 +272,7 @@ public class VersionConflictException : Exception
     public string FolioNumber { get; }
     public int ExpectedVersion { get; }
     public VersionConflictException(string folioNumber, int expectedVersion)
-        : base($"Version conflict on folio '{folioNumber}'. Expected version: {expectedVersion}")
+        : base($"El folio '{folioNumber}' fue modificado por otro proceso. Recarga para continuar.")
     { FolioNumber = folioNumber; ExpectedVersion = expectedVersion; }
 }
 
@@ -355,7 +355,7 @@ Behavior:
   InvalidQuoteStateException    → 422 { "type": "invalidQuoteState", "message": "...", "field": null }
   CoreOhsUnavailableException   → 503 { "type": "coreOhsUnavailable", "message": "...", "field": null }
   ValidationException (Fluent)  → 400 { "type": "validationError", "message": "...", "field": "fieldName" }
-  Exception (unhandled)         → 500 { "type": "internal", "message": "Internal server error", "field": null }
+  Exception (unhandled)         → 500 { "type": "internal", "message": "Error interno del servidor", "field": null }
 
 NEVER expose stack traces or internal details in the response body.
 Log the full exception with Serilog (Warning for 4xx, Error for 5xx).
@@ -659,18 +659,18 @@ A sample document fixture for testing:
   "locations": [
     {
       "index": 1,
-      "locationName": "Central Warehouse CDMX",
+      "locationName": "Bodega Central CDMX",
       "address": "Av. Industria 340",
       "zipCode": "06600",
       "state": "Ciudad de México",
       "municipality": "Cuauhtémoc",
       "neighborhood": "Doctores",
       "city": "Ciudad de México",
-      "constructionType": "Type 1 - Solid",
+      "constructionType": "Tipo 1 - Macizo",
       "level": 2,
       "constructionYear": 1998,
       "businessLine": {
-        "description": "Storage warehouse",
+        "description": "Bodega de almacenamiento",
         "fireKey": "B-03"
       },
       "guarantees": ["building_fire", "contents_fire", "cat_tev", "theft"],
@@ -913,3 +913,111 @@ N/A — backend-only.
 ### 9.5 test-engineer-frontend
 
 N/A — backend-only.
+
+---
+
+## AMENDMENT-001: Política de idioma (ADR-008)
+
+**Fecha:** 2026-03-29
+**Origen:** ADR-008 — Idioma del Frontend: código en inglés, UI en español
+**Impacto:** Excepciones de dominio (mensajes), validaciones (mensajes de error), datos semilla, middleware de errores
+
+### A1.1 Principio general
+
+ADR-008 aplica a **todos los componentes**, incluyendo `cotizador-backend`. La regla:
+
+| Plano | Idioma | Aplica a en este spec |
+|---|---|---|
+| **Código fuente** | Inglés | Nombres de clases, métodos, propiedades, constantes, campo `type` en error responses |
+| **Contenido visible al usuario** | Español | Campo `message` en error responses HTTP, texto en `base(...)` de excepciones de dominio, mensajes de validación |
+
+### A1.2 Correcciones en excepciones de dominio (§3.3)
+
+El texto pasado a `base(...)` en cada excepción termina siendo el campo `message` del error response HTTP. Debe estar en español.
+
+```csharp
+// Cotizador.Domain/Exceptions/FolioNotFoundException.cs
+public class FolioNotFoundException : Exception
+{
+    public string FolioNumber { get; }
+    public FolioNotFoundException(string folioNumber)
+        : base($"El folio '{folioNumber}' no existe") => FolioNumber = folioNumber;
+    //       ❌ ANTES: "Folio '{folioNumber}' not found"
+    //       ✅ AHORA: "El folio '{folioNumber}' no existe"
+}
+
+// Cotizador.Domain/Exceptions/VersionConflictException.cs
+public class VersionConflictException : Exception
+{
+    public string FolioNumber { get; }
+    public int ExpectedVersion { get; }
+    public VersionConflictException(string folioNumber, int expectedVersion)
+        : base($"El folio '{folioNumber}' fue modificado por otro proceso. Recarga para continuar.")
+    //       ❌ ANTES: "Version conflict on folio '{folioNumber}'. Expected version: {expectedVersion}"
+    //       ✅ AHORA: Mensaje en español legible por el usuario
+    { FolioNumber = folioNumber; ExpectedVersion = expectedVersion; }
+}
+
+// Cotizador.Domain/Exceptions/InvalidQuoteStateException.cs
+// El parámetro `message` que recibe el constructor DEBE pasarse en español desde el Use Case.
+// Ejemplo: throw new InvalidQuoteStateException(folio, state, "No se puede calcular un folio sin ubicaciones");
+
+// Cotizador.Domain/Exceptions/CoreOhsUnavailableException.cs
+// El mensaje DEBE ser en español.
+// Ejemplo: throw new CoreOhsUnavailableException("Servicio de catálogos no disponible, intenta de nuevo más tarde");
+```
+
+### A1.3 Correcciones en mensajes de validación (§2.3)
+
+| Campo | Mensaje actual (inglés ❌) | Mensaje corregido (español ✅) |
+|---|---|---|
+| `folioNumber` | `"Invalid folio number format"` | `"Formato de número de folio inválido"` |
+| `version` | `"Version conflict"` | `"Conflicto de versión"` |
+| `quoteStatus` | `"Invalid quote status"` | `"Estado de cotización inválido"` |
+| `insuredData.name` | `"Insured name is required"` | `"El nombre del asegurado es obligatorio"` |
+| `insuredData.taxId` | `"Invalid tax ID format"` | `"Formato de RFC inválido"` |
+| `agentCode` | `"Invalid agent code"` | `"Código de agente inválido"` |
+
+### A1.4 Correcciones en datos semilla (§5.4)
+
+Los campos que representan contenido visible al usuario en el documento semilla deben estar en español:
+
+| Campo (path) | Valor actual (inglés ❌) | Valor corregido (español ✅) |
+|---|---|---|
+| `locations[0].locationName` | `"Central Warehouse CDMX"` | `"Bodega Central CDMX"` |
+| `locations[0].constructionType` | `"Type 1 - Solid"` | `"Tipo 1 - Macizo"` |
+| `locations[0].businessLine.description` | `"Storage warehouse"` | `"Bodega de almacenamiento"` |
+
+> **Nota:** Campos como `folioNumber`, `agentCode`, `subscriberCode`, `zipCode`, `fireKey`, `catZone`, `guarantees[]` (keys), `quoteStatus`, `validationStatus` son identificadores de código y permanecen en inglés.
+
+### A1.5 Correcciones en middleware de errores (§3.4)
+
+El `ExceptionHandlingMiddleware` ya usa `ex.Message` como campo `message` del response. Dado que A1.2 corrige los mensajes de las excepciones a español, el middleware no requiere cambios estructurales. Sin embargo, se añade la siguiente regla:
+
+```
+Excepción genérica (catch-all) → 500:
+  ❌ ANTES: { "type": "internal", "message": "Internal server error", "field": null }
+  ✅ AHORA: { "type": "internal", "message": "Error interno del servidor", "field": null }
+```
+
+### A1.6 Lo que NO cambia (confirmación)
+
+- Nombres de clases (`PropertyQuote`, `Location`, `FolioNotFoundException`) → inglés ✅
+- Nombres de propiedades (`FolioNumber`, `QuoteStatus`, `InsuredData`) → inglés ✅
+- Nombres de métodos (`UpdateGeneralInfoAsync`, `GetByFolioNumberAsync`) → inglés ✅
+- Constantes (`QuoteStatus.Draft`, `ValidationStatus.Calculable`, `GuaranteeKeys.BuildingFire`) → inglés ✅
+- Campo `type` en error responses (`folioNotFound`, `versionConflict`, `invalidQuoteState`) → inglés ✅
+- Campos BSON (`folioNumber`, `quoteStatus`, `insuredData`, `netPremium`) → inglés (camelCase) ✅
+- Nombre de colección MongoDB (`property_quotes`) → inglés ✅
+- Nombres de índices (`idx_folioNumber_unique`) → inglés ✅
+- Interfaces (`IQuoteRepository`, `ICoreOhsClient`) → inglés ✅
+- Rutas API (`/v1/quotes/{folio}/general-info`) → inglés ✅
+
+### A1.7 Tareas adicionales derivadas del amendment
+
+- [x] Actualizar mensajes `base(...)` en las 4 excepciones de dominio a español
+- [ ] Actualizar mensajes de validación FluentValidation a español
+- [x] Actualizar mensaje catch-all del `ExceptionHandlingMiddleware` a español
+- [x] Actualizar documento semilla (§5.4) con textos visibles en español
+- [ ] Actualizar tests unitarios que validan texto de `Message` en excepciones
+- [ ] Actualizar tests de integración que validan campo `message` en responses HTTP

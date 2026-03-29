@@ -1,6 +1,6 @@
 ---
 id: SPEC-001
-status: DRAFT
+status: IMPLEMENTED
 feature: core-reference-service
 feature_type: backend-only
 requires_design_spec: false
@@ -8,9 +8,9 @@ has_calculation_logic: false
 affects_database: false
 consumes_core_ohs: false
 created: 2026-03-28
-updated: 2026-03-28
+updated: 2026-03-29
 author: spec-generator
-version: "1.0"
+version: "1.1"
 related-specs: []
 priority: alta
 estimated-complexity: M
@@ -18,7 +18,7 @@ estimated-complexity: M
 
 # Spec: Core Reference Service (Mock)
 
-> **Estado:** `DRAFT` → approve with `status: APPROVED` before starting implementation.
+> **Estado:** `APPROVED` → approve with `status: APPROVED` before starting implementation.
 > **Lifecycle:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---
@@ -57,7 +57,7 @@ Implement the `cotizador-core-mock` service that simulates `plataforma-core-ohs`
 
 - **Given** agent `AGT-999` does not exist in the fixture
   **When** `GET /v1/agents?code=AGT-999` is called
-  **Then** the response status is 404 with body `{ "type": "agentNotFound", "message": "Agent not found" }`
+  **Then** the response status is 404 with body `{ "type": "agentNotFound", "message": "Agente no encontrado" }`
 
 ---
 
@@ -85,7 +85,7 @@ Implement the `cotizador-core-mock` service that simulates `plataforma-core-ohs`
 
 - **Given** zip code `99999` does not exist in the fixture
   **When** `GET /v1/zip-codes/99999` is called
-  **Then** the response status is 404 with body `{ "type": "zipCodeNotFound", "message": "Zip code not found" }`
+  **Then** the response status is 404 with body `{ "type": "zipCodeNotFound", "message": "Código postal no encontrado" }`
 
 - **Given** zip code `06600` exists in the fixture
   **When** `POST /v1/zip-codes/validate` is called with body `{ "zipCode": "06600" }`
@@ -361,7 +361,7 @@ All endpoints are served by the mock on `http://localhost:3001`.
 
 **Response 404** (with `?code=AGT-999`):
 ```json
-{ "type": "agentNotFound", "message": "Agent not found" }
+{ "type": "agentNotFound", "message": "Agente no encontrado" }
 ```
 
 ---
@@ -409,7 +409,7 @@ All endpoints are served by the mock on `http://localhost:3001`.
 
 **Response 404**:
 ```json
-{ "type": "zipCodeNotFound", "message": "Zip code not found" }
+{ "type": "zipCodeNotFound", "message": "Código postal no encontrado" }
 ```
 
 ---
@@ -850,3 +850,125 @@ N/A — backend-only.
 ### 9.5 test-engineer-frontend
 
 N/A — backend-only.
+
+---
+
+## AMENDMENT-001: Política de idioma (ADR-008)
+
+**Fecha:** 2026-03-29
+**Origen:** ADR-008 — Idioma del Frontend: código en inglés, UI en español
+**Impacto:** Contratos API (mensajes de error) + Fixtures (datos visibles al usuario)
+
+### A1.1 Principio general
+
+ADR-008 aplica a **todos los componentes**, incluyendo `cotizador-core-mock`. La regla:
+
+| Plano | Idioma | Aplica a en este spec |
+|---|---|---|
+| **Código fuente** | Inglés | Nombres de tipos, archivos, rutas, variables, interfaces, `key` fields, `type` en errores |
+| **Contenido visible al usuario** | Español | Campo `message` en errores, campos `name`/`description` en fixtures de catálogos |
+
+### A1.2 Correcciones en contratos API (§3.4) — campo `message` de errores
+
+Todos los campos `message` en respuestas de error deben estar en español. El campo `type` permanece en inglés (es un identificador de código).
+
+| Endpoint | `type` (inglés ✅) | `message` actual (inglés ❌) | `message` corregido (español ✅) |
+|---|---|---|---|
+| `GET /v1/agents?code=AGT-999` | `agentNotFound` | `"Agent not found"` | `"Agente no encontrado"` |
+| `GET /v1/zip-codes/99999` | `zipCodeNotFound` | `"Zip code not found"` | `"Código postal no encontrado"` |
+| `POST /v1/zip-codes/validate` (400) | `validationError` | `"Field 'zipCode' is required"` | `"El campo 'zipCode' es obligatorio"` |
+
+### A1.3 Correcciones en fixtures — datos visibles al usuario
+
+Los campos `name`, `description` y equivalentes que se muestran en la UI deben estar en español. Los campos que son identificadores de código (`key`, `fireKey`, `code`, `zone`, `condition`) permanecen en inglés.
+
+#### `guarantees.json` — campos `name` y `description`
+
+| `key` (inglés ✅) | `name` actual (inglés ❌) | `name` corregido (español ✅) | `description` corregido (español ✅) |
+|---|---|---|---|
+| `building_fire` | `Building Fire` | `Incendio Edificios` | `Cobertura base sobre la construcción contra incendio` |
+| `contents_fire` | `Contents Fire` | `Incendio Contenidos` | `Cobertura sobre bienes muebles e inventarios contra incendio` |
+| `coverage_extension` | `Coverage Extension` | `Extensión de Cobertura` | `Riesgos adicionales sobre incendio (daño por agua, explosión, etc.)` |
+| `cat_tev` | `CAT TEV` | `CAT TEV` | `Catástrofe — Terremoto, Erupción Volcánica` |
+| `cat_fhm` | `CAT FHM` | `CAT FHM` | `Catástrofe — Fenómenos Hidrometeorológicos (huracán, inundación)` |
+| `debris_removal` | `Debris Removal` | `Remoción de Escombros` | `Costos de limpieza post-siniestro` |
+| `extraordinary_expenses` | `Extraordinary Expenses` | `Gastos Extraordinarios` | `Erogaciones adicionales derivadas del siniestro` |
+| `rent_loss` | `Rent Loss` | `Pérdida de Rentas` | `Lucro cesante por inhabilitación del inmueble` |
+| `business_interruption` | `Business Interruption` | `Interrupción de Negocio` | `Pérdida de utilidades por interrupción del negocio` |
+| `electronic_equipment` | `Electronic Equipment` | `Equipo Electrónico` | `Cobertura all-risk para equipos electrónicos` |
+| `theft` | `Theft` | `Robo` | `Robo con violencia y/o asalto` |
+| `cash_and_securities` | `Cash and Securities` | `Dinero y Valores` | `Efectivo, cheques, títulos en caja fuerte o en tránsito` |
+| `glass` | `Glass` | `Vidrios` | `Rotura accidental de cristales` |
+| `illuminated_signs` | `Illuminated Signs` | `Anuncios Luminosos` | `Daño a letreros y señalética iluminada` |
+
+> **Nota:** Los textos en español provienen directamente de `bussines-context.md` §5 (Componentes técnicos de cobertura).
+
+#### `businessLines.json` — campo `description`
+
+| `code` (inglés ✅) | `description` actual (inglés ❌) | `description` corregido (español ✅) |
+|---|---|---|
+| `BL-001` | `Storage warehouse` | `Bodega de almacenamiento` |
+| `BL-002` | `Retail store` | `Tienda de retail` |
+| `BL-003` | `Chemical plant` | `Planta química` |
+| `BL-004` | `Office building` | `Edificio de oficinas` |
+| `BL-005` | `Restaurant` | `Restaurante` |
+
+#### `riskClassification.json` — campo `description`
+
+| `code` (inglés ✅) | `description` actual (inglés ❌) | `description` corregido (español ✅) |
+|---|---|---|
+| `standard` | `Standard risk` | `Riesgo estándar` |
+| `preferred` | `Preferred risk - lower risk profile` | `Riesgo preferente — perfil de riesgo bajo` |
+| `substandard` | `Substandard risk - higher risk profile` | `Riesgo subestándar — perfil de riesgo alto` |
+
+#### `fireTariffs.json` — campo `description`
+
+| `fireKey` (inglés ✅) | `description` actual (inglés ❌) | `description` corregido (español ✅) |
+|---|---|---|
+| `A-07` | `Chemical plant` | `Planta química` |
+| `B-03` | `Storage warehouse` | `Bodega de almacenamiento` |
+| `C-01` | `Retail store` | `Tienda de retail` |
+| `D-02` | `Office building` | `Edificio de oficinas` |
+| `E-04` | `Restaurant` | `Restaurante` |
+
+#### Fixtures que NO requieren cambios
+
+- `subscribers.json` — nombres ya están en español ✅
+- `agents.json` — nombres ya están en español ✅
+- `zipCodes.json` — nombres geográficos ya están en español ✅
+- `catTariffs.json` — solo contiene códigos (`zone`) y valores numéricos ✅
+- `fhmTariffs.json` — solo contiene códigos y valores numéricos. Campo `condition` es identificador de código ✅
+- `electronicEquipmentFactors.json` — solo contiene códigos y valores numéricos ✅
+- `calculationParameters.json` — solo contiene valores numéricos y una fecha ✅
+
+### A1.4 Correcciones en Gherkin (§2.1)
+
+Los criterios Gherkin en las HU que mencionan mensajes de error deben reflejar el texto en español:
+
+| HU | Criterio afectado | Texto actual | Texto corregido |
+|---|---|---|---|
+| HU-001-02 | Edge case (AGT-999) | `"Agent not found"` | `"Agente no encontrado"` |
+| HU-001-04 | Edge case (99999) | `"Zip code not found"` | `"Código postal no encontrado"` |
+
+### A1.5 Lo que NO cambia (confirmación)
+
+- Campo `type` en errores → inglés (`agentNotFound`, `zipCodeNotFound`, `validationError`) ✅
+- Campo `key` en garantías → inglés (`building_fire`, `cat_tev`) ✅
+- Campo `fireKey` → inglés (`B-03`, `A-07`) ✅
+- Campo `code` en todos los catálogos → inglés (`AGT-001`, `SUB-001`, `BL-001`) ✅
+- Campo `category` en garantías → inglés (`fire`, `cat`, `additional`, `special`) ✅
+- Campo `riskLevel` en business lines → inglés (`low`, `medium`, `high`) ✅
+- Campo `condition` en FHM tariffs → inglés (`standard`, `reinforced`) ✅
+- Nombres de tipos TypeScript → inglés ✅
+- Rutas de archivos → inglés ✅
+- Rutas de API → inglés ✅
+
+### A1.6 Tareas adicionales derivadas del amendment
+
+- [x] Actualizar `src/fixtures/guarantees.json` — campos `name` y `description` a español
+- [x] Actualizar `src/fixtures/businessLines.json` — campo `description` a español
+- [x] Actualizar `src/fixtures/riskClassification.json` — campo `description` a español
+- [x] Actualizar `src/fixtures/fireTariffs.json` — campo `description` a español
+- [x] Actualizar mensajes de error 404/400 en todas las rutas a español
+- [ ] Actualizar tests de integración que validan texto de `message` en errores
+- [x] Actualizar criterios Gherkin de HU-001-02 y HU-001-04 con mensajes en español

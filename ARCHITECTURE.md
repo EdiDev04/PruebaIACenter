@@ -11,7 +11,7 @@
 |---|---|---|
 | Backend API | `cotizador-backend` | C# / .NET 8 |
 | Frontend SPA | `cotizador-webapp` | TypeScript / Node |
-| Core mock externo | `cotizador-core-mock` | — (servicio externo) |
+| Core mock externo | `cotizador-core-mock` | Node.js + Express + TypeScript|
 | Automatización | `cotizador-automatization` | — |
 
 ---

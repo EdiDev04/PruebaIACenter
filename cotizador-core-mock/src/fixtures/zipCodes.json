@@ -1,0 +1,12 @@
+[
+  { "zipCode": "06600", "state": "Ciudad de México", "municipality": "Cuauhtémoc", "neighborhood": "Doctores", "city": "Ciudad de México", "catZone": "A", "technicalLevel": 2 },
+  { "zipCode": "06700", "state": "Ciudad de México", "municipality": "Cuauhtémoc", "neighborhood": "Roma Norte", "city": "Ciudad de México", "catZone": "A", "technicalLevel": 2 },
+  { "zipCode": "44100", "state": "Jalisco", "municipality": "Guadalajara", "neighborhood": "Centro", "city": "Guadalajara", "catZone": "B", "technicalLevel": 3 },
+  { "zipCode": "44200", "state": "Jalisco", "municipality": "Guadalajara", "neighborhood": "Zapopan", "city": "Guadalajara", "catZone": "B", "technicalLevel": 3 },
+  { "zipCode": "64000", "state": "Nuevo León", "municipality": "Monterrey", "neighborhood": "Centro", "city": "Monterrey", "catZone": "C", "technicalLevel": 4 },
+  { "zipCode": "64010", "state": "Nuevo León", "municipality": "Monterrey", "neighborhood": "Obispado", "city": "Monterrey", "catZone": "C", "technicalLevel": 4 },
+  { "zipCode": "72000", "state": "Puebla", "municipality": "Puebla", "neighborhood": "Centro Histórico", "city": "Puebla", "catZone": "B", "technicalLevel": 3 },
+  { "zipCode": "20000", "state": "Aguascalientes", "municipality": "Aguascalientes", "neighborhood": "Centro", "city": "Aguascalientes", "catZone": "C", "technicalLevel": 5 },
+  { "zipCode": "80000", "state": "Sinaloa", "municipality": "Culiacán", "neighborhood": "Centro", "city": "Culiacán", "catZone": "A", "technicalLevel": 1 },
+  { "zipCode": "85000", "state": "Sonora", "municipality": "Cajeme", "neighborhood": "Centro", "city": "Ciudad Obregón", "catZone": "B", "technicalLevel": 2 }
+]
