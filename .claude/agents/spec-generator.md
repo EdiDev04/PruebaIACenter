@@ -339,6 +339,8 @@ Incluir TODOS los supuestos tomados durante 1.3. Si no hay supuestos, escribir `
 ##### `### 6.1 Grafo de agentes`
 
 ```
+[architect]                      (Fase 0, una sola vez al inicio del proyecto)
+        │
 [spec-generator] → APPROVED
         │
         ├── [ux-designer]        (Fase 0.5, si requires_design_spec=true)
@@ -349,19 +351,37 @@ Incluir TODOS los supuestos tomados durante 1.3. Si no hay supuestos, escribir `
         ├── [database-agent]     (Fase 1.5, si affects_database=true)
         │
         ├── [backend-developer]  (Fase 2, si feature_type != frontend-only)
-        └── [frontend-developer] (Fase 2, si feature_type != backend-only)
-                                   BLOQUEADO hasta design.status=APPROVED
+        ├── [frontend-developer] (Fase 2, si feature_type != backend-only)
+        │                          BLOQUEADO hasta design.status=APPROVED
+        └── [integration]        (Fase 2, valida contratos BE ↔ core-mock)
+                │
+                ├── [test-engineer-backend]   (Fase 3, paralelo)
+                ├── [test-engineer-frontend]  (Fase 3, paralelo)
+                └── [e2e-tests]              (Fase 3, paralelo)
+                        │
+                        [code-quality]       (Fase 4A, bloquea QA)
+                                │
+                        [qa-agent]           (Fase 4B, requiere QUALITY_GATE: PASSED)
+                                │
+                        ├── [tech-docs]      (Fase 5, paralelo)
+                        └── [ops-docs]       (Fase 5, paralelo)
 ```
 
 ##### `### 6.2 Tabla de bloqueos`
 
 | Agente | Bloqueado por | Condición de desbloqueo |
 |---|---|---|
+| `ux-designer` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + feature tiene frontend |
 | `frontend-developer` | `ux-designer` | `design-specs/<feature>.design.md` → `status: APPROVED` |
-| `backend-developer` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` |
-| `test-engineer-backend` | `backend-developer` | Implementación completa |
-| `test-engineer-frontend` | `frontend-developer` | Implementación completa |
-| `qa-agent` | ambos test engineers | Tests completos |
+| `backend-developer` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + Fase 1.5 completa |
+| `integration` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + Fase 1.5 completa |
+| `test-engineer-backend` | `backend-developer` | Implementación backend completa |
+| `test-engineer-frontend` | `frontend-developer` | Implementación frontend completa |
+| `e2e-tests` | `backend-developer` + `frontend-developer` + `integration` | Fase 2 completa (los 3 agentes) |
+| `code-quality` | test engineers + `e2e-tests` | Fase 3 completa |
+| `qa-agent` | `code-quality` | `QUALITY_GATE: PASSED` (NO puede ejecutarse si FAILED) |
+| `tech-docs` | `qa-agent` | Fase 4 completa |
+| `ops-docs` | `qa-agent` | Fase 4 completa |
 
 ##### `### 6.3 Specs relacionadas`
 
