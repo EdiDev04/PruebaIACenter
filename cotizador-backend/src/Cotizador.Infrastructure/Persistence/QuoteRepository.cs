@@ -41,6 +41,7 @@ public class QuoteRepository : IQuoteRepository
         string agentCode,
         string businessType,
         string riskClassification,
+        string? newQuoteStatus = null,
         CancellationToken ct = default)
     {
         FilterDefinition<PropertyQuote> filter = BuildVersionedFilter(folioNumber, expectedVersion);
@@ -54,6 +55,9 @@ public class QuoteRepository : IQuoteRepository
             .Set(q => q.Version, expectedVersion + 1)
             .Set(q => q.Metadata.UpdatedAt, DateTime.UtcNow)
             .Set(q => q.Metadata.LastWizardStep, 1);
+
+        if (newQuoteStatus is not null)
+            update = update.Set(q => q.QuoteStatus, newQuoteStatus);
 
         await ExecuteUpdateAsync(folioNumber, expectedVersion, filter, update, ct);
     }

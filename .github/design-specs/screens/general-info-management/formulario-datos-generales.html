@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architectural Underwriter - Cotización Paso 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container": "#e7eeff", "on-surface": "#24334a", "surface-variant": "#d5e3ff", "tertiary-fixed": "#82ff99", background: "#f9f9ff", "on-primary-fixed-variant": "#fefcff", "surface-container-low": "#f0f3ff", "primary-container": "#4878fd", "primary-fixed": "#4878fd", outline: "#6c7b96", "on-tertiary-fixed": "#004c1d", "tertiary-container": "#82ff99", "on-secondary-fixed-variant": "#8c4a00", "on-primary-container": "#000000", "surface-container-highest": "#d5e3ff", secondary: "#914d00", "on-surface-variant": "#506079", "primary-dim": "#0047c6", "tertiary-fixed-dim": "#73f08c", "inverse-on-surface": "#969dac", "secondary-fixed": "#ffdcc3", "surface-dim": "#cbdbf9", tertiary: "#006e2e", "surface-container-high": "#dee8ff", "on-background": "#24334a", "on-secondary": "#fff7f4", "inverse-surface": "#070e19", "on-tertiary-fixed-variant": "#006c2d", "on-secondary-fixed": "#633300", "on-primary-fixed": "#ffffff", "on-secondary-container": "#7e4200", "on-error-container": "#6e0523", error: "#a8364b", "primary-fixed-dim": "#386bef", "outline-variant": "#a3b3cf", "tertiary-dim": "#006127", "surface-bright": "#f9f9ff", surface: "#f9f9ff", "secondary-fixed-dim": "#ffcaa1", "inverse-primary": "#638aff", "error-container": "#f97386", "on-error": "#fff7f7", "surface-tint": "#1554d9", "surface-container-lowest": "#ffffff", "secondary-container": "#ffdcc3", "on-tertiary": "#e9ffe6", "error-dim": "#6b0221", "on-tertiary-container": "#006127", "on-primary": "#faf8ff", "secondary-dim": "#804300", primary: "#1554d9"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+      }
+      .silent-margin {
+        margin-bottom: 3.5rem; /* spacing-16 from Design System */
+      }
+      .ghost-border-input {
+        border: none;
+        border-bottom: 1px solid rgba(171, 179, 183, 0.3); /* outline_variant at 30% */
+        background: transparent;
+        transition: border-color 0.2s ease;
+      }
+      .ghost-border-input:focus {
+        outline: none;
+        border-bottom: 2px solid #1353d8; /* primary */
+        box-shadow: none;
+      }
+      .tabular-nums {
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#f8f9fa] dark:bg-slate-900 flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto docked full-width top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="font-headline font-bold tracking-[-0.02em] text-[2rem] text-[#1353d8] dark:text-blue-400">
+                Architectural Underwriter
+            </span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-[#586064] dark:text-slate-400 hover:bg-[#f1f4f6] dark:hover:bg-slate-800 transition-colors p-2 rounded-lg">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex-grow w-full max-w-[800px] mx-auto px-6 py-12">
+<div class="mb-12">
+<h1 class="font-headline font-bold tracking-[-0.02em] text-[2rem] text-on-surface mb-2">Nueva Solicitud de Seguro</h1>
+<p class="text-on-surface-variant">Complete los datos institucionales para iniciar el proceso de suscripción técnica.</p>
+</div>
+<form class="flex flex-col gap-8">
+<!-- CARD 1: DATOS DEL ASEGURADO -->
+<section class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_12px_32px_rgba(43,52,55,0.04)]">
+<header class="mb-8">
+<span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] font-medium text-on-surface-variant">A. DATOS DEL ASEGURADO</span>
+</header>
+<div class="space-y-8">
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="nombre_asegurado">Nombre del asegurado *</label>
+<input class="ghost-border-input py-3 px-1 text-on-surface placeholder:text-outline-variant/60" id="nombre_asegurado" placeholder="Grupo Industrial SA de CV" required="" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="rfc">RFC *</label>
+<input class="ghost-border-input py-3 px-1 text-on-surface placeholder:text-outline-variant/60 uppercase" id="rfc" placeholder="GIN850101AAA" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="telefono">Teléfono (opcional)</label>
+<input class="ghost-border-input py-3 px-1 text-on-surface placeholder:text-outline-variant/60" id="telefono" placeholder="(55) XXXX-XXXX" type="tel"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="email">Correo electrónico (opcional)</label>
+<input class="ghost-border-input py-3 px-1 text-on-surface placeholder:text-outline-variant/60" id="email" placeholder="contacto@empresa.com" type="email"/>
+</div>
+</div>
+</section>
+<!-- CARD 2: DATOS DE CONDUCCIÓN -->
+<section class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_12px_32px_rgba(43,52,55,0.04)]">
+<header class="mb-8">
+<span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] font-medium text-on-surface-variant">B. DATOS DE CONDUCCIÓN</span>
+</header>
+<div class="space-y-8">
+<div class="flex flex-col gap-2 relative">
+<label class="text-[0.875rem] font-medium text-on-surface" for="suscriptor">Suscriptor *</label>
+<div class="relative">
+<input class="w-full ghost-border-input py-3 pl-1 pr-10 text-on-surface placeholder:text-outline-variant/60" id="suscriptor" placeholder="Seleccionar suscriptor..." required="" type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-3 text-on-surface-variant pointer-events-none" data-icon="search">search</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface">Oficina</label>
+<div class="bg-surface-container-low py-3 px-4 rounded flex items-center justify-between">
+<span class="text-on-surface-variant text-[0.9375rem]">Oficina Central México</span>
+<span class="bg-[#fff4e5] text-[#b45d03] text-[0.625rem] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider tabular-nums">[auto]</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="agente">Código de agente *</label>
+<div class="relative">
+<input class="w-full ghost-border-input py-3 pl-1 pr-10 text-on-surface placeholder:text-outline-variant/60" id="agente" placeholder="AGT-001" required="" type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-3 text-on-surface-variant pointer-events-none" data-icon="search">search</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CARD 3: TIPO Y CLASIFICACIÓN -->
+<section class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_12px_32px_rgba(43,52,55,0.04)] mb-12">
+<header class="mb-8">
+<span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] font-medium text-on-surface-variant">C. TIPO Y CLASIFICACIÓN DE RIESGO</span>
+</header>
+<div class="space-y-8">
+<div class="flex flex-col gap-4">
+<span class="text-[0.875rem] font-medium text-on-surface">Tipo de negocio *</span>
+<div class="flex bg-surface-container-high p-1 rounded-lg w-full md:w-fit">
+<label class="flex-1 md:flex-none">
+<input checked="" class="sr-only peer" name="tipo_negocio" type="radio" value="nuevo"/>
+<div class="px-6 py-2 text-[0.875rem] font-medium text-on-surface-variant peer-checked:bg-surface-container-lowest peer-checked:text-primary peer-checked:shadow-sm rounded-md cursor-pointer transition-all text-center">
+                                    Nuevo negocio
+                                </div>
+</label>
+<label class="flex-1 md:flex-none">
+<input class="sr-only peer" name="tipo_negocio" type="radio" value="renovacion"/>
+<div class="px-6 py-2 text-[0.875rem] font-medium text-on-surface-variant peer-checked:bg-surface-container-lowest peer-checked:text-primary peer-checked:shadow-sm rounded-md cursor-pointer transition-all text-center">
+                                    Renovación
+                                </div>
+</label>
+<label class="flex-1 md:flex-none">
+<input class="sr-only peer" name="tipo_negocio" type="radio" value="endoso"/>
+<div class="px-6 py-2 text-[0.875rem] font-medium text-on-surface-variant peer-checked:bg-surface-container-lowest peer-checked:text-primary peer-checked:shadow-sm rounded-md cursor-pointer transition-all text-center">
+                                    Endoso
+                                </div>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[0.875rem] font-medium text-on-surface" for="clasificacion">Clasificación de riesgo *</label>
+<select class="ghost-border-input py-3 px-1 text-on-surface bg-transparent appearance-none" id="clasificacion" required="">
+<option disabled="" selected="" value="">Seleccionar clasificación...</option>
+<option value="bajo">Riesgo Bajo (Institucional)</option>
+<option value="medio">Riesgo Medio (Comercial)</option>
+<option value="alto">Riesgo Alto (Industrial Pesado)</option>
+</select>
+</div>
+</div>
+</section>
+</form>
+</main>
+<!-- BottomNavBar (Sticky Footer) -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-8 py-4 bg-[#f8f9fa] dark:bg-slate-900 shadow-[0px_-4px_16px_rgba(43,52,55,0.04)]">
+<button class="flex items-center justify-center text-[#586064] dark:text-slate-400 border border-transparent px-6 py-3 hover:brightness-110 dark:hover:brightness-125 transition-all Active:scale-95 duration-150">
+<span class="material-symbols-outlined mr-2" data-icon="arrow_back">arrow_back</span>
+<span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] font-medium">Volver</span>
+</button>
+<button class="flex items-center justify-center bg-gradient-to-br from-[#1353d8] to-[#0b50d5] text-white rounded-md px-6 py-3 shadow-sm hover:brightness-110 dark:hover:brightness-125 transition-all Active:scale-95 duration-150">
+<span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] font-medium mr-2">Guardar y continuar</span>
+<span class="material-symbols-outlined" data-icon="save">save</span>
+</button>
+</footer>
+<div class="h-24"></div> <!-- Spacer for sticky footer -->
+</body></html>

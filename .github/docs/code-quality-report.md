@@ -1,4 +1,4 @@
-# Reporte de calidad — SPEC-002 quote-data-model — 2026-03-28
+# Reporte de calidad — SPEC-003 (folio-creation) + SPEC-004 (general-info-management) — 2026-03-29
 
 ---
 
@@ -8,67 +8,73 @@
 
 | Severidad | Total | Bloquea qa-agent |
 |-----------|-------|-----------------|
-| CRÍTICO   | 1     | Sí              |
+| CRÍTICO   | 3     | Sí              |
 | MAYOR     | 3     | No              |
-| MENOR     | 3     | No              |
+| MENOR     | 2     | No              |
 
 ### Violaciones críticas
 
 #### CRIT-001
-- **Archivo:** `cotizador-backend/src/Cotizador.API/Program.cs`
-- **Línea:** 29–32
-- **Regla:** OWASP A05 Security Misconfiguration — CORS sin restricción de entorno
-- **Detalle:** `AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()` se aplica en **todos los entornos** (incluyendo producción). El comentario dice "for development" pero no existe un guard `if (app.Environment.IsDevelopment())`. En producción, cualquier origen puede realizar solicitudes cross-origin con cualquier método HTTP, incluyendo `DELETE` y `PUT`.
-- **Acción requerida:** Envolver la política CORS permisiva dentro de `if (app.Environment.IsDevelopment())`. Definir una política restrictiva para producción con orígenes explícitos vía `appsettings.Production.json`.
+- **Archivo:** `cotizador-webapp/src/features/general-info-form/ui/ConductionDataSection.tsx`
+- **Línea:** 4
+- **Regla:** Feature importa slice del mismo nivel (feature → feature)
+- **Detalle:** `import { SubscriberComboBox } from '@/features/subscriber-selector'` — en FSD una feature no puede importar de otra feature. La capa `features/` es horizontal; cada slice es independiente.
+- **Acción requerida:** Mover `SubscriberComboBox` (con su query y api) a `shared/ui/` o crear una entidad de negocio en `entities/subscriber/` si representa un concepto de dominio.
+
+#### CRIT-002
+- **Archivo:** `cotizador-webapp/src/features/general-info-form/ui/BusinessClassSection.tsx`
+- **Línea:** 5
+- **Regla:** Feature importa slice del mismo nivel (feature → feature)
+- **Detalle:** `import { RiskClassificationSelect } from '@/features/risk-classification'` — misma violación que CRIT-001.
+- **Acción requerida:** Mover `RiskClassificationSelect` (con su query y api) a `shared/ui/` o `entities/risk-classification/`.
+
+#### CRIT-003
+- **Archivos:** `cotizador-webapp/src/pages/FolioHomePage.tsx`, `FolioCreatedPage.tsx`, `GeneralInfoPage.tsx`
+- **Línea:** N/A (ausencia de componente)
+- **Regla:** `ErrorBoundary` ausente en `pages/`
+- **Detalle:** Ninguna de las tres páginas auditadas está envuelta en un `ErrorBoundary`. Un error en render no controlado colapsa la UI completa sin mostrar mensaje al usuario ni permitir recovery.
+- **Acción requerida:** Crear `shared/ui/ErrorBoundary.tsx` (class component o usar `react-error-boundary`) y envolver las rutas en el router con un `<ErrorBoundary fallback={<ErrorFallback />}>` por página o a nivel de layout.
 
 ---
 
 ### Violaciones mayores
 
-#### MAYOR-001
-- **Archivo:** `cotizador-backend/src/Cotizador.API/Auth/BasicAuthHandler.cs`
-- **Línea:** 65–68
-- **Regla:** Excepción capturada con catch vacío / swallowed — MAYOR
-- **Detalle:** El bloque `catch` general captura **toda excepción** (incluidas `OutOfMemoryException`, `ThreadAbortException`) sin registrar nada en el logger. Los fallos de autenticación quedan silenciados e invisibles para operaciones y monitoreo de seguridad (OWASP A09 — Security Logging and Monitoring Failures).
-- **Acción:** Agregar `_logger.LogWarning(ex, "Error parsing Authorization header")` antes del `return`.
+#### MAY-001
+- **Archivos:** `cotizador-backend/src/Cotizador.API/Controllers/FolioController.cs` (L13) y `QuoteController.cs` (L14)
+- **Regla:** Código duplicado — DRY violation
+- **Detalle:** `private static readonly Regex FolioRegex = new(@"^DAN-\d{4}-\d{5}$", RegexOptions.Compiled)` está definido idénticamente en ambos controllers. Si el formato cambia, debe actualizarse en dos lugares de forma manual.
+- **Acción:** Extraer a `Cotizador.Application/Constants/FolioConstants.cs` como `public static readonly Regex FolioRegex` o a un `static partial class` en API.
 
-#### MAYOR-002
-- **Archivo:** `cotizador-backend/src/Cotizador.API/Middleware/ExceptionHandlingMiddleware.cs`
-- **Línea:** 49
-- **Regla:** Errores internos revelan detalles de implementación — OWASP A05
-- **Detalle:** El handler de `CoreOhsUnavailableException` devuelve `ex.Message` directamente al cliente HTTP. El mensaje incluye la ruta interna del servicio (e.g., `"Error communicating with core-ohs at '/v1/subscribers'."`), exponiendo la topología interna del sistema al consumidor externo.
-- **Acción:** Retornar un mensaje genérico al cliente (`"Core service temporarily unavailable"`) y registrar `ex.Message` solo en el log interno.
+#### MAY-002
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/UpdateGeneralInfoUseCase.cs`
+- **Línea:** 58
+- **Regla:** Argumento de dominio incompleto en excepción
+- **Detalle:** `throw new InvalidQuoteStateException(folioNumber, string.Empty, ...)` — el segundo parámetro (estado actual de la cotización) se pasa como `string.Empty`, eliminando información de diagnóstico. En el flujo actual el validador del agente se ejecuta antes de leer el folio (paso 3), por lo que el estado real aún no está disponible.
+- **Acción:** Reestructurar para leer el folio antes de validar el agente, o usar un overload de excepción que no requiera el estado si no está disponible en ese punto.
 
-#### MAYOR-003
-- **Archivo:** `cotizador-backend/src/Cotizador.Domain/ValueObjects/` (todos los archivos)
-- **Regla:** Single Responsibility / Naming — clases en `ValueObjects/` no son value objects DDD
-- **Detalle:** `InsuredData`, `QuoteMetadata`, `BusinessLine`, `ConductionData`, `CoverageOptions`, `LayoutConfiguration`, `CoveragePremium` y `LocationPremium` son **clases mutables** con setters públicos y sin igualdad por valor (`Equals`/`GetHashCode`/tipo `record`). Llamarlos "ValueObjects" crea una abstracción engañosa que viola el principio de Single Responsibility (la carpeta mezcla semántica DDD con transfer bags). Esto además dificulta la detección de regresiones cuando se comparten referencias mutables.
-- **Acción:** Renombrar la carpeta a `Models/` o convertir las clases a `record` types inmutables si el serializer MongoDB lo permite. Si permanecen mutables, retirarlos del namespace de ValueObjects.
+#### MAY-003
+- **Archivos:** `cotizador-webapp/src/features/folio-search/model/useFolioSearch.ts` (L34) y `features/general-info-form/ui/GeneralInfoForm.tsx` (L40)
+- **Regla:** Type assertion insegura sin type guard
+- **Detalle:** `const error = err as { type?: string; message?: string }` — si la API devuelve un shape de error diferente al esperado, la bifurcación por `.type` falla silenciosamente y el usuario ve el mensaje genérico en todos los casos, incluso cuando habría un mensaje específico disponible.
+- **Acción:** Crear un type guard `isApiError(err)` con chequeo en runtime (`typeof err === 'object' && err !== null && 'type' in err`) o usar un schema Zod para parsear la respuesta de error.
 
 ---
 
 ### Sugerencias menores
 
-#### MENOR-001
-- **Archivo:** `cotizador-backend/src/Cotizador.Infrastructure/Persistence/QuoteRepository.cs`
-- **Línea:** 33
-- **Regla:** Magic string en filtro MongoDB
-- **Detalle:** `Filter.Eq("metadata.idempotencyKey", idempotencyKey)` usa un string literal. Un cambio en el nombre serializado del campo no generará error de compilación.
-- **Acción:** Usar expresión tipada: `Filter.Eq(q => q.Metadata.IdempotencyKey, idempotencyKey)` o definir una constante.
+#### MIN-001
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/GetGeneralInfoUseCase.cs`
+- **Línea:** 31–41
+- **Regla:** Acceso sin guardia a propiedades potencialmente nulas en estado `Draft`
+- **Detalle:** `MapToDto` accede directamente a `quote.InsuredData.Name`, `quote.InsuredData.TaxId`, etc. Un folio en estado `Draft` (antes del primer PUT de general-info) puede tener `InsuredData` o `ConductionData` nulos, causando `NullReferenceException` en tiempo de ejecución.
+- **Acción:** Agregar null-check: `quote.InsuredData is not null ? new InsuredDataDto(...) : null` o devolver un DTO parcial con campos en blanco.
 
-#### MENOR-002
-- **Archivo:** `cotizador-backend/src/Cotizador.Infrastructure/Persistence/QuoteRepository.cs`
-- **Línea:** 105
-- **Regla:** Magic string en update MongoDB
-- **Detalle:** `.Set($"locations.{arrayIndex}", patchData)` usa interpolación de string para acceder a elementos de array. Aceptable como patrón MongoDB, pero frágil ante renombrado del campo `locations`.
-- **Acción:** Definir una constante para el nombre del campo (`private const string LocationsField = "locations"`).
-
-#### MENOR-003
-- **Archivo:** `cotizador-backend/src/Cotizador.API/appsettings.json`
-- **Línea:** 19–22
-- **Regla:** Credenciales de desarrollo en archivo base (no en `appsettings.Development.json`)
-- **Detalle:** `Auth.Username = "admin"` y `Auth.Password = "cotizador2026"` están en `appsettings.json` (base, versionado). Deberían estar únicamente en `appsettings.Development.json` (gitignored) o en User Secrets / variables de entorno. La regla del proyecto permite appsettings, pero el archivo base se comparte entre todos los entornos.
-- **Acción:** Mover al archivo `appsettings.Development.json` y configurar el archivo `.gitignore` adecuadamente.
+#### MIN-002
+- **Archivo:** `cotizador-webapp/src/features/folio-creation/model/useCreateFolio.ts`
+- **Línea:** 10–12
+- **Regla:** Handler `onError` vacío — sin observabilidad
+- **Detalle:** `onError: () => { // Keep same idempotency key for retry }` — la intención está documentada en el comentario pero no hay ningún log ni telemetría. En producción un error silencioso aquí es indetectable.
+- **Acción:** Agregar al menos `console.warn('createFolio failed, keeping idempotency key')` o integrar con el sistema de observabilidad del proyecto.
 
 ---
 
@@ -76,54 +82,42 @@
 
 ### Resumen ejecutivo
 
-- **Project Key:** No resuelto — workspace no vinculado a SonarQube Cloud/Server en Connected Mode
-- **Archivos analizados con Roslyn (local):** 5 archivos (QuoteRepository.cs, BasicAuthHandler.cs, CoreOhsClient.cs, ExceptionHandlingMiddleware.cs, Program.cs, PropertyQuote.cs)
-- **Gate SonarQube Server:** N/A (no Connected Mode disponible)
-- **Análisis local SonarLint:** Disparado. No se reportaron issues BLOCKER ni CRITICAL adicionales en PROBLEMS view más allá de los detectados manualmente.
+- **Project Key:** No disponible — servidor SonarQube no enlazado al workspace (standalone).
+- **Archivos `.cs` analizados vía Roslyn:** 5 (FolioController, QuoteController, CreateFolioUseCase, GetGeneralInfoUseCase, UpdateGeneralInfoUseCase).
+- **Security Hotspots / Taint Vulnerabilities:** No disponibles sin Connected Mode.
+- **Gate SonarQube Server:** N/A.
 
-### Conteo de issues (análisis local Roslyn + auditoría manual)
+### Conteo de issues (Roslyn local + auditoría manual)
 
 | Severidad | Total |
 |-----------|-------|
 | BLOCKER   | 0     |
-| CRITICAL  | 1     |
+| CRITICAL  | 0     |
 | MAJOR     | 3     |
-| MINOR     | 3     |
+| MINOR     | 2     |
 | INFO      | 0     |
 
-### Issues CRITICAL — Acción requerida
+### Issues BLOCKER y CRITICAL — Ninguno
 
-| # | Archivo | Línea | Regla | Mensaje | Severidad |
-|---|---------|-------|-------|---------|-----------|
-| 1 | `Cotizador.API/Program.cs` | 29–32 | OWASP-A05 / S5122 | CORS AllowAnyOrigin sin restricción de entorno — Security Hotspot confirmado | CRITICAL |
+No se detectaron issues BLOCKER ni CRITICAL en los 5 archivos backend auditados.
 
 ### Issues MAJOR — Revisión recomendada
 
-| # | Archivo | Línea | Regla | Mensaje |
-|---|---------|-------|-------|---------|
-| 1 | `Cotizador.API/Auth/BasicAuthHandler.cs` | 65–68 | S2486 / S1166 | Catch vacío swallows todas las excepciones sin logging |
-| 2 | `Cotizador.API/Middleware/ExceptionHandlingMiddleware.cs` | 49 | OWASP-A05 | ex.Message de CoreOhsUnavailableException expone paths internos al cliente HTTP |
-| 3 | `Cotizador.Domain/ValueObjects/*.cs` | — | SRP / DDD | Clases mutables sin value equality nombradas como ValueObjects — abstracción engañosa |
+| # | Archivo | Línea | Descripción |
+|---|---------|-------|-------------|
+| 1 | `FolioController.cs` + `QuoteController.cs` | 13 / 14 | Regex `FolioRegex` duplicada — código muerto en espera de divergencia |
+| 2 | `UpdateGeneralInfoUseCase.cs` | 58 | `InvalidQuoteStateException` con `string.Empty` pierde contexto de diagnóstico |
+| 3 | `useFolioSearch.ts` + `GeneralInfoForm.tsx` | 34 / 40 | Type assertion `err as {...}` sin type guard en runtime |
 
----
+### Revisión manual OWASP (sin Connected Mode)
 
-## Parte 3 — Verificación de reglas específicas SPEC-002
-
-### Optimistic locking
-- `BuildVersionedFilter` usa filtro compuesto `{ folioNumber, version }`: ✅
-- `ExecuteUpdateAsync` verifica `result.ModifiedCount == 0` y lanza `VersionConflictException`: ✅
-- Todos los métodos `Update*` y `PatchLocation*` usan este patrón: ✅
-
-### IQuoteRepository en Application/Ports
-- Interfaz correctamente ubicada en `Cotizador.Application/Ports/`: ✅
-- Todos los métodos retornan `Task<T>` con `CancellationToken`: ✅
-
-### Excepciones de dominio en Domain/Exceptions
-- `FolioNotFoundException`, `VersionConflictException`: ✅ — correctamente ubicadas y con propiedades de contexto
-- Ausencia de `InvalidQuoteStateException` — referenciada en middleware pero su ubicación no fue auditada (posiblemente ya existe)
-
-### ICoreOhsClient — inyección de parámetros en URL
-- `Uri.EscapeDataString()` aplicado en todos los parámetros de query string y path: ✅
+| Control OWASP | Estado | Observación |
+|---------------|--------|-------------|
+| A01 Broken Access Control | ✅ | `[Authorize]` en todos los controllers del scope |
+| A02 Cryptographic Failures | ✅ | Sin credenciales hardcodeadas; env vars en frontend |
+| A03 Injection | ✅ | MongoDB.Driver tipado; sin concatenación de queries |
+| A05 Misconfiguration | ✅ | No hay CORS en los controllers del scope |
+| A07 Auth Failures | ✅ | `[Authorize]` aplicado; `HttpContext.User.Identity.Name` usado correctamente |
 
 ---
 
@@ -131,16 +125,120 @@
 
 | Fuente | Estado |
 |--------|--------|
-| Auditoría arquitectura | FAIL — 1 crítico (CORS sin env guard) |
-| SonarQube local (Roslyn) | PASS — 0 BLOCKER, 0 CRITICAL adicionales |
+| Auditoría arquitectura — Backend Clean Architecture | PASS |
+| Auditoría arquitectura — Frontend FSD compliance | **FAIL — 2 críticos (CRIT-001, CRIT-002)** |
+| Auditoría arquitectura — ErrorBoundary en pages | **FAIL — 1 crítico (CRIT-003)** |
+| SonarQube Roslyn (local) | PASS — 0 BLOCKER, 0 CRITICAL |
+| SonarQube Server | N/A (sin Connected Mode) |
 | **Gate final** | **FAILED** |
 
-**Causa raíz del fallo:** La política CORS de `Program.cs` permite cualquier origen, cabecera y método HTTP en todos los entornos sin distinción. Esto es un Security Hotspot OWASP A05 confirmado que se aplicaría a producción tal como está el código. Debe resolverse antes de proceder a Fase 3.
+**Causa raíz:** 3 violaciones críticas de arquitectura — dos importaciones feature→feature en `general-info-form` (`SubscriberComboBox` y `RiskClassificationSelect`) y ausencia de `ErrorBoundary` en las tres páginas del scope. Deben resolverse antes de avanzar a `qa-agent`.
 
-Los issues MAYOR-001 (catch swallowed en BasicAuthHandler), MAYOR-002 (exposición de path interno en CoreOhsUnavailableException) y MAYOR-003 (mutable "ValueObjects") deben corregirse pero no bloquean el gate.
+Los issues MAYOR (MAY-001 a MAY-003) y MENOR (MIN-001 a MIN-002) deben ser corregidos pero no bloquean el gate.
 
 ---
 
-```
-QUALITY_GATE: FAILED — 1 violación crítica de arquitectura/seguridad, ver .github/docs/code-quality-report.md
-```
+# Reporte de calidad — SPEC-004 Proxy de Catálogos (catalog-proxy) — 2026-03-29
+
+> Alcance: 12 archivos nuevos en `cotizador-backend` (3 interfaces, 3 use cases, 1 controller, 4 test files + verificación de `Program.cs`).
+
+---
+
+## Parte 1 — Auditoría de arquitectura
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 0     | No              |
+| MAYOR     | 1     | No              |
+| MENOR     | 2     | No              |
+
+### Violaciones críticas
+
+Ninguna.
+
+### Violaciones mayores
+
+#### MAY-004
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Middleware/ExceptionHandlingMiddleware.cs` (archivo existente, modificado para la feature)
+- **Línea:** 48
+- **Regla:** ADR-008 — `message` debe estar en español
+- **Detalle:** El handler de `CoreOhsUnavailableException` retorna la respuesta 503 con mensaje en inglés: `"The reference data service is temporarily unavailable. Please try again later."`. Todos los mensajes visibles al cliente deben estar en español; solo el campo `type` permanece en inglés.
+- **Acción:** Reemplazar el literal por: `"El servicio de datos de referencia no está disponible temporalmente. Inténtelo de nuevo más tarde."`
+
+### Sugerencias menores
+
+#### MIN-003
+- **Archivo:** `cotizador-backend/src/Cotizador.Tests/Application/UseCases/GetAgentByCodeUseCaseTests.cs`
+- **Línea:** 36
+- **Regla:** Convención `[Trait]` — categorizar todos los tests
+- **Detalle:** El test `ExecuteAsync_Should_ReturnNull_WhenAgentDoesNotExist` carece de `[Trait("Category", ...)]`. El resto de tests del proyecto usa `[Trait("Category", "Smoke")]` o `[Trait("Category", "Regression")]` para organizar la ejecución por pipeline.
+- **Acción:** Añadir `[Trait("Category", "Regression")]`.
+
+#### MIN-004
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Controllers/CatalogController.cs`
+- **Línea:** 10
+- **Regla:** Convención de atributo de autenticación del proyecto
+- **Detalle:** El controller usa `[Authorize]` estándar de ASP.NET Core. Las instrucciones del proyecto indican el uso de `[BasicAuthorize]` como convención de equipo. En la práctica es inocuo porque `BasicAuth` es el único esquema registrado, pero genera inconsistencia con otros controllers.
+- **Acción:** Verificar si existe un atributo personalizado `[BasicAuthorize]` en `Cotizador.API/Auth/` y, de existir, reemplazar `[Authorize]` por `[BasicAuthorize]` para mantener coherencia.
+
+---
+
+## Checklist de los 8 puntos solicitados
+
+| # | Criterio | Estado | Detalle |
+|---|----------|--------|---------|
+| 1 | Clean Architecture: `API → Application`, sin referencia a Infrastructure | ✅ PASS | `CatalogController` importa únicamente `Cotizador.Application.DTOs`, `Cotizador.Application.Interfaces` y frameworks `Microsoft.AspNetCore.*`. Los use cases importan `Cotizador.Application.Ports.ICoreOhsClient` (interface definida en Application, no Infrastructure). |
+| 2 | Inyección por interfaz, no implementación concreta | ✅ PASS | Controller recibe `IGetSubscribersUseCase`, `IGetAgentByCodeUseCase`, `IGetRiskClassificationsUseCase`. Use cases reciben `ICoreOhsClient`. Ningún `new()` fuera del composition root. |
+| 3 | Tests siguen patrón AAA, sin estado mutable compartido | ✅ PASS | xUnit crea nueva instancia de clase por cada test. Mocks son campos de instancia (no `static`). `Sut` es una expression-bodied property (`=>`) que crea instancia fresca por acceso. `CatalogControllerTests.CreateController()` también es local a cada test. |
+| 4 | ADR-008: `type` en inglés, `message` en español | ⚠️ MAYOR | Controller ✅: `"validationError"` / `"Código de agente inválido"`, `"agentNotFound"` / `"El agente {code} no está registrado en el catálogo"`. Middleware ❌: respuesta 503 de `CoreOhsUnavailableException` en inglés (ver MAY-004). |
+| 5 | Envelope `{ "data": ... }` en todos los 200 | ✅ PASS | `GetSubscribersAsync` → `Ok(new { data = subscribers })`, `GetAgentByCodeAsync` → `Ok(new { data = agent })`, `GetRiskClassificationsAsync` → `Ok(new { data = classifications })`. |
+| 6 | 404 cuando agente no existe, no 500 | ✅ PASS | `GetAgentByCodeAsync` evalúa `agent is null` y retorna `NotFound(...)`. Test `GetAgentByCode_Should_Return404_WhenAgentNotFound` lo cubre con verificación de `StatusCodes.Status404NotFound` y `value.type == "agentNotFound"`. |
+| 7 | Validación de formato antes del use case | ✅ PASS | `AgentCodeRegex = new(@"^AGT-\d{3}$", RegexOptions.Compiled)` valida antes de llamar al use case. Test `GetAgentByCode_Should_Return400_WhenCodeFormatInvalid` verifica explícitamente `Times.Never` en la invocación del use case. |
+| 8 | 3 use cases registrados con `AddScoped` en `Program.cs` | ✅ PASS | `AddScoped<IGetSubscribersUseCase, GetSubscribersUseCase>()`, `AddScoped<IGetAgentByCodeUseCase, GetAgentByCodeUseCase>()`, `AddScoped<IGetRiskClassificationsUseCase, GetRiskClassificationsUseCase>()` — los tres presentes en la sección "Proxy catálogos (SPEC-004)". |
+
+---
+
+## Parte 2 — Análisis estático SonarQube
+
+### Resumen ejecutivo
+
+- **Project Key:** No registrado en servidor SonarQube (workspace sin Connected Mode)
+- **Archivos analizados:** 8 (3 use cases + 1 controller + 4 test files)
+- **Análisis:** Roslyn local vía SonarQube for IDE
+- **Gate SonarQube:** PASS
+
+### Conteo de issues
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 0     |
+| MAJOR     | 1     |
+| MINOR     | 0     |
+| INFO      | 0     |
+
+### Issues BLOCKER y CRITICAL — Ninguno
+
+### Issues MAJOR — Revisión recomendada
+
+| # | Archivo | Línea | Mensaje |
+|---|---------|-------|---------|
+| 1 | `Cotizador.API/Controllers/CatalogController.cs` | L12 | "This controller has multiple responsibilities and could be split into 3 smaller controllers." |
+
+> El MAJOR de SonarQube responde a que `CatalogController` agrupa 3 endpoints de tipos de catálogo distintos. Es una decisión de diseño de la spec (agrupar catálogos en un solo controller). Puede resolverse en una iteración futura si se añaden más endpoints al controller.
+
+---
+
+## Veredicto consolidado — SPEC-004 Proxy de Catálogos
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura | PASS — 0 críticos, 1 mayor, 2 menores |
+| SonarQube (Roslyn local) | PASS — 0 BLOCKER, 0 CRITICAL, 1 MAJOR |
+| **Gate final** | **PASSED** |
+
+El único MAYOR (ADR-008 en mensaje 503 del middleware existente) no es una violación crítica de arquitectura. Los 8 puntos de verificación explícitos están aprobados.
+
+---

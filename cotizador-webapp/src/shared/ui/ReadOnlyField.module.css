@@ -1,0 +1,36 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-container-low);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+}
+
+.value {
+  font-size: 0.9375rem;
+  color: var(--color-on-surface-variant);
+}
+
+.chip {
+  background: #fff4e5;
+  color: #b45d03;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 0.125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

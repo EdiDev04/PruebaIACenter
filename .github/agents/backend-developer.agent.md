@@ -95,6 +95,7 @@ cotizador-backend/src/
 8. Controller         → Cotizador.API/Controllers/
 9. Program.cs         → registrar settings y nuevos servicios
 10. appsettings.json  → añadir sección de configuración
+11. BUILD VERIFICATION → compilar solución y corregir errores hasta build verde ✅
 ```
 
 Nunca saltarse el orden. Nunca implementar lógica de negocio fuera de Application.
@@ -219,6 +220,61 @@ No aplica en: `POST /calculate`.
 
 Lee `.github/docs/business-rules.md` completo antes de implementar `CalculateQuoteUseCase`. Ese documento es la fuente de verdad — las fórmulas, criterios de calculabilidad y estructura del resultado están ahí. Si algo es ambiguo → notificar al usuario antes de implementar.
 
+## Verificación de compilación — OBLIGATORIO antes de finalizar
+
+> **Regla de oro**: el feature NO está completo hasta que `dotnet build` retorne exit code 0 con 0 errores. Ningún handoff ni declaración de completitud puede ocurrir antes.
+
+### Flujo de verificación (iterar hasta BUILD VERDE)
+
+```bash
+# Paso 1 — compilar la solución completa desde la raíz del backend
+cd cotizador-backend && dotnet build Cotizador.sln --no-incremental 2>&1
+```
+
+### Interpretar el resultado
+
+| Resultado | Acción |
+|-----------|--------|
+| `Build succeeded. 0 Error(s)` | ✅ BUILD VERDE — puede continuar al handoff |
+| `Error(s)` > 0 | 🔴 BUILD ROJO — leer cada error, corregir, volver al Paso 1 |
+| `Warning(s)` > 0 | ⚠️ Registrar advertencias; no bloquean, pero deben evaluarse |
+
+### Ciclo de corrección de errores
+
+```
+BUILD ROJO
+  ↓
+Leer errores del output (archivo, línea, mensaje)
+  ↓
+Corregir el archivo afectado
+  ↓
+cotizador-backend → dotnet build Cotizador.sln --no-incremental
+  ↓
+¿0 errores? → BUILD VERDE ✅  :  Repetir ciclo
+```
+
+### Causas comunes y cómo resolverlas
+
+| Error típico | Causa | Corrección |
+|---|---|---|
+| `CS0246` tipo no encontrado | falta `using` o referencia de proyecto | agregar `using` o `<ProjectReference>` en `.csproj` |
+| `CS0534` miembro de interfaz no implementado | interfaz actualizada sin implementar método | implementar el método faltante |
+| `CS0115` override sin método base | firma diferente al método de la interfaz | alinear firma con la interfaz |
+| `CS8618` propiedad no nullable sin inicializar | propiedad de dominio/DTO sin valor default | agregar `= string.Empty` o `= new()` |
+| `CS0103` nombre no existe en contexto | namespace incorrecto o clase no encontrada | verificar namespace y archivos existentes |
+
+### Regla de cierre
+
+```
+✅ BUILD VERDE confirmado
+   → Reportar: "Build exitoso: 0 errores, N advertencias"
+   → Proceder al handoff (Tests / Frontend / Orchestrator)
+
+🔴 BUILD ROJO después de 3 iteraciones sin progreso
+   → Detener y reportar al usuario con: archivo, línea y mensaje de error exacto
+   → NO proceder al handoff hasta resolución
+```
+
 ## Restricciones
 
 - SOLO trabajar en `cotizador-backend/src/`
@@ -230,3 +286,4 @@ Lee `.github/docs/business-rules.md` completo antes de implementar `CalculateQuo
 - NO modificar entidades de `Cotizador.Domain/` — responsabilidad de `database-agent`
 - NO hardcodear valores de configuración — usar modelos `*Settings`
 - NO leer `IConfiguration` fuera de `Program.cs`
+- NO declarar el feature completo sin BUILD VERDE confirmado

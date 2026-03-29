@@ -1,0 +1,32 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  text-align: center;
+}
+
+.step {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--color-outline);
+  background: var(--color-surface-container-low);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}

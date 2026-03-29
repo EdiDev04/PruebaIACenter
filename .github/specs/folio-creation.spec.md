@@ -1,6 +1,6 @@
 ---
 id: SPEC-003
-status: DRAFT
+status: APPROVED
 feature: folio-creation
 feature_type: full-stack
 requires_design_spec: true

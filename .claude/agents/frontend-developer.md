@@ -18,6 +18,10 @@ OBLIGATORIOS:
 ├── .github/specs/<feature>.spec.md                        → Spec técnica (contratos, modelos, estado)
 ├── ARCHITECTURE.md                                        → Stack, capas FSD, separación de estado
 
+CONTRATOS DE INTEGRACIÓN (si existen — fuente de verdad para API calls):
+├── .github/docs/integration-contracts.md                  → Contratos FE ↔ BE verificados por el agente integration
+│   └── Sección "Contratos FE ↔ BE"                        → Rutas, request/response, errores, query keys, invalidación
+
 DESIGN SPECS (si existen — consumir como referencia obligatoria):
 ├── .github/design-specs/<feature>.design.md               → Design spec: UX, componentes, behavioral annotations
 ├── .github/design-specs/screens/<feature>/*.html          → HTML/CSS de referencia visual (generado por Stitch)
@@ -25,6 +29,8 @@ DESIGN SPECS (si existen — consumir como referencia obligatoria):
 ```
 
 **Regla**: Si existe `.github/design-specs/<feature>.design.md`, es **input obligatorio**. No implementar sin haberlo leído.
+
+**Regla**: Si existe `.github/docs/integration-contracts.md`, la sección **"Contratos FE ↔ BE"** es la fuente de verdad para las API calls del frontend. Prevalece sobre cualquier suposición.
 
 ---
 
@@ -80,6 +86,34 @@ Si hay conflicto entre el design spec y la spec técnica:
 | **Validación UX (triggers, mensajes)** | Design spec (`.design.md`) | Cuándo validar, qué mensaje mostrar, dónde mostrar feedback |
 | **Zod schemas** | Design spec (`.design.md`) | Si el design spec define schemas por step con validación parcial, implementarlos así |
 | **Separación de estado (Query vs Redux)** | Spec técnica (`.spec.md`) | La spec técnica define qué dato es server state vs UI state |
+
+---
+
+## Contratos de integración FE ↔ BE (cuando existen)
+
+El agente `integration` genera `.github/docs/integration-contracts.md` con contratos verificados entre el frontend y el backend. Si este archivo existe, **consumirlo como fuente de verdad** para implementar las API calls.
+
+### Qué consumir de la sección "Contratos FE ↔ BE"
+
+| Dato del contrato | Cómo aplicar en el frontend |
+|---|---|
+| **Ruta del endpoint** | Usar exactamente esa ruta en el API helper (`entities/<entidad>/api/`) |
+| **Request esperado** | Los campos del body/params del fetch deben coincidir exactamente |
+| **Response esperado** | Los tipos TypeScript deben mapear 1:1 con el JSON del response |
+| **Errores manejados** | Implementar manejo de CADA código de error listado (400, 404, 409, 422, 503) |
+| **Hook/Query** | Usar el hook indicado (`useQuery` o `useMutation`) con la query key especificada |
+| **Invalidación de caché** | Aplicar la estrategia de invalidación indicada tras cada mutación |
+
+### Regla de precedencia con contratos
+
+| Fuente | Prevalece para |
+|---|---|
+| **Contrato FE ↔ BE** (`integration-contracts.md`) | Rutas exactas, campos de request/response, códigos de error, query keys |
+| **Spec técnica** (`<feature>.spec.md` §3.4) | Lógica de negocio, estructura de DTOs, validaciones del backend |
+| **Spec técnica** (`<feature>.spec.md` §3.6) | Estructura FSD de archivos a crear |
+| **Design spec** (`.design.md`) | Layout, UX, triggers de validación, Zod schemas |
+
+Si hay discrepancia entre el contrato de integración y la spec técnica en cuanto a campos de request/response → **reportar al orquestador** como posible CONTRACT_DRIFT antes de implementar.
 
 ---
 
@@ -284,17 +318,20 @@ Si el DESIGN-SYSTEM.md define reglas de accesibilidad, implementarlas todas. Si 
 - NO usar rojo para estados "incompletos" — rojo es solo para errores reales.
 - NO usar jerga de seguros en textos de UI — seguir el lenguaje definido en DESIGN-SYSTEM.md.
 - `strict: true` en tsconfig — NUNCA usar `any`.
+- NO inventar rutas de API — usar las rutas exactas del contrato de integración FE ↔ BE.
+- NO omitir manejo de errores documentados en el contrato — cada código (400, 404, 409, 422, 503) requiere un handler en el FE.
+- Si detectas discrepancia entre el contrato y la spec → reportar CONTRACT_DRIFT, no improvisar.
 
 ---
 
 ## Orden de implementación por feature
 
 ```
-1. Leer spec técnica + design spec + screens HTML
-2. shared/api/       → endpoints nuevos en el cliente HTTP
+1. Leer spec técnica + contratos de integración FE↔BE + design spec + screens HTML
+2. shared/api/       → endpoints nuevos en el cliente HTTP (rutas EXACTAS del contrato de integración)
 3. shared/ui/        → componentes primitivos nuevos (DerivedField, ProgressStepper, etc.)
-4. entities/         → tipos TS, schemas Zod, hooks de datos
-5. features/         → interacciones de usuario con behavioral annotations
+4. entities/         → tipos TS (alineados con response del contrato), schemas Zod, hooks de datos (query keys del contrato)
+5. features/         → interacciones de usuario con behavioral annotations + manejo de TODOS los errores del contrato
 6. widgets/          → bloques compuestos (LocationSummaryBar, etc.)
 7. pages/            → ensamblado final + router
 8. app/              → actualizar router si hay rutas nuevas

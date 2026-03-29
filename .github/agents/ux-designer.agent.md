@@ -27,7 +27,7 @@ handoffs:
     prompt: El design spec y las pantallas de referencia están en .github/design-specs/. Implementa el frontend consumiendo el design spec como input obligatorio.
     send: false
   - label: Orquestar flujo ASDD completo
-    agent: Orchestrator
+    agent: orchestrator
     prompt: Los diseños están listos en .github/design-specs/. Continúa el flujo ASDD.
     send: false
 ---
