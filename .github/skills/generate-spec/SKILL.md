@@ -23,10 +23,11 @@ Si el requerimiento no cumple el DoR → listar las preguntas pendientes antes d
 
 1. Busca requerimiento en `.github/requirements/<feature>.md` (si existe, úsalo)
 2. Lee las instrucciones de stack: `.github/instructions/backend.instructions.md`
-3. Explora código existente — no duplicar modelos, Use Cases ni endpoints existentes
-4. Valida DoR (arriba) — si hay ambigüedades, lista preguntas antes de continuar
-5. Usa plantilla: `.github/skills/generate-spec/spec-template.md` EXACTAMENTE
-6. Guarda en `.github/specs/<nombre-en-kebab-case>.spec.md`
+3. Lee las decisiones de arquitectura en `.github/docs/architecture-decisions.md`
+4. Explora código existente — no duplicar modelos, Use Cases ni endpoints existentes
+5. Valida DoR (arriba) — si hay ambigüedades, lista preguntas antes de continuar
+6. Usa plantilla: `.github/skills/generate-spec/spec-template.md` EXACTAMENTE
+7. Guarda en `.github/specs/<nombre-en-kebab-case>.spec.md`
 
 ## Frontmatter obligatorio
 

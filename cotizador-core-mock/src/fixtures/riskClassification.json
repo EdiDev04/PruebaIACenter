@@ -1,0 +1,5 @@
+[
+  { "code": "standard", "description": "Riesgo estándar", "factor": 1.0 },
+  { "code": "preferred", "description": "Riesgo preferente — perfil de riesgo bajo", "factor": 0.85 },
+  { "code": "substandard", "description": "Riesgo subestándar — perfil de riesgo alto", "factor": 1.25 }
+]

@@ -1,0 +1,7 @@
+[
+  { "code": "BL-001", "description": "Bodega de almacenamiento", "fireKey": "B-03", "riskLevel": "medium" },
+  { "code": "BL-002", "description": "Tienda de retail", "fireKey": "C-01", "riskLevel": "low" },
+  { "code": "BL-003", "description": "Planta química", "fireKey": "A-07", "riskLevel": "high" },
+  { "code": "BL-004", "description": "Edificio de oficinas", "fireKey": "D-02", "riskLevel": "low" },
+  { "code": "BL-005", "description": "Restaurante", "fireKey": "E-04", "riskLevel": "medium" }
+]

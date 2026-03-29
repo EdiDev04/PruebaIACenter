@@ -1,0 +1,8 @@
+{
+  "expeditionExpenses": 0.05,
+  "agentCommission": 0.10,
+  "issuingRights": 0.03,
+  "iva": 0.16,
+  "surcharges": 0.02,
+  "effectiveDate": "2026-01-01"
+}

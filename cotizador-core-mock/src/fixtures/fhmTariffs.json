@@ -1,0 +1,8 @@
+[
+  { "group": 1, "zone": "A", "condition": "standard", "rate": 0.0028 },
+  { "group": 1, "zone": "B", "condition": "standard", "rate": 0.0018 },
+  { "group": 1, "zone": "C", "condition": "standard", "rate": 0.0012 },
+  { "group": 2, "zone": "A", "condition": "standard", "rate": 0.0032 },
+  { "group": 2, "zone": "B", "condition": "reinforced", "rate": 0.0014 },
+  { "group": 2, "zone": "C", "condition": "reinforced", "rate": 0.0009 }
+]

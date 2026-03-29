@@ -1,0 +1,16 @@
+[
+  { "key": "building_fire", "name": "Incendio Edificios", "description": "Cobertura base sobre la construcción contra incendio", "category": "fire", "requiresInsuredAmount": true },
+  { "key": "contents_fire", "name": "Incendio Contenidos", "description": "Cobertura sobre bienes muebles e inventarios contra incendio", "category": "fire", "requiresInsuredAmount": true },
+  { "key": "coverage_extension", "name": "Extensión de Cobertura", "description": "Riesgos adicionales sobre incendio (daño por agua, explosión, etc.)", "category": "fire", "requiresInsuredAmount": true },
+  { "key": "cat_tev", "name": "CAT TEV", "description": "Catástrofe — Terremoto, Erupción Volcánica", "category": "cat", "requiresInsuredAmount": true },
+  { "key": "cat_fhm", "name": "CAT FHM", "description": "Catástrofe — Fenómenos Hidrometeorológicos (huracán, inundación)", "category": "cat", "requiresInsuredAmount": true },
+  { "key": "debris_removal", "name": "Remoción de Escombros", "description": "Costos de limpieza post-siniestro", "category": "additional", "requiresInsuredAmount": true },
+  { "key": "extraordinary_expenses", "name": "Gastos Extraordinarios", "description": "Erogaciones adicionales derivadas del siniestro", "category": "additional", "requiresInsuredAmount": true },
+  { "key": "rent_loss", "name": "Pérdida de Rentas", "description": "Lucro cesante por inhabilitación del inmueble", "category": "additional", "requiresInsuredAmount": true },
+  { "key": "business_interruption", "name": "Interrupción de Negocio", "description": "Pérdida de utilidades por interrupción del negocio", "category": "additional", "requiresInsuredAmount": true },
+  { "key": "electronic_equipment", "name": "Equipo Electrónico", "description": "Cobertura all-risk para equipos electrónicos", "category": "special", "requiresInsuredAmount": true },
+  { "key": "theft", "name": "Robo", "description": "Robo con violencia y/o asalto", "category": "special", "requiresInsuredAmount": true },
+  { "key": "cash_and_securities", "name": "Dinero y Valores", "description": "Efectivo, cheques, títulos en caja fuerte o en tránsito", "category": "special", "requiresInsuredAmount": true },
+  { "key": "glass", "name": "Vidrios", "description": "Rotura accidental de cristales", "category": "special", "requiresInsuredAmount": false },
+  { "key": "illuminated_signs", "name": "Anuncios Luminosos", "description": "Daño a letreros y señalética iluminada", "category": "special", "requiresInsuredAmount": false }
+]

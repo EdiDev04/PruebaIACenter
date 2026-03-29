@@ -1,0 +1,5 @@
+[
+  { "code": "SUB-001", "name": "María González López", "office": "CDMX Central", "active": true },
+  { "code": "SUB-002", "name": "Carlos Ramírez Torres", "office": "Guadalajara Norte", "active": true },
+  { "code": "SUB-003", "name": "Ana Martínez Ruiz", "office": "Monterrey Sur", "active": true }
+]

@@ -1,0 +1,5 @@
+[
+  { "code": "AGT-001", "name": "Roberto Hernández", "region": "Centro", "active": true },
+  { "code": "AGT-002", "name": "Laura Sánchez", "region": "Occidente", "active": true },
+  { "code": "AGT-003", "name": "Pedro Díaz", "region": "Norte", "active": true }
+]
