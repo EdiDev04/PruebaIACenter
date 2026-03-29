@@ -164,7 +164,7 @@ Cada ubicación puede tener activas una o varias de estas coberturas:
 {
   "numeroFolio": "DAN-2025-00142",
   "estadoCotizacion": "en_proceso",
-  "datosAsegurado": { "nombre": "...", "rfc": "..." },
+  "datosAsegurado": { "nombre": "...", "rfc": "...", "email": "..." (opcional), "telefono": "..." (opcional) },
   "datosConduccion": { "suscriptor": "...", "oficina": "..." },
   "codigoAgente": "AGT-001",
   "calificacionRiesgo": "estandar",

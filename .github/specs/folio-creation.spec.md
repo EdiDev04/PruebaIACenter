@@ -132,12 +132,14 @@ Flujo de ejecución:
   Fase 1.5 (core-ohs):       NO APLICA — endpoint GET /v1/folios/next ya implementado (SPEC-001)
   Fase 1.5 (business-rules): NO APLICA
   Fase 1.5 (database-agent): NO APLICA — entidades y repositorio ya implementados (SPEC-002)
+  Fase 2 integration:        APLICA — valida contrato GET /v1/folios/next (mock ↔ cliente HTTP)
   Fase 2 backend-developer:  APLICA — Use Cases + Controller
   Fase 2 frontend-developer: APLICA — página, features y entities
 
 Bloqueos de ejecución:
   - frontend-developer NO puede iniciar si design_spec.status != APPROVED
   - backend-developer puede iniciar inmediatamente tras spec.status == APPROVED
+  - integration puede iniciar en paralelo con backend-developer tras spec.status == APPROVED
 ```
 
 ### 3.2 Design Spec
@@ -446,6 +448,7 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
         ├── [ux-designer]        (Fase 0.5, requires_design_spec=true)
         │       └── design.status=APPROVED → desbloquea frontend-developer
         │
+        ├── [integration]        (Fase 2, paralelo — valida contratos core-ohs)
         ├── [backend-developer]  (Fase 2, no bloqueado — SPEC-002 ya implementó Domain + Repository)
         └── [frontend-developer] (Fase 2, BLOQUEADO hasta design.status=APPROVED)
                 │
@@ -458,6 +461,7 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
 | Agente | Bloqueado por | Condición de desbloqueo |
 |---|---|---|
 | `ux-designer` | `spec-generator` | `specs/folio-creation.spec.md` → `status: APPROVED` |
+| `integration` | `spec-generator` | `specs/folio-creation.spec.md` → `status: APPROVED` |
 | `backend-developer` | `spec-generator` | `specs/folio-creation.spec.md` → `status: APPROVED` |
 | `frontend-developer` | `ux-designer` | `design-specs/folio-creation.design.md` → `status: APPROVED` |
 | `test-engineer-backend` | `backend-developer` | Implementación backend completa |
@@ -475,7 +479,15 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
 
 ## 8. LISTA DE TAREAS
 
-### 8.1 backend-developer
+### 8.1 integration
+
+- [ ] Documentar contrato `GET /v1/folios/next` en `.github/docs/integration-contracts.md`: request, response 200, manejo de errores
+- [ ] Verificar que `cotizador-core-mock/src/routes/folioRoutes.ts` expone `GET /v1/folios/next` con response `{ "data": { "folioNumber": "DAN-YYYY-NNNNN" } }`
+- [ ] Verificar que `CoreOhsClient.GenerateFolioAsync()` mapea correctamente a `FolioDto`
+- [ ] Verificar que `CoreOhsClient` transforma timeout/5xx en `CoreOhsUnavailableException`
+- [ ] Reportar CONTRACT_DRIFT si hay discrepancias entre mock, cliente HTTP y spec §3.5
+
+### 8.2 backend-developer
 
 - [ ] Crear `ICreateFolioUseCase` en `Cotizador.Application/Interfaces/`
 - [ ] Implementar `CreateFolioUseCase` en `Cotizador.Application/UseCases/`
@@ -494,7 +506,7 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
 - [ ] Registrar Use Cases en `Program.cs`: `AddScoped<ICreateFolioUseCase, CreateFolioUseCase>()`, `AddScoped<IGetQuoteSummaryUseCase, GetQuoteSummaryUseCase>()`
 - [ ] Mensajes de error en español (ADR-008)
 
-### 8.2 frontend-developer
+### 8.3 frontend-developer
 
 - [ ] Inicializar proyecto `cotizador-webapp` con Vite + React 18 + TypeScript
 - [ ] Configurar `app/providers/AppProviders.tsx` (QueryClient, Redux store, Router, ErrorBoundary)
@@ -516,7 +528,7 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
 - [ ] Configurar `app/router/router.tsx` con ruta `/cotizador`
 - [ ] Strings UI en español (ADR-008)
 
-### 8.3 test-engineer-backend
+### 8.4 test-engineer-backend
 
 - [ ] `CreateFolioUseCaseTests` — creación exitosa (verify Create + GenerateFolio calls)
 - [ ] `CreateFolioUseCaseTests` — idempotencia (verify GetByIdempotencyKey retorna existente)
@@ -528,7 +540,7 @@ Ninguno requerido. El primer folio se genera al usar el sistema.
 - [ ] `FolioControllerTests` — POST exitoso → 201 con envelope `{ data: {...} }`
 - [ ] `FolioControllerTests` — GET existente → 200 con envelope `{ data: {...} }`
 
-### 8.4 test-engineer-frontend
+### 8.5 test-engineer-frontend
 
 - [ ] `CreateFolioCard.test.tsx` — renderiza botón, invoca mutación en clic
 - [ ] `OpenFolioCard.test.tsx` — validación de formato (Zod), error al ingresar formato inválido

@@ -25,7 +25,7 @@ estimated-complexity: M
 
 ## 1. RESUMEN EJECUTIVO
 
-Implementar la consulta y guardado de los datos generales de una cotización: datos del asegurado (nombre, RFC), datos de conducción (suscriptor, oficina), agente asociado, tipo de negocio y clasificación de riesgo. Corresponde al Step 1 del wizard (ADR-005). Los catálogos de suscriptores, agentes y clasificación de riesgo se consultan desde `cotizador-core-mock`. El backend valida la existencia del agente y suscriptor contra core-ohs antes de persistir. Los valores válidos de `businessType` se configuran vía `appsettings.json`. Este feature junto con SPEC-003 forma el primer flujo CRUD completo del sistema.
+Implementar la consulta y guardado de los datos generales de una cotización: datos del asegurado (nombre, RFC, y opcionalmente correo electrónico y teléfono), datos de conducción (suscriptor, oficina), agente asociado, tipo de negocio y clasificación de riesgo. Corresponde al Step 1 del wizard (ADR-005). Los catálogos de suscriptores, agentes y clasificación de riesgo se consultan desde `cotizador-core-mock`. El backend valida la existencia del agente y suscriptor contra core-ohs antes de persistir. Los valores válidos de `businessType` se configuran vía `appsettings.json`. Este feature junto con SPEC-003 forma el primer flujo CRUD completo del sistema.
 
 ---
 
@@ -33,7 +33,7 @@ Implementar la consulta y guardado de los datos generales de una cotización: da
 
 ### 2.1 Historias de usuario
 
-**HU-004-01**: Como usuario del cotizador, quiero capturar los datos del asegurado (nombre, RFC) para identificar al cliente de la póliza.
+**HU-004-01**: Como usuario del cotizador, quiero capturar los datos del asegurado (nombre, RFC, y opcionalmente correo electrónico y teléfono) para identificar y contactar al cliente de la póliza.
 
 **Criterios de aceptación (Gherkin):**
 
@@ -42,12 +42,17 @@ Implementar la consulta y guardado de los datos generales de una cotización: da
   **Entonces** el sistema retorna HTTP 200 con los campos de datos generales vacíos o con valores por defecto
   **Y** el response incluye `version` actual del folio
 
-- **Dado** que capturo nombre `"Grupo Industrial SA de CV"` y RFC `"GIN850101AAA"`
+- **Dado** que capturo nombre `"Grupo Industrial SA de CV"`, RFC `"GIN850101AAA"`, email `"contacto@grupoindustrial.com"` y teléfono `"5551234567"`
   **Cuando** envío `PUT /v1/quotes/DAN-2026-00001/general-info` con esos datos y `version: 1`
-  **Entonces** el sistema persiste solo la sección de datos generales
+  **Entonces** el sistema persiste solo la sección de datos generales (incluyendo email y teléfono como opcionales)
   **Y** incrementa `version` a 2
   **Y** actualiza `metadata.updatedAt`
   **Y** retorna HTTP 200 con `{ "data": { ...datosActualizados } }`
+
+- **Dado** que capturo solo nombre `"Empresa XYZ SA"` y RFC `"EXY900515BBB"` sin email ni teléfono
+  **Cuando** envío `PUT /v1/quotes/DAN-2026-00001/general-info` con esos datos y `version: 1`
+  **Entonces** el sistema persiste con `email: null` y `phone: null`
+  **Y** la operación se completa exitosamente
 
 ---
 
@@ -161,12 +166,14 @@ Flujo de ejecución:
   Fase 1.5 (core-ohs):       NO APLICA — endpoints de catálogos ya implementados (SPEC-001)
   Fase 1.5 (business-rules): NO APLICA
   Fase 1.5 (database-agent): NO APLICA — repositorio ya implementado (SPEC-002)
+  Fase 2 integration:        APLICA — valida contratos: agents, subscribers, risk-classification (mock ↔ cliente HTTP)
   Fase 2 backend-developer:  APLICA — Use Cases + Controller + Validadores + Configuración
   Fase 2 frontend-developer: APLICA — página, formulario, queries de catálogos
 
 Bloqueos de ejecución:
   - frontend-developer NO puede iniciar si design_spec.status != APPROVED
   - backend-developer puede iniciar inmediatamente tras spec.status == APPROVED
+  - integration puede iniciar en paralelo con backend-developer tras spec.status == APPROVED
 ```
 
 ### 3.2 Design Spec
@@ -575,6 +582,7 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
         ├── [ux-designer]        (Fase 0.5, requires_design_spec=true)
         │       └── design.status=APPROVED → desbloquea frontend-developer
         │
+        ├── [integration]        (Fase 2, paralelo — valida contratos core-ohs)
         ├── [backend-developer]  (Fase 2, no bloqueado — SPEC-002 ya implementó Domain + Repository)
         └── [frontend-developer] (Fase 2, BLOQUEADO hasta design.status=APPROVED)
                 │
@@ -587,6 +595,7 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 | Agente | Bloqueado por | Condición de desbloqueo |
 |---|---|---|
 | `ux-designer` | `spec-generator` | `specs/general-info-management.spec.md` → `status: APPROVED` |
+| `integration` | `spec-generator` | `specs/general-info-management.spec.md` → `status: APPROVED` |
 | `backend-developer` | `spec-generator` | `specs/general-info-management.spec.md` → `status: APPROVED` |
 | `frontend-developer` | `ux-designer` | `design-specs/general-info-management.design.md` → `status: APPROVED` |
 | `test-engineer-backend` | `backend-developer` | Implementación backend completa |
@@ -604,7 +613,20 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 
 ## 8. LISTA DE TAREAS
 
-### 8.1 backend-developer
+### 8.1 integration
+
+- [ ] Documentar contrato `GET /v1/agents?code={code}` en `.github/docs/integration-contracts.md`: request, response 200, response 404
+- [ ] Documentar contrato `GET /v1/subscribers` en `.github/docs/integration-contracts.md`: request, response 200
+- [ ] Documentar contrato `GET /v1/catalogs/risk-classification` en `.github/docs/integration-contracts.md`: request, response 200
+- [ ] Verificar que `cotizador-core-mock/src/routes/agentRoutes.ts` responde 404 con `{ "type": "AgentNotFoundException", "message": "..." }` cuando el agente no existe
+- [ ] Verificar que `cotizador-core-mock/src/routes/subscriberRoutes.ts` retorna `{ "data": [...] }` con campos `code`, `name`, `office`, `active`
+- [ ] Verificar que `cotizador-core-mock/src/routes/catalogRoutes.ts` ruta `/risk-classification` retorna `{ "data": [...] }` con campos `code`, `description`, `factor`
+- [ ] Verificar que `CoreOhsClient.GetAgentByCodeAsync()` mapea correctamente response 200 → `AgentDto` y response 404 → `null`
+- [ ] Verificar que `CoreOhsClient.GetSubscribersAsync()` mapea a `List<SubscriberDto>`
+- [ ] Verificar que `CoreOhsClient.GetRiskClassificationsAsync()` mapea a `List<RiskClassificationDto>`
+- [ ] Reportar CONTRACT_DRIFT si hay discrepancias entre mock, cliente HTTP y spec §3.5
+
+### 8.2 backend-developer
 
 - [ ] Crear `BusinessTypeSettings` en `Cotizador.Application/Settings/`
 - [ ] Agregar sección `"BusinessTypes"` en `appsettings.json` y `appsettings.Development.json`
@@ -635,7 +657,7 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 - [ ] Registrar Use Cases en `Program.cs`
 - [ ] Mensajes de error en español (ADR-008)
 
-### 8.2 frontend-developer
+### 8.3 frontend-developer
 
 - [ ] Crear `entities/general-info/` — types, schema Zod, query, api
 - [ ] Crear `entities/subscriber/` — types, query (staleTime 30min), api
@@ -644,13 +666,14 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 - [ ] Crear `features/save-general-info/` — `useSaveGeneralInfo` mutation + `SaveGeneralInfoButton`
 - [ ] Crear `widgets/general-info-form/` — formulario con React Hook Form + Zod, secciones: asegurado, conducción, agente, negocio, riesgo
 - [ ] Crear `pages/general-info/` — `GeneralInfoPage` ensambla el widget
-- [ ] Integrar `useFormPersist` (ADR-007) para persistir formulario en `sessionStorage`
+- [ ] Crear `shared/lib/useFormPersist.ts` — hook genérico que serializa `form.getValues()` a `sessionStorage` cada 3s (debounced), restaura al montar, y limpia tras `mutation.onSuccess` (implementación definida en ADR-007)
+- [ ] Integrar `useFormPersist` en el formulario de general-info con key `wizard:{folio}:step:1`
 - [ ] Agregar ruta `/quotes/:folio/general-info` en `app/router/router.tsx`
 - [ ] Agregar endpoints en `shared/api/endpoints.ts`
 - [ ] Labels, placeholders, mensajes de error y validación en español (ADR-008)
 - [ ] Strings en: `entities/general-info/strings.ts`, `features/save-general-info/strings.ts`
 
-### 8.3 test-engineer-backend
+### 8.4 test-engineer-backend
 
 - [ ] `GetGeneralInfoUseCaseTests` — folio con datos → retorna DTO mapeado
 - [ ] `GetGeneralInfoUseCaseTests` — folio sin datos (recién creado) → retorna campos vacíos
@@ -669,7 +692,7 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 - [ ] `QuoteControllerTests` — PUT general-info válido → 200 con version incrementada
 - [ ] `QuoteControllerTests` — PUT general-info folio inválido → 400
 
-### 8.4 test-engineer-frontend
+### 8.5 test-engineer-frontend
 
 - [ ] `GeneralInfoForm.test.tsx` — renderiza campos, carga catálogos via mock
 - [ ] `GeneralInfoForm.test.tsx` — validación Zod: nombre vacío muestra error
