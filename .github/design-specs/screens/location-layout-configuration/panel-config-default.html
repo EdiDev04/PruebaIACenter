@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cotizador de Daños - Configurar Vista</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-surface": "#24334a", outline: "#6c7b96", "surface-container-highest": "#d5e3ff", primary: "#1554d9", "primary-container": "#4878fd", "on-tertiary-fixed-variant": "#006c2d", "on-secondary": "#fff7f4", "secondary-container": "#ffdcc3", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#969dac", "tertiary-fixed-dim": "#73f08c", "on-tertiary-fixed": "#004c1d", "surface-dim": "#cbdbf9", "surface-tint": "#1554d9", secondary: "#914d00", "on-secondary-fixed": "#633300", "on-background": "#24334a", "on-tertiary": "#e9ffe6", "surface-container-low": "#f0f3ff", "on-secondary-fixed-variant": "#8c4a00", "on-error-container": "#6e0523", "surface-variant": "#d5e3ff", "on-error": "#fff7f7", "tertiary-fixed": "#82ff99", tertiary: "#006e2e", "tertiary-container": "#82ff99", "on-primary-fixed": "#ffffff", "on-primary-fixed-variant": "#fefcff", surface: "#f9f9ff", background: "#f9f9ff", "surface-container-high": "#dee8ff", "on-surface-variant": "#506079", "surface-container": "#e7eeff", error: "#a8364b", "surface-bright": "#f9f9ff", "on-primary-container": "#000000", "primary-fixed": "#4878fd", "inverse-surface": "#070e19", "error-container": "#f97386", "inverse-primary": "#638aff", "on-primary": "#faf8ff", "on-tertiary-container": "#006127", "secondary-fixed-dim": "#ffcaa1", "on-secondary-container": "#7e4200", "outline-variant": "#a3b3cf", "primary-fixed-dim": "#386bef", "secondary-fixed": "#ffdcc3", "secondary-dim": "#804300", "tertiary-dim": "#006127", "primary-dim": "#0047c6", "error-dim": "#6b0221"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface overflow-hidden">
+<!-- Main Content Underlay (Blurred Grid) -->
+<div class="fixed inset-0 z-0 blur-sm brightness-90 bg-surface">
+<!-- TopAppBar Placeholder -->
+<header class="flex justify-between items-center px-8 py-3 w-full sticky top-0 z-40 bg-white border-b-0">
+<div class="text-xl font-bold tracking-tight text-slate-900 font-headline">Cotizador de Daños</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-500">notifications</span>
+<span class="material-symbols-outlined text-slate-500">help_outline</span>
+</div>
+</header>
+<!-- Grid Underlay -->
+<main class="p-8">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h1 class="font-headline font-bold text-3xl text-on-surface">Ubicaciones del Riesgo</h1>
+<p class="text-on-surface-variant text-sm mt-1 italic">Gestión de activos y puntos de interés asegurables.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-high px-4 py-2 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filtrar
+                    </button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">settings</span> Configurar
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Underlay -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-8 bg-surface-container-lowest rounded-xl h-[400px] border-l-4 border-primary"></div>
+<div class="col-span-4 bg-surface-container-low rounded-xl h-[400px]"></div>
+<div class="col-span-12 bg-white rounded-xl h-[200px]"></div>
+</div>
+</main>
+</div>
+<!-- Backdrop Overlay -->
+<div class="fixed inset-0 bg-on-surface/20 z-40 backdrop-blur-[2px]"></div>
+<!-- Configuration Drawer -->
+<aside class="fixed top-0 right-0 h-full w-[360px] bg-surface-container-lowest z-50 shadow-2xl flex flex-col border-l-0">
+<!-- Header -->
+<div class="flex items-center justify-between p-6 pb-4">
+<div class="flex items-center gap-3">
+<h2 class="font-headline font-bold text-xl text-on-surface">Configurar vista</h2>
+<span class="bg-surface-container-high text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Por defecto</span>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors text-outline">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Content Area -->
+<div class="flex-1 overflow-y-auto scrollbar-hide px-6 space-y-8">
+<!-- Modo de Visualización -->
+<section class="space-y-3">
+<h3 class="text-on-surface-variant font-semibold text-xs uppercase tracking-widest">Modo de visualizacion</h3>
+<div class="flex p-1 bg-surface-container-low rounded-lg gap-1">
+<button class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+                        Grilla
+                    </button>
+<button class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-outline hover:text-on-surface-variant font-medium text-sm transition-all">
+<span class="material-symbols-outlined text-[20px]">list</span>
+                        Lista
+                    </button>
+</div>
+</section>
+<!-- Columnas Visibles -->
+<section class="space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="text-on-surface-variant font-semibold text-xs uppercase tracking-widest">Columnas visibles</h3>
+<span class="text-outline text-[12px] font-medium">(5 de 15)</span>
+</div>
+<div class="space-y-3">
+<!-- Accordion 1: Identificacion (Expanded) -->
+<div class="bg-surface-container-low/50 rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-low">
+<span class="font-headline font-bold text-sm text-on-surface">Identificacion</span>
+<span class="material-symbols-outlined text-outline">expand_less</span>
+</button>
+<div class="p-4 space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface font-medium">#</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface font-medium">Nombre de ubicacion</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface-variant">Direccion</span>
+</label>
+</div>
+</div>
+<!-- Accordion 2: Ubicacion geografica (Collapsed) -->
+<div class="bg-surface-container-low/30 rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-2">
+<span class="font-headline font-bold text-sm text-on-surface">Ubicacion geografica</span>
+<span class="text-[10px] font-bold text-outline-variant">(1 de 5)</span>
+</div>
+<span class="material-symbols-outlined text-outline">expand_more</span>
+</button>
+</div>
+<!-- Accordion 3: Caracteristicas del inmueble (Collapsed) -->
+<div class="bg-surface-container-low/30 rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-2">
+<span class="font-headline font-bold text-sm text-on-surface">Caracteristicas del inmueble</span>
+<span class="text-[10px] font-bold text-outline-variant">(0 de 3)</span>
+</div>
+<span class="material-symbols-outlined text-outline">expand_more</span>
+</button>
+</div>
+<!-- Accordion 4: Clasificacion y estado (Expanded) -->
+<div class="bg-surface-container-low/50 rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-low">
+<span class="font-headline font-bold text-sm text-on-surface">Clasificacion y estado</span>
+<span class="material-symbols-outlined text-outline">expand_less</span>
+</button>
+<div class="p-4 space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface font-medium">Giro comercial</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface-variant">Coberturas</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface-variant">Zona catastrofica</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<span class="text-sm text-on-surface font-medium">Estado de validacion</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="p-6 border-t border-surface-container-high flex items-center justify-between bg-surface-container-lowest">
+<button class="text-primary font-semibold text-sm hover:underline transition-all">
+                Restaurar predeterminados
+            </button>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-5 py-2.5 rounded-lg font-bold text-sm shadow-md transition-all active:scale-95">
+                Guardar configuracion
+            </button>
+</footer>
+</aside>
+<!-- Map Detail Mock (Hidden content for detail context) -->
+<div class="hidden">
+<img data-alt="professional insurance risk assessment map showing location pins and topographic data with clean user interface elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfbTI3acaI8pNmlQmMzODRm8VmAyPfOAsWgqc0dJzgqLlgGG2zFcUVujA0GS3A4OIUuMyuzDYF6TnLm996ttV6eRcCeqQ-PLMDucv485YVbo6PoPKWvVe1HQnswTIwIL-hEgV9452K_jbA0iUkXhoqoAd7zkk-B0Sl1MlCftofdTfWsqbcp3WpSr9ug94A3Xw4RWWSiRIBawlyVxpXUHheHHqtornNUgaOg6SqZCXoUQ3RcK2NTLmLVairNqd2-M745JfZ_U47Rw4"/>
+</div>
+</body></html>

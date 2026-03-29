@@ -10,7 +10,7 @@
       "title": "Inicio Cotizador de Daños",
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
-      "status": "draft"
+      "status": "approved"
     },
     "folio-creation/confirmation": {
       "screenName": "projects/3802726589783048530/screens/e0f30ce305ea47d88a1ba7a6195ecdc6",
@@ -19,7 +19,7 @@
       "title": "Confirmación de Folio",
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
-      "status": "draft"
+      "status": "approved"
     },
     "general-info/wizard-header": {
       "screenName": "projects/3802726589783048530/screens/cca87cf36f824193a2645ba38a906757",
@@ -28,7 +28,7 @@
       "title": "Header Wizard - Paso 1",
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
-      "status": "draft"
+      "status": "approved"
     },
     "general-info/formulario-datos-generales": {
       "screenName": "projects/3802726589783048530/screens/a025353b575a402197900cc3a549eabf",
@@ -37,7 +37,7 @@
       "title": "Wizard Paso 1: Datos Generales",
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
-      "status": "draft"
+      "status": "approved"
     },
     "general-info/modal-conflicto-version": {
       "screenName": "projects/3802726589783048530/screens/47c1c0568fff4bfaac798a694239e3ea",
@@ -46,34 +46,37 @@
       "title": "Modal Advertencia: Conflicto de Versión",
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
-      "status": "draft"
+      "status": "approved"
     },
     "layout-config/panel-default": {
-      "screenName": null,
-      "screenId": null,
+      "screenName": "projects/3802726589783048530/screens/a8621f593b2141b493f7f7f9772c437e",
+      "screenId": "a8621f593b2141b493f7f7f9772c437e",
+      "screenIdOriginal": "701b767a23fe4b6481edbf8c3329f7d6",
       "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-config-default.html",
-      "title": "Panel Config Layout - Estado Default",
+      "title": "Panel Configurar Vista - Ubicaciones",
       "model": "GEMINI_3_FLASH",
-      "designSystemApplied": false,
-      "status": "pending-stitch"
+      "designSystemApplied": true,
+      "status": "approved"
     },
     "layout-config/panel-personalizado": {
-      "screenName": null,
-      "screenId": null,
+      "screenName": "projects/3802726589783048530/screens/486482b0515d44b3abbd0f0cc2a6d6db",
+      "screenId": "486482b0515d44b3abbd0f0cc2a6d6db",
+      "screenIdOriginal": "9da86353d6b04ef3b59305a5cf15e2ef",
       "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-config-personalizado.html",
-      "title": "Panel Config Layout - Estado Personalizado",
+      "title": "Panel Configurar Vista - Personalizado",
       "model": "GEMINI_3_FLASH",
-      "designSystemApplied": false,
-      "status": "pending-stitch"
+      "designSystemApplied": true,
+      "status": "approved"
     },
     "layout-config/panel-error-conflicto": {
-      "screenName": null,
-      "screenId": null,
+      "screenName": "projects/3802726589783048530/screens/7bc60b3174b44a59b6baa1b832a001e8",
+      "screenId": "7bc60b3174b44a59b6baa1b832a001e8",
+      "screenIdOriginal": "5ed28b076d624614b0a8772fdd372fed",
       "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-error-conflicto.html",
-      "title": "Panel Config Layout - Error Conflicto Version",
+      "title": "Configuración de Vista - Conflicto 409",
       "model": "GEMINI_3_FLASH",
-      "designSystemApplied": false,
-      "status": "pending-stitch"
+      "designSystemApplied": true,
+      "status": "approved"
     }
   }
 }
