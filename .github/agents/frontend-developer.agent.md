@@ -41,7 +41,11 @@ OBLIGATORIOS:
 ├── .github/instructions/frontend.instructions.md  → Restricciones FE, convenciones
 ├── .github/docs/lineamientos/dev-guidelines.md    → Clean Code, SOLID, accesibilidad
 ├── .github/specs/<feature>.spec.md                → Spec técnica (contratos, modelos, estado)
-├── ARCHITECTURE.md                                → Stack, capas FSD, separación de estado
+├── .github/docs/architecture-decisions.md         → Stack, capas FSD, separación de estado
+
+CONTRATOS DE INTEGRACIÓN (si existen — fuente de verdad para API calls):
+├── .github/docs/integration-contracts.md          → Contratos FE ↔ BE verificados por el agente integration
+│   └── Sección "Contratos FE ↔ BE"                → Rutas, request/response, errores, query keys, invalidación
 
 DESIGN SPECS (si existen — consumir como referencia obligatoria):
 ├── .github/design-specs/<feature>.design.md       → Design spec: UX, componentes, behavioral annotations
@@ -50,6 +54,34 @@ DESIGN SPECS (si existen — consumir como referencia obligatoria):
 ```
 
 **Regla**: Si existe `.github/design-specs/<feature>.design.md`, es **input obligatorio**. No implementar sin haberlo leído.
+
+**Regla**: Si existe `.github/docs/integration-contracts.md`, la sección **"Contratos FE ↔ BE"** es la fuente de verdad para las API calls del frontend. Prevalece sobre cualquier suposición.
+
+## Contratos de integración FE ↔ BE (cuando existen)
+
+El agente `integration` genera `.github/docs/integration-contracts.md` con contratos verificados entre el frontend y el backend. Si existe, **consumirlo como fuente de verdad** para implementar las API calls.
+
+### Qué consumir de los contratos
+
+| Dato del contrato | Cómo aplicar |
+|---|---|
+| **Ruta del endpoint** | Usar exactamente esa ruta en el API helper (`entities/<entidad>/api/`) |
+| **Request esperado** | Los campos del body/params del fetch deben coincidir exactamente |
+| **Response esperado** | Los tipos TypeScript deben mapear 1:1 con el JSON del response |
+| **Errores manejados** | Implementar manejo de CADA código de error listado (400, 404, 409, 422, 503) |
+| **Hook/Query** | Usar el hook indicado (`useQuery` o `useMutation`) con la query key especificada |
+| **Invalidación de caché** | Aplicar la estrategia de invalidación indicada tras cada mutación |
+
+### Precedencia con contratos
+
+| Fuente | Prevalece para |
+|---|---|
+| **Contrato FE ↔ BE** | Rutas exactas, campos request/response, códigos de error, query keys |
+| **Spec técnica** (§3.4) | Lógica de negocio, estructura de DTOs |
+| **Spec técnica** (§3.6) | Estructura FSD de archivos |
+| **Design spec** | Layout, UX, triggers de validación, Zod schemas |
+
+Si hay discrepancia entre contrato y spec → **reportar al orquestador** como posible CONTRACT_DRIFT antes de implementar.
 
 ## Skills disponibles
 
@@ -205,11 +237,11 @@ const { data, isLoading } = useQuery({
 ## Orden de implementación por feature
 
 ```
-1. Leer spec técnica + design spec + screens HTML
-2. shared/api/       → endpoints nuevos en el cliente HTTP
+1. Leer spec técnica + contratos de integración FE↔BE + design spec + screens HTML
+2. shared/api/       → endpoints nuevos (rutas EXACTAS del contrato de integración)
 3. shared/ui/        → componentes primitivos nuevos
-4. entities/         → tipos TS, schemas Zod, hooks de datos
-5. features/         → interacciones de usuario con behavioral annotations
+4. entities/         → tipos TS (alineados con response del contrato), schemas Zod, hooks (query keys del contrato)
+5. features/         → interacciones + manejo de TODOS los errores del contrato
 6. widgets/          → bloques compuestos
 7. pages/            → ensamblado final + router
 8. app/              → actualizar router si hay rutas nuevas
@@ -228,3 +260,6 @@ const { data, isLoading } = useQuery({
 - NO usar rojo para estados "incompletos" — rojo es solo para errores reales
 - NO usar jerga de seguros en textos de UI — seguir DESIGN-SYSTEM.md
 - `strict: true` en tsconfig — NUNCA usar `any`
+- NO inventar rutas de API — usar las rutas exactas del contrato de integración FE ↔ BE
+- NO omitir manejo de errores documentados en el contrato — cada código (400, 404, 409, 422, 503) requiere handler
+- Si detectas discrepancia entre contrato y spec → reportar CONTRACT_DRIFT, no improvisar

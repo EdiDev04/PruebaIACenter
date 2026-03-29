@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirmación de Folio - The Precision Editorial</title>
+<!-- Google Fonts: Inter & Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"tertiary-container": "#82ff99", "inverse-on-surface": "#969dac", "surface-variant": "#d5e3ff", secondary: "#914d00", "primary-fixed": "#4878fd", "inverse-surface": "#070e19", "surface-container": "#e7eeff", primary: "#1554d9", "surface-tint": "#1554d9", "surface-container-low": "#f0f3ff", "surface-container-lowest": "#ffffff", "surface-container-high": "#dee8ff", "tertiary-fixed-dim": "#73f08c", "primary-container": "#4878fd", "on-primary-fixed-variant": "#fefcff", "on-surface-variant": "#506079", "surface-bright": "#f9f9ff", "on-background": "#24334a", "on-secondary-fixed": "#633300", "on-tertiary": "#e9ffe6", "on-primary-fixed": "#ffffff", "tertiary-fixed": "#82ff99", "on-error": "#fff7f7", "on-tertiary-container": "#006127", "secondary-fixed": "#ffdcc3", "surface-container-highest": "#d5e3ff", "outline-variant": "#a3b3cf", "on-secondary-fixed-variant": "#8c4a00", "primary-fixed-dim": "#386bef", "secondary-container": "#ffdcc3", outline: "#6c7b96", "on-tertiary-fixed-variant": "#006c2d", "inverse-primary": "#638aff", "surface-dim": "#cbdbf9", error: "#a8364b", surface: "#f9f9ff", "on-secondary-container": "#7e4200", "on-error-container": "#6e0523", background: "#f9f9ff", "on-surface": "#24334a", tertiary: "#006e2e", "on-tertiary-fixed": "#004c1d", "on-primary": "#faf8ff", "secondary-fixed-dim": "#ffcaa1", "on-primary-container": "#000000", "on-secondary": "#fff7f4", "error-container": "#f97386", "error-dim": "#6b0221", "primary-dim": "#0047c6", "tertiary-dim": "#006127", "secondary-dim": "#804300"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .tonal-transition {
+        background: linear-gradient(to bottom, transparent, rgba(243, 243, 243, 0.5));
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm shadow-blue-900/5">
+<nav class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
+<div class="text-xl font-bold tracking-tighter text-blue-900">
+                The Precision Editorial
+            </div>
+<div class="flex items-center gap-4">
+<button aria-label="Help" class="p-2 rounded-full hover:bg-slate-100 transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-slate-500" data-icon="help">help</span>
+</button>
+<button aria-label="Account" class="p-2 rounded-full hover:bg-slate-100 transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-slate-500" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center px-4 pt-20 pb-12">
+<div class="w-full max-w-[560px] bg-surface-container-lowest rounded-2xl shadow-[0_8px_32px_rgba(0,16,105,0.06)] p-8 md:p-12 text-center animate-fade-in">
+<!-- Success Icon -->
+<div class="mb-6 flex justify-center">
+<div class="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-green-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Title -->
+<h1 class="text-3xl font-extrabold tracking-tight text-green-900 mb-8 font-headline">
+                Folio creado exitosamente
+            </h1>
+<!-- Folio Card Container -->
+<div class="bg-surface-container-low rounded-xl p-6 mb-4 relative group">
+<div class="flex flex-col items-center justify-center gap-2">
+<span class="text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1">Número de Folio</span>
+<div aria-label="Número de folio DAN-2026-00001" class="flex items-center gap-4">
+<span class="text-2xl md:text-[28px] font-bold font-mono text-primary tracking-tight">DAN-2026-00001</span>
+<button aria-label="Copiar número de folio" class="p-2 rounded-lg hover:bg-white/60 text-primary transition-all active:scale-90" title="Copiar al portapapeles">
+<span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Status Chip & Meta -->
+<div class="flex flex-col items-center gap-3 mb-10">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFFBEB] border border-[#FEF3C7]">
+<span class="w-2 h-2 rounded-full bg-[#D97706]"></span>
+<span class="text-sm font-semibold text-[#D97706]">En borrador</span>
+</div>
+<p class="text-xs text-outline font-medium">
+                    Creado el 29/03/2026 10:32 hrs
+                </p>
+</div>
+<!-- Visual Separator -->
+<div class="h-px w-full bg-outline-variant/30 mb-10"></div>
+<!-- Guidance Text -->
+<p class="text-on-surface-variant text-base mb-8 px-4">
+                Ya tienes tu folio. Ahora captura los datos de la cotización para obtener una propuesta formal.
+            </p>
+<!-- Primary Action -->
+<button class="w-full py-5 px-8 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-bold text-lg shadow-lg shadow-blue-900/20 hover:shadow-xl transition-all active:scale-[0.98] focus:ring-4 focus:ring-primary/30 flex items-center justify-center gap-3">
+<span>Iniciar captura: Datos Generales</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<!-- Decorative Texture Element -->
+<div class="mt-8 text-xs text-outline/50 font-medium tracking-widest uppercase">
+                Precision Insurance Systems • 2026
+            </div>
+</div>
+</main>
+<!-- Suppressing BottomNavBar as per Transactional Screen logic in instructions -->
+<!-- But if required by "Must map active tab", the current context is "Policies" or "Quotes" creation -->
+<!-- Navigation Shell Placeholder for desktop/logic compliance -->
+<div class="hidden md:block fixed bottom-8 left-1/2 -translate-x-1/2">
+<div class="bg-white/90 backdrop-blur-md rounded-full px-6 py-3 shadow-xl flex gap-8 items-center border border-white/20">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+<span class="text-xs uppercase tracking-widest">Quotes</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 font-medium">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="text-xs uppercase tracking-widest">Policies</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 font-medium">
+<span class="material-symbols-outlined" data-icon="report_problem">report_problem</span>
+<span class="text-xs uppercase tracking-widest">Claims</span>
+</div>
+</div>
+</div>
+</body></html>

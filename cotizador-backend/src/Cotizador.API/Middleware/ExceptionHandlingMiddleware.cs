@@ -47,7 +47,7 @@ public class ExceptionHandlingMiddleware
         {
             _logger.LogError(ex, "Core OHS unavailable");
             // Do not expose internal path details — use generic message
-            await WriteErrorResponseAsync(context, StatusCodes.Status503ServiceUnavailable, "coreOhsUnavailable", "The reference data service is temporarily unavailable. Please try again later.");
+            await WriteErrorResponseAsync(context, StatusCodes.Status503ServiceUnavailable, "coreOhsUnavailable", "Servicio de catálogos no disponible, intente más tarde.");
         }
         catch (ValidationException ex)
         {
@@ -74,7 +74,7 @@ public class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
 
         object body = field is not null
-            ? new { type, message, field }
+            ? new { type, message, field = (string?)field }
             : new { type, message, field = (string?)null };
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(body, JsonOptions));

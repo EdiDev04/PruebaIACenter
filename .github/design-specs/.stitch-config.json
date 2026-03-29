@@ -1,0 +1,82 @@
+{
+  "projectName": "projects/3802726589783048530",
+  "projectId": "3802726589783048530",
+  "designSystemAssetId": "4588898471681033353",
+  "screens": {
+    "folio-creation/home": {
+      "screenName": "projects/3802726589783048530/screens/42527aa4dddf44b48a074cefe6ae9119",
+      "screenId": "42527aa4dddf44b48a074cefe6ae9119",
+      "htmlFile": ".github/design-specs/screens/folio-creation/home.html",
+      "title": "Inicio Cotizador de Daños",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "folio-creation/confirmation": {
+      "screenName": "projects/3802726589783048530/screens/e0f30ce305ea47d88a1ba7a6195ecdc6",
+      "screenId": "e0f30ce305ea47d88a1ba7a6195ecdc6",
+      "htmlFile": ".github/design-specs/screens/folio-creation/confirmation.html",
+      "title": "Confirmación de Folio",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "general-info/wizard-header": {
+      "screenName": "projects/3802726589783048530/screens/cca87cf36f824193a2645ba38a906757",
+      "screenId": "cca87cf36f824193a2645ba38a906757",
+      "htmlFile": ".github/design-specs/screens/general-info-management/wizard-header.html",
+      "title": "Header Wizard - Paso 1",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "general-info/formulario-datos-generales": {
+      "screenName": "projects/3802726589783048530/screens/a025353b575a402197900cc3a549eabf",
+      "screenId": "a025353b575a402197900cc3a549eabf",
+      "htmlFile": ".github/design-specs/screens/general-info-management/formulario-datos-generales.html",
+      "title": "Wizard Paso 1: Datos Generales",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "general-info/modal-conflicto-version": {
+      "screenName": "projects/3802726589783048530/screens/47c1c0568fff4bfaac798a694239e3ea",
+      "screenId": "47c1c0568fff4bfaac798a694239e3ea",
+      "htmlFile": ".github/design-specs/screens/general-info-management/modal-conflicto-version.html",
+      "title": "Modal Advertencia: Conflicto de Versión",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "layout-config/panel-default": {
+      "screenName": "projects/3802726589783048530/screens/a8621f593b2141b493f7f7f9772c437e",
+      "screenId": "a8621f593b2141b493f7f7f9772c437e",
+      "screenIdOriginal": "701b767a23fe4b6481edbf8c3329f7d6",
+      "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-config-default.html",
+      "title": "Panel Configurar Vista - Ubicaciones",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "layout-config/panel-personalizado": {
+      "screenName": "projects/3802726589783048530/screens/486482b0515d44b3abbd0f0cc2a6d6db",
+      "screenId": "486482b0515d44b3abbd0f0cc2a6d6db",
+      "screenIdOriginal": "9da86353d6b04ef3b59305a5cf15e2ef",
+      "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-config-personalizado.html",
+      "title": "Panel Configurar Vista - Personalizado",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "layout-config/panel-error-conflicto": {
+      "screenName": "projects/3802726589783048530/screens/7bc60b3174b44a59b6baa1b832a001e8",
+      "screenId": "7bc60b3174b44a59b6baa1b832a001e8",
+      "screenIdOriginal": "5ed28b076d624614b0a8772fdd372fed",
+      "htmlFile": ".github/design-specs/screens/location-layout-configuration/panel-error-conflicto.html",
+      "title": "Configuración de Vista - Conflicto 409",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+:root {
+  --color-primary: #1554d9;
+  --color-on-primary: #faf8ff;
+  --color-primary-container: #4878fd;
+  --color-primary-fixed: #4878fd;
+  --color-primary-fixed-dim: #386bef;
+  --color-primary-dim: #0047c6;
+  --color-on-primary-fixed: #ffffff;
+  --color-on-primary-fixed-variant: #fefcff;
+  --color-on-primary-container: #000000;
+  --color-secondary: #914d00;
+  --color-on-secondary: #fff7f4;
+  --color-secondary-container: #ffdcc3;
+  --color-secondary-fixed: #ffdcc3;
+  --color-secondary-fixed-dim: #ffcaa1;
+  --color-secondary-dim: #804300;
+  --color-on-secondary-fixed: #633300;
+  --color-on-secondary-fixed-variant: #8c4a00;
+  --color-on-secondary-container: #7e4200;
+  --color-tertiary: #006e2e;
+  --color-on-tertiary: #e9ffe6;
+  --color-tertiary-container: #82ff99;
+  --color-on-tertiary-container: #006127;
+  --color-surface: #f9f9ff;
+  --color-surface-bright: #f9f9ff;
+  --color-surface-dim: #cbdbf9;
+  --color-surface-container: #e7eeff;
+  --color-surface-container-low: #f0f3ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #dee8ff;
+  --color-surface-container-highest: #d5e3ff;
+  --color-surface-variant: #d5e3ff;
+  --color-on-surface: #24334a;
+  --color-on-surface-variant: #506079;
+  --color-background: #f9f9ff;
+  --color-on-background: #24334a;
+  --color-outline: #6c7b96;
+  --color-outline-variant: #a3b3cf;
+  --color-error: #a8364b;
+  --color-error-container: #f97386;
+  --color-on-error: #fff7f7;
+  --color-on-error-container: #6e0523;
+  --color-inverse-surface: #070e19;
+  --color-inverse-on-surface: #969dac;
+  --color-inverse-primary: #638aff;
+  --color-surface-tint: #1554d9;
+  --color-tertiary-fixed: #82ff99;
+  --color-tertiary-fixed-dim: #73f08c;
+  --color-tertiary-dim: #006127;
+  --color-on-tertiary-fixed: #004c1d;
+  --color-on-tertiary-fixed-variant: #006c2d;
+
+  --font-family: 'Inter', sans-serif;
+  --border-radius-default: 0.25rem;
+  --border-radius: 0.25rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+  --border-radius-full: 9999px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-family);
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-family);
+}

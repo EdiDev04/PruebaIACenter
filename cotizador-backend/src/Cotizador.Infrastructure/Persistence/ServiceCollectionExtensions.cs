@@ -15,10 +15,11 @@ public static class ServiceCollectionExtensions
         configuration.GetSection("MongoDB").Bind(settings);
         services.AddSingleton(settings);
 
-        // Register camelCase BSON convention
+        // Register camelCase BSON convention + ignore unmapped fields (e.g. _id when no Id property exists)
         ConventionPack conventionPack = new()
         {
-            new CamelCaseElementNameConvention()
+            new CamelCaseElementNameConvention(),
+            new IgnoreExtraElementsConvention(true)
         };
         ConventionRegistry.Register("camelCase", conventionPack, _ => true);
 
@@ -28,29 +29,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMongoClient>(mongoClient);
         services.AddSingleton(database);
 
-        // Create indexes on startup
-        CreateIndexes(database, settings);
-
         services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddHostedService<MongoDbIndexInitializer>();
 
         return services;
-    }
-
-    private static void CreateIndexes(IMongoDatabase database, MongoDbSettings settings)
-    {
-        IMongoCollection<Domain.Entities.PropertyQuote> collection =
-            database.GetCollection<Domain.Entities.PropertyQuote>(settings.QuotesCollectionName);
-
-        // Unique index on folioNumber
-        CreateIndexModel<Domain.Entities.PropertyQuote> folioIndex = new(
-            Builders<Domain.Entities.PropertyQuote>.IndexKeys.Ascending(q => q.FolioNumber),
-            new CreateIndexOptions { Unique = true, Name = "idx_folioNumber_unique" });
-
-        // Unique sparse index on metadata.idempotencyKey
-        CreateIndexModel<Domain.Entities.PropertyQuote> idempotencyIndex = new(
-            Builders<Domain.Entities.PropertyQuote>.IndexKeys.Ascending("metadata.idempotencyKey"),
-            new CreateIndexOptions { Unique = true, Sparse = true, Name = "idx_idempotencyKey_unique_sparse" });
-
-        collection.Indexes.CreateMany(new[] { folioIndex, idempotencyIndex });
     }
 }

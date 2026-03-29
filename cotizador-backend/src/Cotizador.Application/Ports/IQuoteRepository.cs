@@ -18,6 +18,7 @@ public interface IQuoteRepository
     /// Updates general info section. Throws VersionConflictException if version mismatch.
     /// $set: insuredData, conductionData, agentCode, businessType, riskClassification,
     ///       version+1, metadata.updatedAt, metadata.lastWizardStep=1
+    /// If newQuoteStatus is not null, also sets quoteStatus.
     /// </summary>
     Task UpdateGeneralInfoAsync(
         string folioNumber,
@@ -27,6 +28,7 @@ public interface IQuoteRepository
         string agentCode,
         string businessType,
         string riskClassification,
+        string? newQuoteStatus = null,
         CancellationToken ct = default);
 
     /// <summary>

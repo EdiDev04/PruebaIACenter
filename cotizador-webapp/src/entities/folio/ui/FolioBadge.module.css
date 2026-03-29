@@ -1,0 +1,9 @@
+.badge {
+  background: var(--color-surface-container-low);
+  border: 1px solid rgba(163, 179, 207, 0.2);
+  border-radius: var(--border-radius);
+  padding: 0.125rem 0.5rem;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  color: var(--color-on-surface-variant);
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cotizador de Daños | Underwriting Portal</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-secondary-fixed": "#633300", "surface-tint": "#1554d9", "secondary-container": "#ffdcc3", "secondary-dim": "#804300", "primary-fixed-dim": "#386bef", "on-secondary-fixed-variant": "#8c4a00", "primary-container": "#4878fd", "tertiary-container": "#82ff99", "on-error": "#fff7f7", "surface-container-lowest": "#ffffff", "surface-bright": "#f9f9ff", "on-surface": "#24334a", "error-container": "#f97386", surface: "#f9f9ff", "on-primary-fixed-variant": "#fefcff", "on-primary-fixed": "#ffffff", "inverse-on-surface": "#969dac", "on-tertiary-fixed-variant": "#006c2d", "on-secondary-container": "#7e4200", outline: "#6c7b96", error: "#a8364b", "on-background": "#24334a", background: "#f9f9ff", "tertiary-dim": "#006127", "outline-variant": "#a3b3cf", "surface-variant": "#d5e3ff", "on-tertiary": "#e9ffe6", "error-dim": "#6b0221", secondary: "#914d00", "on-tertiary-container": "#006127", "primary-dim": "#0047c6", "inverse-surface": "#070e19", "tertiary-fixed": "#82ff99", "surface-container-low": "#f0f3ff", "on-error-container": "#6e0523", "surface-container-highest": "#d5e3ff", "surface-dim": "#cbdbf9", tertiary: "#006e2e", "on-tertiary-fixed": "#004c1d", "primary-fixed": "#4878fd", "on-secondary": "#fff7f4", "on-primary-container": "#000000", "secondary-fixed-dim": "#ffcaa1", "secondary-fixed": "#ffdcc3", primary: "#1554d9", "on-surface-variant": "#506079", "inverse-primary": "#638aff", "surface-container-high": "#dee8ff", "surface-container": "#e7eeff", "tertiary-fixed-dim": "#73f08c", "on-primary": "#faf8ff"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar: Execution of Shared Components JSON -->
+<header class="bg-white dark:bg-slate-900 shadow-sm dark:shadow-none docked full-width top-0 sticky z-50 font-['Inter'] antialiased">
+<div class="flex justify-between items-center px-6 py-3 w-full max-w-full">
+<!-- Brand Logo Anchor -->
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="security">security</span>
+<span class="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Cotizador de Daños</span>
+</div>
+<!-- User Actions -->
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end hidden md:flex">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-100">User Name</span>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider">Senior Underwriter</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/20">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Professional studio portrait of a corporate executive in business attire with neutral lighting and blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuP5B9zet8YJlccm-A7aiyEyycQ7eIausqc9dOIRzHdEZJUCoCPyfmXZpTTZF6exFJQPW8VtyqB1_b27LFSfoBbci2QgXHkwo0QaTYQdZE5QXYrM3KQROLS8qPCthLfWfqJ6uB1MHVKrHj6fkO8xQa1l84YCUVq0D8saZc0DbFy8tT5uu3wsfUUv9OLIhONtl4-Thzt81eF7inWFt6tq_EiaYdE6seoiZpa6k7V80Z3yMOjoCYKb6P3V8_oZjoYyX27Rt66m-YjxU"/>
+</div>
+</div>
+</div>
+<!-- Separation Logic -->
+<div class="bg-slate-100 dark:bg-slate-800 h-[1px] w-full"></div>
+</header>
+<!-- Main Content: Layered Canvas Layout -->
+<main class="flex-grow flex items-center justify-center p-6 md:p-12 lg:p-16">
+<div class="max-w-6xl w-full">
+<!-- Hero Messaging -->
+<div class="mb-12 text-center md:text-left">
+<h1 class="text-[2.25rem] font-extrabold text-on-surface tracking-tight mb-2">Panel de Suscripción</h1>
+<p class="text-on-surface-variant text-lg max-w-2xl">Gestione riesgos de propiedad con precisión institucional y flujos de trabajo optimizados.</p>
+</div>
+<!-- 2-Column Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+<!-- Card 1: Crear folio nuevo -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_8px_32px_rgba(19,83,216,0.04)] border border-outline-variant/10 flex flex-col justify-between transition-transform hover:-translate-y-1 duration-300">
+<div>
+<div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="add_circle">add_circle</span>
+</div>
+<h2 class="text-[24px] font-bold text-on-surface mb-3">Crear folio nuevo</h2>
+<p class="text-[14px] text-on-surface-variant leading-relaxed mb-8">Inicia una nueva cotización de seguros de daños a la propiedad</p>
+</div>
+<button class="w-full py-4 px-6 bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-semibold rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+                        + Crear folio nuevo
+                    </button>
+</div>
+<!-- Card 2: Abrir folio existente -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_8px_32px_rgba(19,83,216,0.04)] border border-outline-variant/10 flex flex-col justify-between transition-transform hover:-translate-y-1 duration-300">
+<div>
+<div class="w-14 h-14 bg-secondary-container/50 rounded-lg flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-on-secondary-fixed text-3xl" data-icon="folder_open">folder_open</span>
+</div>
+<h2 class="text-[24px] font-bold text-on-surface mb-3">Abrir folio existente</h2>
+<p class="text-[14px] text-on-surface-variant leading-relaxed mb-8">Retoma una cotización en progreso</p>
+<div class="space-y-2 mb-8">
+<label class="block text-[0.75rem] font-medium text-on-surface-variant px-1" for="folio_input">Número de folio</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 text-on-surface placeholder:text-outline-variant transition-all" id="folio_input" placeholder="DAN-YYYY-NNNNN" type="text"/>
+</div>
+</div>
+</div>
+<button class="w-full py-4 px-6 bg-white border border-secondary/40 hover:bg-surface-container-low text-secondary font-semibold rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-xl" data-icon="search">search</span>
+                        🔍 Abrir folio
+                    </button>
+</div>
+</div>
+<!-- Supporting Illustration Area (Subtle Backdrop) -->
+<div class="mt-16 relative h-48 rounded-xl overflow-hidden hidden lg:block opacity-60">
+<img alt="Modern Architecture" class="w-full h-full object-cover grayscale brightness-110 contrast-75" data-alt="Monochrome architectural shot of a modern glass and steel skyscraper reaching into a clear sky with sharp geometric lines and high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBonpuHhLDtPlzmSsEtCaoFycIw5YXjxQupU-imn3pmo2pE-h6nl2vZZHSjBkWz090c_8pCab3hD0HbE5t9iGWTnm5x6KAwhUSWToT_oCg6j9QUEeVM5GYW8MvNe_k9UcBASQrFt7BQhZAzVXddxIoYmMW08ficCII11-qxY8Wk8kgQv9jxaCUGRyyh50j_tObWvy-V1GCBykdN8F2KE6Y9ZMDQ6elaEoMuhz5E765KWxGgl9C4OvWjn937HzSYX_mLjR1EEAlMrWg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+</div>
+</div>
+</main>
+<!-- Footer: Execution of Shared Components JSON -->
+<footer class="bg-slate-50 dark:bg-slate-950 full-width py-8 border-t border-slate-200 dark:border-slate-800 text-[12px] font-medium font-['Inter'] text-slate-500 dark:text-slate-400">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full gap-4">
+<div class="order-2 md:order-1">
+                © 2024 Cotizador de Daños. All rights reserved. Institutional Sovereign Ledger.
+            </div>
+<div class="flex gap-6 order-1 md:order-2">
+<a class="text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="#">Legal Regulatory Disclosure</a>
+</div>
+</div>
+</footer>
+</body></html>

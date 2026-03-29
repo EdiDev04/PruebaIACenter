@@ -1,6 +1,6 @@
 ---
 id: SPEC-004
-status: DRAFT
+status: IMPLEMENTED
 feature: general-info-management
 feature_type: full-stack
 requires_design_spec: true
@@ -10,7 +10,7 @@ consumes_core_ohs: true
 created: 2026-03-29
 updated: 2026-03-29
 author: spec-generator
-version: "1.0"
+version: "1.1"
 related-specs: ["SPEC-001", "SPEC-002", "SPEC-003"]
 priority: alta
 estimated-complexity: M
@@ -134,6 +134,7 @@ Implementar la consulta y guardado de los datos generales de una cotización: da
 | RN-004-07 | `metadata.lastWizardStep` se actualiza a 1 | PUT general-info exitoso | Automático en el `$set` del repositorio | ADR-007 |
 | RN-004-08 | Response envelope `{ "data": {...} }` | Toda respuesta 2xx | Wrapper obligatorio | architecture-decisions.md §Response Format |
 | RN-004-09 | Mensajes de error en español | Toda respuesta de error | Campo `message` en español; `type` en inglés | ADR-008 |
+| RN-004-10 | Frontend NO habla directo con core-ohs | Toda consulta de catálogo del frontend | Pasa por endpoint proxy del backend | bussines-context.md §2, REQ-01 HUs |
 
 ### 2.3 Validaciones
 
@@ -192,11 +193,12 @@ Flujos de usuario a diseñar:
   - Error de versión: mostrar alerta "El folio fue modificado" con botón recargar
 
 Inputs de comportamiento que el ux-designer debe conocer:
-  - Selector de suscriptor (dropdown) con datos de GET /v1/subscribers
-  - Campo agente: text input con búsqueda/validación contra GET /v1/agents?code=X
+  - Selector de suscriptor (dropdown) con datos de GET /v1/subscribers (proxy backend)
+  - Campo agente: text input con búsqueda/validación contra GET /v1/agents?code=X (proxy backend)
   - Selector de tipo de negocio: 3 opciones fijas (commercial, industrial, residential) con labels en español
-  - Selector de clasificación de riesgo: dropdown con datos de GET /v1/catalogs/risk-classification
+  - Selector de clasificación de riesgo: dropdown con datos de GET /v1/catalogs/risk-classification (proxy backend)
   - Todos los strings de UI en español (ADR-008)
+  - Todas las llamadas API pasan por el backend — el frontend NO habla directo con core-mock
 ```
 
 ### 3.3 Modelo de dominio
@@ -397,37 +399,122 @@ Response 503: { "type": "coreOhsUnavailable", "message": "Servicio de catálogos
 Response 500: { "type": "internal", "message": "Error interno del servidor", "field": null }
 ```
 
-### 3.5 Contratos core-ohs consumidos
+### 3.5 Endpoints proxy de catálogos (backend → core-ohs → frontend)
+
+> **Principio arquitectónico**: El frontend **NUNCA** habla directo con core-ohs.
+> Toda comunicación pasa por el backend (bussines-context.md §2, REQ-01 HUs).
+> El backend actúa como proxy/passthrough para los catálogos requeridos por el frontend.
 
 ```
 GET /v1/subscribers
-Propósito: Obtener catálogo de suscriptores (frontend consume directo para poblar selector)
-Response 200: { "data": [{ "code": "SUB-001", "name": "María González López", "office": "CDMX Central", "active": true }, ...] }
-Fixture: cotizador-core-mock/src/fixtures/subscribers.json
-Datos extraídos: code, name, office
-Mapeado a: ConductionData.SubscriberCode, ConductionData.OfficeName
-Manejo de error: Timeout/5xx → alerta global "Servicio no disponible"
+Propósito: Proxy — obtener catálogo de suscriptores desde core-ohs para el frontend
+Auth: Basic Auth ([Authorize])
+Use Case: GetSubscribersUseCase (passthrough)
+Repositorios: Ninguno
+Servicios externos: ICoreOhsClient.GetSubscribersAsync()
+
+Request:
+  Headers:
+    Authorization: Basic dXNlcjpwYXNz
+    X-Correlation-Id: (opcional, UUID v4)
+
+Response 200:
+{
+  "data": [
+    { "code": "SUB-001", "name": "María González López", "office": "CDMX Central", "active": true },
+    { "code": "SUB-002", "name": "Carlos Ramírez Díaz", "office": "Monterrey Norte", "active": true }
+  ]
+}
+
+Response 401: { "type": "unauthorized", "message": "Credenciales inválidas o ausentes", "field": null }
+Response 503: { "type": "coreOhsUnavailable", "message": "Servicio de catálogos no disponible, intente más tarde", "field": null }
+Response 500: { "type": "internal", "message": "Error interno del servidor", "field": null }
 ```
 
 ```
 GET /v1/agents?code={code}
-Propósito: Validar existencia de agente (backend valida antes de persistir)
-Response 200: { "data": { "code": "AGT-001", "name": "Roberto Hernández", "region": "Centro", "active": true } }
-Response 404: { "type": "AgentNotFoundException", "message": "Agent AGT-999 not found" }
-Fixture: cotizador-core-mock/src/fixtures/agents.json
-Datos extraídos: code (existencia)
-Mapeado a: PropertyQuote.AgentCode
-Manejo de error: 404 de core → InvalidQuoteStateException (422 al cliente con mensaje en español)
+Propósito: Proxy — buscar agente por código desde core-ohs (frontend busca + backend valida al persistir)
+Auth: Basic Auth ([Authorize])
+Use Case: GetAgentByCodeUseCase (passthrough)
+Repositorios: Ninguno
+Servicios externos: ICoreOhsClient.GetAgentByCodeAsync()
+
+Request:
+  Headers:
+    Authorization: Basic dXNlcjpwYXNz
+    X-Correlation-Id: (opcional, UUID v4)
+  Query params:
+    code: AGT-001 (requerido, formato ^AGT-\d{3}$)
+
+Response 200:
+{
+  "data": { "code": "AGT-001", "name": "Roberto Hernández", "region": "Centro", "active": true }
+}
+
+Response 400: { "type": "validationError", "message": "Código de agente inválido", "field": "code" }
+Response 401: { "type": "unauthorized", "message": "Credenciales inválidas o ausentes", "field": null }
+Response 404: { "type": "agentNotFound", "message": "El agente AGT-999 no está registrado en el catálogo", "field": null }
+Response 503: { "type": "coreOhsUnavailable", "message": "Servicio de catálogos no disponible, intente más tarde", "field": null }
+Response 500: { "type": "internal", "message": "Error interno del servidor", "field": null }
 ```
 
 ```
 GET /v1/catalogs/risk-classification
-Propósito: Obtener clasificaciones de riesgo (frontend consume para selector)
+Propósito: Proxy — obtener clasificaciones de riesgo desde core-ohs para el frontend
+Auth: Basic Auth ([Authorize])
+Use Case: GetRiskClassificationsUseCase (passthrough)
+Repositorios: Ninguno
+Servicios externos: ICoreOhsClient.GetRiskClassificationsAsync()
+
+Request:
+  Headers:
+    Authorization: Basic dXNlcjpwYXNz
+    X-Correlation-Id: (opcional, UUID v4)
+
+Response 200:
+{
+  "data": [
+    { "code": "standard", "description": "Standard risk", "factor": 1.0 },
+    { "code": "preferred", "description": "Preferred risk", "factor": 0.85 },
+    { "code": "substandard", "description": "Substandard risk", "factor": 1.25 }
+  ]
+}
+
+Response 401: { "type": "unauthorized", "message": "Credenciales inválidas o ausentes", "field": null }
+Response 503: { "type": "coreOhsUnavailable", "message": "Servicio de catálogos no disponible, intente más tarde", "field": null }
+Response 500: { "type": "internal", "message": "Error interno del servidor", "field": null }
+```
+
+### 3.5.1 Contratos core-ohs subyacentes (consumidos por el backend)
+
+```
+GET /v1/subscribers (core-mock)
+Response 200: { "data": [{ "code": "SUB-001", "name": "María González López", "office": "CDMX Central", "active": true }, ...] }
+Fixture: cotizador-core-mock/src/fixtures/subscribers.json
+Datos extraídos: code, name, office
+Mapeado a: ConductionData.SubscriberCode, ConductionData.OfficeName
+Manejo de error: Timeout/5xx → CoreOhsUnavailableException → 503 al frontend
+```
+
+```
+GET /v1/agents?code={code} (core-mock)
+Response 200: { "data": { "code": "AGT-001", "name": "Roberto Hernández", "region": "Centro", "active": true } }
+Response 404: { "type": "AgentNotFoundException", "message": "Agent AGT-999 not found" }
+Fixture: cotizador-core-mock/src/fixtures/agents.json
+Datos extraídos: code (existencia + datos de agente)
+Mapeado a: PropertyQuote.AgentCode
+Manejo de error backend:
+  - En proxy (GET /v1/agents): 404 de core → 404 al frontend con mensaje en español
+  - En UpdateGeneralInfo (PUT): 404 de core → InvalidQuoteStateException → 422 al frontend
+```
+
+```
+GET /v1/catalogs/risk-classification (core-mock)
 Response 200: { "data": [{ "code": "standard", "description": "Standard risk", "factor": 1.0 }, ...] }
 Fixture: cotizador-core-mock/src/fixtures/riskClassification.json
 Datos extraídos: code, description
 Mapeado a: PropertyQuote.RiskClassification
-Manejo de error: Timeout/5xx → alerta global
+Manejo de error: Timeout/5xx → CoreOhsUnavailableException → 503 al frontend
 ```
 
 ### 3.6 Estructura frontend (FSD)
@@ -471,21 +558,21 @@ cotizador-webapp/src/
 │   │   │   ├── types.ts                        # CREAR — SubscriberDto
 │   │   │   └── useSubscribersQuery.ts          # CREAR — useQuery(['subscribers'], staleTime: 30min)
 │   │   └── api/
-│   │       └── subscriberApi.ts                # CREAR — getSubscribers()
+│   │       └── subscriberApi.ts                # CREAR — getSubscribers() → GET /v1/subscribers (backend proxy)
 │   ├── agent/
 │   │   ├── index.ts                            # CREAR — Public API
 │   │   ├── model/
 │   │   │   ├── types.ts                        # CREAR — AgentDto
 │   │   │   └── useAgentQuery.ts                # CREAR — useQuery(['agent', code], enabled: !!code)
 │   │   └── api/
-│   │       └── agentApi.ts                     # CREAR — getAgentByCode()
+│   │       └── agentApi.ts                     # CREAR — getAgentByCode() → GET /v1/agents?code=X (backend proxy)
 │   └── risk-classification/
 │       ├── index.ts                            # CREAR — Public API
 │       ├── model/
 │       │   ├── types.ts                        # CREAR — RiskClassificationDto
 │       │   └── useRiskClassificationsQuery.ts  # CREAR — useQuery(['risk-classifications'], staleTime: 30min)
 │       └── api/
-│           └── riskClassificationApi.ts        # CREAR — getRiskClassifications()
+│           └── riskClassificationApi.ts        # CREAR — getRiskClassifications() → GET /v1/catalogs/risk-classification (backend proxy)
 └── shared/
     └── api/
         └── endpoints.ts                        # MODIFICAR — agregar rutas de general-info, subscribers, agents, risk-classifications
@@ -569,6 +656,7 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 | SUP-004-03 | Campos obligatorios: `insuredData.name`, `insuredData.taxId`, `agentCode`, `conductionData.subscriberCode`, `conductionData.officeName`, `businessType`, `riskClassification` | Son los datos mínimos para identificar asegurado y conducción | Si algún campo debería ser opcional, la validación se afloja | usuario |
 | SUP-004-04 | Valores de `businessType` configurables vía `appsettings.json`, default: `["commercial", "industrial", "residential"]` | El usuario confirmó que estos valores son fijos pero deben ser modificables sin recompilar | Si se quiere un catálogo dinámico de core-mock, habría que crear nuevo endpoint | usuario |
 | SUP-004-05 | La validación de `subscriberCode` en Oleada 2 es solo de formato (`^SUB-\d{3}$`), no contra core-ohs | Reducir acoplamiento en esta oleada. La validación completa contra el catálogo se puede agregar en oleadas futuras | Si se requiere validación estricta, agregar consulta a `GET /v1/subscribers` en el Use Case | usuario |
+| SUP-004-06 | El backend expone endpoints proxy (`GET /v1/subscribers`, `GET /v1/agents`, `GET /v1/catalogs/risk-classification`) que hacen passthrough a core-mock | La arquitectura define `Frontend → Backend → Core-OHS` (bussines-context.md §2). REQ-01 define al backend como consumidor de todos los catálogos | Si se permite FE→core directo, los endpoints proxy son innecesarios. Pero viola la arquitectura planteada | usuario |
 
 ---
 
@@ -639,6 +727,12 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 - [ ] Implementar `UpdateGeneralInfoUseCase` en `Cotizador.Application/UseCases/`
   - Inyecta: `IQuoteRepository`, `ICoreOhsClient`, `BusinessTypeSettings`, `ILogger<UpdateGeneralInfoUseCase>`
   - Flujo: validar businessType contra config → validar agentCode contra core-ohs → leer folio para verificar si es draft → llamar UpdateGeneralInfoAsync con quoteStatus condicional → retornar DTO actualizado
+- [ ] Crear `IGetSubscribersUseCase` en `Cotizador.Application/Interfaces/`
+- [ ] Implementar `GetSubscribersUseCase` en `Cotizador.Application/UseCases/` (passthrough a `ICoreOhsClient.GetSubscribersAsync()`)
+- [ ] Crear `IGetAgentByCodeUseCase` en `Cotizador.Application/Interfaces/`
+- [ ] Implementar `GetAgentByCodeUseCase` en `Cotizador.Application/UseCases/` (passthrough a `ICoreOhsClient.GetAgentByCodeAsync()`, 404 si null)
+- [ ] Crear `IGetRiskClassificationsUseCase` en `Cotizador.Application/Interfaces/`
+- [ ] Implementar `GetRiskClassificationsUseCase` en `Cotizador.Application/UseCases/` (passthrough a `ICoreOhsClient.GetRiskClassificationsAsync()`)
 - [ ] Crear DTOs: `GeneralInfoDto`, `InsuredDataDto`, `ConductionDataDto`, `UpdateGeneralInfoRequest` en `Cotizador.Application/DTOs/`
 - [ ] Crear validador FluentValidation `UpdateGeneralInfoRequestValidator`
   - name: requerido, max 200
@@ -651,27 +745,34 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
   - version: requerido, > 0
 - [ ] Modificar `IQuoteRepository.UpdateGeneralInfoAsync` — agregar parámetro opcional `string? newQuoteStatus = null`
 - [ ] Modificar `QuoteRepository.UpdateGeneralInfoAsync` — si `newQuoteStatus` != null, incluir en `$set`
+- [ ] Crear `CatalogController` en `Cotizador.API/Controllers/` — endpoints proxy:
+  - `GET /v1/subscribers` → `GetSubscribersUseCase`
+  - `GET /v1/agents` (query param `code`) → `GetAgentByCodeUseCase`
+  - `GET /v1/catalogs/risk-classification` → `GetRiskClassificationsUseCase`
 - [ ] Crear `QuoteController` en `Cotizador.API/Controllers/` (o extender el creado en SPEC-003)
   - `GET /v1/quotes/{folio}/general-info`
   - `PUT /v1/quotes/{folio}/general-info`
-- [ ] Registrar Use Cases en `Program.cs`
+- [ ] Registrar Use Cases proxy en `Program.cs`: `AddScoped<IGetSubscribersUseCase, ...>()`, `AddScoped<IGetAgentByCodeUseCase, ...>()`, `AddScoped<IGetRiskClassificationsUseCase, ...>()`
+- [ ] Registrar Use Cases de general-info en `Program.cs`
 - [ ] Mensajes de error en español (ADR-008)
 
 ### 8.3 frontend-developer
 
 - [ ] Crear `entities/general-info/` — types, schema Zod, query, api
-- [ ] Crear `entities/subscriber/` — types, query (staleTime 30min), api
-- [ ] Crear `entities/agent/` — types, query (enabled: !!code), api
-- [ ] Crear `entities/risk-classification/` — types, query (staleTime 30min), api
+- [ ] Crear `entities/subscriber/` — types, query (staleTime 30min), api → `GET /v1/subscribers` (backend proxy, **NO** core-mock directo)
+- [ ] Crear `entities/agent/` — types, query (enabled: !!code), api → `GET /v1/agents?code=X` (backend proxy)
+- [ ] Crear `entities/risk-classification/` — types, query (staleTime 30min), api → `GET /v1/catalogs/risk-classification` (backend proxy)
 - [ ] Crear `features/save-general-info/` — `useSaveGeneralInfo` mutation + `SaveGeneralInfoButton`
 - [ ] Crear `widgets/general-info-form/` — formulario con React Hook Form + Zod, secciones: asegurado, conducción, agente, negocio, riesgo
 - [ ] Crear `pages/general-info/` — `GeneralInfoPage` ensambla el widget
 - [ ] Crear `shared/lib/useFormPersist.ts` — hook genérico que serializa `form.getValues()` a `sessionStorage` cada 3s (debounced), restaura al montar, y limpia tras `mutation.onSuccess` (implementación definida en ADR-007)
 - [ ] Integrar `useFormPersist` en el formulario de general-info con key `wizard:{folio}:step:1`
 - [ ] Agregar ruta `/quotes/:folio/general-info` en `app/router/router.tsx`
-- [ ] Agregar endpoints en `shared/api/endpoints.ts`
+- [ ] Agregar endpoints en `shared/api/endpoints.ts` — **TODAS las rutas apuntan al backend** (single VITE_API_URL), incluyendo catálogos proxy
 - [ ] Labels, placeholders, mensajes de error y validación en español (ADR-008)
 - [ ] Strings en: `entities/general-info/strings.ts`, `features/save-general-info/strings.ts`
+
+> **INVARIANTE**: `VITE_API_URL` apunta SOLO al backend. El frontend no tiene configuración de URL de core-mock.
 
 ### 8.4 test-engineer-backend
 
@@ -688,6 +789,17 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 - [ ] `UpdateGeneralInfoRequestValidatorTests` — name vacío → invalid
 - [ ] `UpdateGeneralInfoRequestValidatorTests` — taxId formato incorrecto → invalid
 - [ ] `UpdateGeneralInfoRequestValidatorTests` — agentCode formato incorrecto → invalid
+- [ ] `GetSubscribersUseCaseTests` — core-ohs disponible → retorna lista de suscriptores
+- [ ] `GetSubscribersUseCaseTests` — core-ohs no disponible → throws CoreOhsUnavailableException
+- [ ] `GetAgentByCodeUseCaseTests` — agente existe → retorna AgentDto
+- [ ] `GetAgentByCodeUseCaseTests` — agente no existe → throws FolioNotFoundException (rewrapped como 404)
+- [ ] `GetAgentByCodeUseCaseTests` — core-ohs no disponible → throws CoreOhsUnavailableException
+- [ ] `GetRiskClassificationsUseCaseTests` — core-ohs disponible → retorna lista
+- [ ] `GetRiskClassificationsUseCaseTests` — core-ohs no disponible → throws CoreOhsUnavailableException
+- [ ] `CatalogControllerTests` — GET /v1/subscribers → 200
+- [ ] `CatalogControllerTests` — GET /v1/agents?code=AGT-001 → 200
+- [ ] `CatalogControllerTests` — GET /v1/agents?code=AGT-999 → 404
+- [ ] `CatalogControllerTests` — GET /v1/catalogs/risk-classification → 200
 - [ ] `QuoteControllerTests` — GET general-info folio existente → 200
 - [ ] `QuoteControllerTests` — PUT general-info válido → 200 con version incrementada
 - [ ] `QuoteControllerTests` — PUT general-info folio inválido → 400
@@ -718,6 +830,10 @@ Ninguno. Los catálogos (suscriptores, agentes, clasificaciones de riesgo) ya ex
 **DoD (Definition of Done)** — para considerar el feature terminado:
 - [ ] `GET /v1/quotes/{folio}/general-info` responde según contrato §3.4
 - [ ] `PUT /v1/quotes/{folio}/general-info` responde según contrato §3.4 (todos los códigos de error)
+- [ ] `GET /v1/subscribers` responde como proxy según contrato §3.5 (backend → core-ohs)
+- [ ] `GET /v1/agents?code={code}` responde como proxy según contrato §3.5 (backend → core-ohs)
+- [ ] `GET /v1/catalogs/risk-classification` responde como proxy según contrato §3.5 (backend → core-ohs)
+- [ ] Frontend consume catálogos exclusivamente a través del backend (NUNCA directo a core-mock)
 - [ ] Validación de agente contra core-ohs funciona (422 si no existe)
 - [ ] `businessType` validado contra configuración de `appsettings.json`
 - [ ] Transición `draft` → `in_progress` al guardar primera sección

@@ -1,0 +1,2 @@
+- [SPEC-005 Design Status](project_spec005_status.md) -- Layout config design spec created, pending Stitch generation
+- [Stitch Project Config](reference_stitch_project.md) -- Project ID and design system references for Stitch MCP

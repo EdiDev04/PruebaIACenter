@@ -70,16 +70,18 @@ Estas son las ÚNICAS tools disponibles del Stitch MCP. No invoques tools que no
 
 ## FASE 0 — CARGA DE CONTEXTO (obligatorio)
 
-Lee estos archivos ANTES de diseñar cualquier pantalla:
+Lee SOLO estos archivos antes de diseñar. No leas otros — minimizan tokens sin perder contexto crítico:
 
 ```
-ARCHITECTURE.md                              → Stack FE, capas FSD, separación de estado
-bussines-context.md                          → Dominio de seguros, entidades, flujos
-.claude/rules/frontend.md                    → Restricciones FE, convenciones, componentes
-.claude/docs/lineamientos/dev-guidelines.md  → Clean Code, accesibilidad, patrones
-.github/design-specs/.stitch-config.json     → Config de proyecto Stitch (si existe)
-.github/specs/<feature>.spec.md              → Spec técnica (si existe)
+.github/design-specs/.stitch-config.json     → IDs del proyecto Stitch, design system y pantallas existentes
+.github/specs/<feature>.spec.md              → Spec técnica: entidades, campos, endpoints (ÚNICO input de dominio)
+bussines-context.md                          → Solo si la spec no describe suficiente el dominio de negocio
 ```
+
+**NO leer en Fase 0** (no aportan a la generación Stitch):
+- `ARCHITECTURE.md` — irrelevante para prompts visuales
+- `.claude/rules/frontend.md` — es para frontend-developer, no para UX
+- `.claude/docs/lineamientos/dev-guidelines.md` — es para frontend-developer, no para UX
 
 Si `.github/design-specs/` no existe, créala.
 
@@ -224,48 +226,76 @@ Prompts optimizados para `generate_screen_from_text`. Cada prompt DEBE incluir:
 
 ### 4.1 Generar pantallas
 
-Para cada prompt de la Sección 6 del design spec:
+**REGLA ANTI-DUPLICADOS — obligatoria antes de generar cualquier pantalla:**
+```
+1. Llama `list_screens` con el projectId
+2. Compara los títulos/nombres contra las pantallas pendientes del config
+3. Si ya existe una pantalla equivalente → NO generar, registrar su screenId en el config y continuar
+4. Solo generar si list_screens confirma que NO existe
+```
+
+**REGLA DE PARALELISMO — máximo 2 pantallas simultáneas:**
+```
+La API de Stitch falla silenciosamente con 3+ llamadas paralelas.
+Generar en lotes de máximo 2 → verificar con list_screens → siguiente lote.
+NUNCA lanzar todas las pantallas de un feature en una sola ronda paralela.
+```
+
+Para cada prompt de la Sección 6 del design spec (en lotes de 2):
 
 ```
-1. Llama `generate_screen_from_text` con:
+1. [VERIFICAR] list_screens → confirmar que la pantalla NO existe ya
+
+2. [GENERAR] Llama `generate_screen_from_text` con:
    - projectId: "<projectId>"
    - prompt: "<prompt de la Sección 6>"
-   - modelId: "GEMINI_3_FLASH"     ← usar Flash para la primera iteración
+   - modelId: "GEMINI_3_FLASH"
 
-2. La respuesta contiene el screen resource name
-   Extrae el screenId del resource name
+3. [CONFIRMAR INMEDIATAMENTE] Llama `list_screens` después de cada generación
+   - Si la pantalla aparece → extraer screenId y registrar en config
+   - Si NO aparece → y solo entonces → reintentar UNA vez
+   - Si tras el reintento tampoco aparece → marcar status: "pending" y continuar
 
-3. Llama `get_screen` con el resource name para obtener los detalles
-   (HTML/CSS generado, metadata de la pantalla)
-
-4. Registra en `.stitch-config.json`:
+4. [REGISTRAR] Actualiza `.stitch-config.json` con el screenId confirmado:
    {
      "screens": {
        "<nombre-pantalla>": {
          "screenName": "<resource-name>",
          "screenId": "<screenId>",
-         "prompt": "<prompt usado>",
          "model": "GEMINI_3_FLASH",
+         "designSystemApplied": false,
          "status": "draft"
        }
      }
    }
+   Registrar INMEDIATAMENTE — no acumular para el final.
 ```
 
 ### 4.2 Aplicar design system a las pantallas generadas
 
-Después de generar las pantallas de un feature:
+**IMPORTANTE — `apply_design_system` crea pantallas NUEVAS con un ID distinto:**
+El screen original queda obsoleto. Solo el screen con DS aplicado es el artefacto final.
 
 ```
-1. Llama `get_project` con el resource name del proyecto
-   → Obtén el array `selectedScreenInstances` de la respuesta
+1. Llama `get_project` → obtén `selectedScreenInstances`
+   Filtrar SOLO las instancias de las pantallas recién generadas (por sourceScreen)
+   NO incluir instancias de pantallas ya estilizadas en sesiones anteriores
 
 2. Llama `apply_design_system` con:
    - projectId: "<projectId>"
-   - selectedScreenInstances: [las instancias del paso anterior]
+   - selectedScreenInstances: [solo las pantallas nuevas]
    - assetId: "<designSystemAssetId de .stitch-config.json>"
 
-3. Esto reestiliza todas las pantallas con los tokens del design system
+3. La respuesta retorna los nuevos screenIds estilizados
+   Actualiza el config con los IDs NUEVOS (styled) — descarta los IDs originales:
+   {
+     "screenId": "<nuevo-id-con-DS>",          ← ID del screen estilizado
+     "screenIdOriginal": "<id-sin-DS>",        ← conservar solo para referencia
+     "designSystemApplied": true
+   }
+
+4. Descargar HTML SOLO del screen estilizado (el nuevo ID)
+   No descargar el HTML del screen original — es obsoleto
 ```
 
 ### 4.3 Evaluar y refinar
@@ -336,13 +366,19 @@ Cuando las pantallas están validadas con Flash:
 
 ### 4.6 Extraer HTML/CSS de referencia
 
-Para cada pantalla final:
+Para cada pantalla final (solo screens con `designSystemApplied: true`):
 
 ```
-1. Llama `get_screen` con el resource name de la pantalla final
-2. Extrae el HTML/CSS de la respuesta
-3. Guarda en `.github/design-specs/screens/<feature>/<nombre-pantalla>.html`
-4. Este archivo es la REFERENCIA VISUAL que el frontend-developer consulta
+1. Usa el downloadUrl del htmlCode de la respuesta de apply_design_system
+   (ya disponible en la respuesta — no necesitas llamar get_screen adicional)
+
+2. Descarga con curl el HTML directamente al path de destino:
+   curl -sL "<downloadUrl>" -o ".github/design-specs/screens/<feature>/<nombre>.html"
+
+3. Descarga en paralelo todos los HTMLs de un mismo feature (son independientes)
+
+4. NO llamar get_screen solo para obtener el HTML si ya tienes el downloadUrl
+   get_screen solo si necesitas metadata adicional de la pantalla
 ```
 
 ---

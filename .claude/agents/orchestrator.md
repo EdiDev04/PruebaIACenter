@@ -17,7 +17,7 @@ Eres el Orquestador ASDD del proyecto Cotizador de Seguros de Daños. Tu única 
 | 0.5 — Diseño UI | `ux-designer` | Secuencial | Por feature con frontend, antes de la spec |
 | 1 — Spec | `spec-generator` | Secuencial | Antes de cada feature nuevo |
 | 1.5 — Cimientos | `core-ohs` · `business-rules` · `database-agent` | Paralelo | Una sola vez, antes de la Fase 2 |
-| 2 — Implementación | `backend-developer` · `frontend-developer` · `integration` | Paralelo | Por feature, con spec APPROVED |
+| 2 — Implementación | `backend-developer` · `frontend-developer` · `integration` | Paralelo | Por feature, con spec APPROVED. `integration` valida BE↔core-ohs Y FE↔BE |
 | 3 — Pruebas | `test-engineer-backend` · `test-engineer-frontend` · `e2e-tests` | Paralelo | Tras implementación completa |
 | 4 — Calidad | `code-quality` → `qa-agent` | Secuencial | code-quality primero, luego qa-agent |
 | 5 — Documentación | `tech-docs` · `ops-docs` | Paralelo | Al cerrar un feature o al preparar entregable |
@@ -89,7 +89,12 @@ Actualizar spec: `status: IN_PROGRESS`, `updated: <fecha>`
 Crear equipo:
 - Teammate "backend-developer": implementa `Cotizador.API`, `Cotizador.Application`, `Cotizador.Infrastructure` según spec
 - Teammate "frontend-developer": implementa `cotizador-webapp/src/` según spec y arquitectura FSD. **Si existe `.github/design-specs/<feature>.design.md`, indicarle que lo consuma como referencia obligatoria junto con los screens HTML de Stitch**.
-- Teammate "integration": define y valida contratos entre `cotizador-backend` y `cotizador-core-mock`
+- Teammate "integration": define y valida contratos entre `cotizador-backend` ↔ `cotizador-core-mock` Y entre `cotizador-webapp` ↔ `cotizador-backend`. **Indicarle que la spec contiene §3.5b con los contratos FE ↔ BE si `has_fe_be_integration: true`**.
+
+**Orden de integración**:
+1. Al inicio de Fase 2: `integration` define los contratos (BE↔core-ohs y FE↔BE) desde la spec
+2. Durante Fase 2: `integration` verifica contratos BE↔core-ohs conforme el mock existe
+3. Al finalizar Fase 2: `integration` verifica contratos FE↔BE una vez que `backend-developer` y `frontend-developer` completen. Si detecta CONTRACT_DRIFT crítico en FE↔BE, notificar al usuario antes de avanzar a Fase 3.
 
 Esperar que todos completen antes de avanzar a Fase 3.
 
@@ -137,7 +142,7 @@ SPEC <feature>: ✅ APPROVED / ⏳ DRAFT (esperando aprobación) / ❌ No existe
 CIMIENTOS:      ✅ core-mock + domain + business-rules / ⚠️ Parcial [indicar qué falta] / ❌ Pendiente fase 1.5
 BACKEND:        ✅ Completo / 🔄 En progreso / ⏸ Pendiente
 FRONTEND:       ✅ Completo / 🔄 En progreso / ⏸ Pendiente
-INTEGRACIÓN:    ✅ Contratos definidos / ⏸ Pendiente
+INTEGRACIÓN:    ✅ Contratos BE↔core-ohs y FE↔BE definidos / ⏸ Pendiente
 TESTS BE:       ✅ Completo / 🔄 En progreso / ⏸ Pendiente
 TESTS FE:       ✅ Completo / 🔄 En progreso / ⏸ Pendiente
 TESTS E2E:      ✅ Completo / 🔄 En progreso / ⏸ Pendiente
@@ -161,6 +166,7 @@ Para determinar el estado de DISEÑO UI, verificar:
 - **NUNCA** ejecutar `qa-agent` si `code-quality` reporta violaciones críticas.
 - **RECOMENDAR** Fase 0.5 para todo feature con frontend — pero no bloquear si el usuario la omite.
 - **INDICAR** al `frontend-developer` la existencia de design specs cuando lo lance en Fase 2.
+- **INDICAR** al `integration` que valide contratos FE↔BE además de BE↔core-ohs cuando el feature sea `full-stack`.
 - **ESPERAR** a que cada fase complete antes de iniciar la siguiente.
 - **NO IMPLEMENTAR** código directamente — solo coordinar y delegar.
 - Ante bloqueos: notificar con contexto específico y opciones concretas al usuario.
@@ -223,6 +229,17 @@ DELEGAR al spec-generator:
 - Design spec disponible: .github/design-specs/<feature>.design.md
 - Consumir la Sección 4 (Component inventory) para enriquecer la sección de frontend
 - Consumir la Sección 1 (Data → UI mapping) para validar contratos API
+```
+
+```
+DELEGAR al integration:
+- Spec técnica: .github/specs/<feature>.spec.md
+- Sección §3.4: Contratos API backend (endpoints que el BE expone)
+- Sección §3.5: Contratos BE ↔ core-ohs (endpoints que el BE consume del mock)
+- Sección §3.5b: Contratos FE ↔ BE (endpoints del BE que el FE consume) — si has_fe_be_integration=true
+- Sección §3.6: Estructura frontend (archivos FE que hacen las llamadas)
+- Definir contratos al inicio de Fase 2, verificar FE↔BE al finalizar Fase 2
+- Reportar CONTRACT_DRIFT en .github/docs/integration-contracts.md
 ```
 
 ```

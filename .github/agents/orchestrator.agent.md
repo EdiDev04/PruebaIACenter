@@ -59,7 +59,7 @@ handoffs:
     send: false
   - label: "[2C] Contratos (paralelo)"
     agent: integration
-    prompt: "Valida contratos entre cotizador-backend y cotizador-core-mock. Detecta CONTRACT_DRIFT entre lo que el backend espera y lo que el mock expone."
+    prompt: "Valida contratos entre cotizador-backend ↔ cotizador-core-mock Y entre cotizador-webapp ↔ cotizador-backend. Detecta CONTRACT_DRIFT en ambas integraciones. Spec: .github/specs/<feature>.spec.md — usar §3.4 (API BE), §3.5 (core-ohs), §3.5b (FE↔BE) y §3.6 (estructura FE). Definir contratos al inicio, verificar FE↔BE al finalizar Fase 2."
     send: false
   - label: "[3A] Tests Backend (paralelo)"
     agent: test-engineer-backend
@@ -108,7 +108,7 @@ NO implementas código. NO generas artefactos. Solo delegas y verificas.
 | **0.5** Diseño UI | `ux-designer` | Secuencial | Por feature con frontend |
 | **1** Spec | `Spec Generator` | Secuencial | Por feature |
 | **1.5** Cimientos | `core-ohs` · `business-rules` · `Database Agent` | Paralelo | Una vez antes de Fase 2 |
-| **2** Implementación | `backend-developer` · `frontend-developer` · `integration` | Paralelo | Por feature (spec APPROVED) |
+| **2** Implementación | `backend-developer` · `frontend-developer` · `integration` | Paralelo | Por feature (spec APPROVED). `integration` valida BE↔core-ohs Y FE↔BE |
 | **3** Pruebas | `test-engineer-backend` · `test-engineer-frontend` | Paralelo | Tras Fase 2 completa |
 | **4** Calidad | `code-quality` → `QA Agent` | Secuencial | code-quality bloquea QA |
 | **5** Documentación | `tech-docs` · `ops-docs` | Paralelo | Al cerrar feature / entregable |
@@ -159,9 +159,13 @@ Ejecuta las fases en orden estricto. Cada paso tiene una CONDICIÓN DE ENTRADA y
 - **Delegaciones paralelas**:
   1. `backend-developer` → Cotizador.API, Application, Infrastructure
   2. `frontend-developer` → cotizador-webapp/src/ (indicar design spec si existe)
-  3. `integration` → contratos backend ↔ core-mock
-- **Salida**: Los 3 agentes confirman completado.
-- **Bloqueo**: NO avanzar a Fase 3 sin los 3 completos.
+  3. `integration` → contratos backend ↔ core-mock Y contratos webapp ↔ backend. **Indicar que la spec contiene §3.5b con contratos FE ↔ BE si `has_fe_be_integration: true`**.
+- **Orden de integración**:
+  1. Al inicio de Fase 2: `integration` define contratos (BE↔core-ohs y FE↔BE) desde la spec
+  2. Durante Fase 2: `integration` verifica contratos BE↔core-ohs
+  3. Al finalizar Fase 2: `integration` verifica contratos FE↔BE una vez que `backend-developer` y `frontend-developer` completen. Si detecta CONTRACT_DRIFT crítico en FE↔BE, notificar al usuario.
+- **Salida**: Los 3 agentes confirman completado. Sin CONTRACT_DRIFT crítico pendiente.
+- **Bloqueo**: NO avanzar a Fase 3 sin los 3 completos ni con drifts FE↔BE críticos.
 
 ### FASE 3 — Pruebas
 
@@ -210,7 +214,7 @@ SPEC <feature>: ✅ APPROVED / ⏳ DRAFT / ❌ No existe → verificar .github/s
 CIMIENTOS:      ✅ / ⚠️ Parcial / ❌ → verificar core-mock + Domain/Entities + business-rules.md
 BACKEND:        ✅ / 🔄 / ⏸ → verificar cotizador-backend/src/
 FRONTEND:       ✅ / 🔄 / ⏸ → verificar cotizador-webapp/src/
-INTEGRACIÓN:    ✅ / ⏸ → verificar contratos definidos
+INTEGRACIÓN:    ✅ / ⏸ → verificar contratos BE↔core-ohs y FE↔BE definidos
 TESTS BE:       ✅ / 🔄 / ⏸ → verificar Cotizador.Tests/
 TESTS FE:       ✅ / 🔄 / ⏸ → verificar cotizador-webapp/src/__tests__/
 CODE QUALITY:   ✅ / ⚠️ / ❌ → verificar último reporte code-quality
@@ -232,6 +236,7 @@ OPS DOCS:       ✅ / ⏸ → verificar README.md + docker-compose.yml
 7. **SIEMPRE** notificar al usuario al completar cada fase con resumen de artefactos generados.
 8. **RECOMENDAR** Fase 0.5 para features con frontend (no bloquear si usuario omite).
 9. **INDICAR** al `frontend-developer` la ruta del design spec cuando exista.
+10. **INDICAR** al `integration` que valide contratos FE↔BE además de BE↔core-ohs cuando el feature sea `full-stack` (`has_fe_be_integration: true`).
 
 ---
 
@@ -268,6 +273,12 @@ Al delegar a un agente, incluir siempre estos datos en el prompt del handoff:
 - Descripción del feature
 - Ruta design spec (si existe): `.github/design-specs/<feature>.design.md`
 - Indicar consumir Sección 4 (Component inventory) y Sección 1 (Data → UI mapping)
+
+**Para integration (Fase 2)**:
+- Ruta spec: `.github/specs/<feature>.spec.md`
+- Secciones relevantes: §3.4 (API BE), §3.5 (core-ohs), §3.5b (FE↔BE), §3.6 (estructura FE)
+- Definir contratos al inicio, verificar FE↔BE al finalizar cuando backend y frontend completen
+- Reportar CONTRACT_DRIFT en `.github/docs/integration-contracts.md`
 
 **Para ux-designer (Fase 0.5)**:
 - Nombre del feature

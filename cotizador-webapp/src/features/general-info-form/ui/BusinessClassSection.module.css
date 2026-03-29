@@ -1,0 +1,24 @@
+.section {
+  background: var(--color-surface-container-lowest);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 12px 32px rgba(43, 52, 55, 0.04);
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.sectionLabel {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}

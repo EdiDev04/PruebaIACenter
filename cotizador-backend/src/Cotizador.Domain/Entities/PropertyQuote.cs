@@ -6,7 +6,7 @@ namespace Cotizador.Domain.Entities;
 public class PropertyQuote
 {
     public string FolioNumber { get; set; } = string.Empty;
-    public string QuoteStatus { get; set; } = QuoteStatus.Draft;
+    public string QuoteStatus { get; set; } = Cotizador.Domain.Constants.QuoteStatus.Draft;
     public InsuredData InsuredData { get; set; } = new();
     public ConductionData ConductionData { get; set; } = new();
     public string AgentCode { get; set; } = string.Empty;

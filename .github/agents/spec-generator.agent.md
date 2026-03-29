@@ -80,6 +80,11 @@ Determina el tipo de feature antes de continuar. Esto define qué agentes se act
 | `has_calculation_logic` | `true` \| `false` | ¿Involucra el motor de cálculo o reglas numéricas? |
 | `affects_database` | `true` \| `false` | ¿Crea o modifica colecciones MongoDB? |
 | `consumes_core_ohs` | `true` \| `false` | ¿Requiere datos de `cotizador-core-mock`? |
+| `has_fe_be_integration` | `true` \| `false` | ¿El FE consume endpoints del BE? `true` si `feature_type` es `full-stack` |
+
+> **Regla**: Si `has_fe_be_integration: true`, el agente `integration` valida contratos FE ↔ BE
+> además de los contratos BE ↔ core-ohs. El `integration` agent define los contratos al inicio
+> de Fase 2 y los verifica al finalizar, antes de avanzar a Fase 3.
 
 > **Regla**: Si `requires_design_spec: true`, el agente `ux-designer` se ejecuta en Fase 0.5
 > (antes de que `frontend-developer` pueda iniciar). El frontend no puede comenzar implementación
@@ -133,6 +138,7 @@ requires_design_spec: true|false
 has_calculation_logic: true|false
 affects_database: true|false
 consumes_core_ohs: true|false
+has_fe_be_integration: true|false
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 author: spec-generator
@@ -307,6 +313,36 @@ Mapeado a: <Entidad>.<campo>
 Manejo de error: <qué hace el backend si falla>
 ```
 
+##### `### 3.5b Contratos FE ↔ BE (solo si has_fe_be_integration: true)`
+
+Para cada endpoint del backend que el frontend consume en este feature:
+
+```
+<VERBO> <ruta backend>
+Consumido por:
+  Archivo FE:    <ruta relativa desde cotizador-webapp/src/>
+  Hook/Query:    <useMutation | useQuery> (TanStack Query)
+  Query Key:     ['recurso', id]
+
+Request FE → BE:
+  { JSON que el FE envía al BE }
+
+Response BE → FE (200):
+  { JSON que el FE espera recibir }
+
+Errores manejados por el FE:
+  - 400: <acción en UI — ej: muestra errores de validación en formulario>
+  - 404: <acción en UI — ej: notificación "recurso no encontrado">
+  - 500: <acción en UI — ej: notificación genérica de error>
+
+Invalidación de caché:
+  - Al mutar, invalida: ['recurso'] | ninguna
+```
+
+> **Regla**: Los campos del request y response DEBEN coincidir exactamente entre
+> la sección §3.4 (contratos API backend) y esta sección §3.5b (contratos FE ↔ BE).
+> El agente `integration` usa ambas secciones para detectar CONTRACT_DRIFT.
+
 ##### `### 3.6 Estructura frontend (solo si feature_type != backend-only)`
 
 Mapa exacto de archivos a crear/modificar:
@@ -455,7 +491,7 @@ Incluir TODOS los supuestos tomados durante 1.3. Si no hay supuestos, escribir `
         ├── [backend-developer]  (Fase 2, si feature_type != frontend-only)
         ├── [frontend-developer] (Fase 2, si feature_type != backend-only)
         │                          BLOQUEADO hasta design.status=APPROVED
-        └── [integration]        (Fase 2, valida contratos BE ↔ core-mock)
+        └── [integration]        (Fase 2, valida contratos BE ↔ core-mock Y FE ↔ BE)
                 │
                 ├── [test-engineer-backend]   (Fase 3, paralelo)
                 ├── [test-engineer-frontend]  (Fase 3, paralelo)
@@ -476,7 +512,7 @@ Incluir TODOS los supuestos tomados durante 1.3. Si no hay supuestos, escribir `
 | `ux-designer` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + feature tiene frontend |
 | `frontend-developer` | `ux-designer` | `design-specs/<feature>.design.md` → `status: APPROVED` |
 | `backend-developer` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + Fase 1.5 completa |
-| `integration` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + Fase 1.5 completa |
+| `integration` | `spec-generator` | `specs/<feature>.spec.md` → `status: APPROVED` + Fase 1.5 completa. Verificación FE↔BE requiere que `backend-developer` y `frontend-developer` completen |
 | `test-engineer-backend` | `backend-developer` | Implementación backend completa |
 | `test-engineer-frontend` | `frontend-developer` | Implementación frontend completa |
 | `e2e-tests` | `backend-developer` + `frontend-developer` + `integration` | Fase 2 completa (los 3 agentes) |
@@ -522,6 +558,7 @@ Antes de escribir el archivo final, verifica:
 4. **Bloqueos declarados**: ¿La tabla §7.2 refleja correctamente los bloqueos según los flags?
 5. **Contratos BE completos**: ¿Cada endpoint tiene todos los códigos de error listados?
 6. **Contratos FE alineados**: ¿Los campos que consume el FE coinciden exactamente con los que devuelve el BE?
+6b. **Contratos FE ↔ BE completos**: Si `has_fe_be_integration: true`, ¿existe §3.5b con un contrato por cada endpoint que el FE consume? ¿Coinciden los campos con §3.4?
 7. **Reglas con test**: ¿Cada RN tiene al menos un criterio Gherkin en §2.1 que la cubre?
 8. **Core-OHS sin invención**: ¿Cada endpoint mock referenciado existe en el dominio documentado?
 9. **Sin referencias rotas**: ¿Todos los IDs (HU, RN, SUP) referenciados en el doc existen?
@@ -548,6 +585,7 @@ Al entregar la spec al usuario, incluir siempre este resumen:
    - Lógica de cálculo: <has_calculation_logic>
    - Afecta BD:          <affects_database>
    - Consume core-ohs:   <consumes_core_ohs>
+   - Integración FE↔BE:  <has_fe_be_integration>
 
 📐 Próximos pasos una vez apruebes la spec (status: DRAFT → APPROVED):
 
@@ -564,6 +602,7 @@ Al entregar la spec al usuario, incluir siempre este resumen:
   Fase 2 (paralelo):
     → backend-developer
     → frontend-developer  ← BLOQUEADO hasta design.status=APPROVED
+    → integration         ← valida contratos BE↔core-ohs Y FE↔BE (si has_fe_be_integration=true)
 
   O ejecuta todo con el orchestrator.
 

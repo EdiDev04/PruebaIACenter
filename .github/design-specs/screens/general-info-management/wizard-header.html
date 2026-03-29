@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cotizador de Daños - Paso 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary": "#e9ffe6", "on-secondary-fixed": "#633300", "surface-container-highest": "#d5e3ff", "primary-dim": "#0047c6", "on-secondary": "#fff7f4", "inverse-primary": "#638aff", "on-primary": "#faf8ff", "surface-container": "#e7eeff", "on-secondary-container": "#7e4200", outline: "#6c7b96", secondary: "#914d00", "primary-fixed": "#4878fd", "tertiary-fixed": "#82ff99", "on-tertiary-fixed": "#004c1d", background: "#f9f9ff", tertiary: "#006e2e", "on-primary-container": "#000000", "secondary-container": "#ffdcc3", "tertiary-fixed-dim": "#73f08c", "on-primary-fixed": "#ffffff", "inverse-surface": "#070e19", "inverse-on-surface": "#969dac", "surface-tint": "#1554d9", "surface-variant": "#d5e3ff", "surface-container-lowest": "#ffffff", "error-container": "#f97386", "surface-dim": "#cbdbf9", "on-background": "#24334a", "on-tertiary-container": "#006127", "primary-fixed-dim": "#386bef", "tertiary-container": "#82ff99", "on-surface-variant": "#506079", "on-primary-fixed-variant": "#fefcff", "tertiary-dim": "#006127", error: "#a8364b", surface: "#f9f9ff", "on-tertiary-fixed-variant": "#006c2d", "outline-variant": "#a3b3cf", "surface-container-low": "#f0f3ff", "surface-bright": "#f9f9ff", "error-dim": "#6b0221", "secondary-fixed": "#ffdcc3", "on-surface": "#24334a", "on-error-container": "#6e0523", "surface-container-high": "#dee8ff", "on-error": "#fff7f7", "secondary-fixed-dim": "#ffcaa1", "primary-container": "#4878fd", primary: "#1554d9", "on-secondary-fixed-variant": "#8c4a00", "secondary-dim": "#804300"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], mono: ["JetBrains Mono"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        /* Overriding for JSON Integrity vs Design System specific rules */
+        .header-anchor {
+            height: 80px; /* As per prompt request */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar Shell -->
+<header class="sticky top-0 w-full z-50 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-800 flex flex-col justify-center px-6 max-w-full mx-auto shadow-sm">
+<!-- Top Row: Identity & Global Progress -->
+<div class="flex items-center justify-between h-10 w-full">
+<div class="flex items-center gap-4">
+<span class="text-lg font-bold text-slate-900 dark:text-slate-50 tracking-tight">Cotizador de Daños</span>
+<div class="flex items-center gap-2">
+<span class="bg-surface-container-low text-on-surface-variant font-mono text-xs px-2 py-0.5 rounded border border-outline-variant/20">
+                        DAN-2026-00001
+                    </span>
+<span class="flex items-center gap-1.5 text-xs font-medium text-primary bg-primary-container/30 px-2 py-0.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                        En progreso
+                    </span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end gap-1">
+<span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant leading-none">Paso 1 de 4</span>
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="25" class="w-32 h-1.5 bg-surface-container rounded-full overflow-hidden" role="progressbar">
+<div class="h-full bg-primary transition-all duration-500" style="width: 25%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Second Row: Step Navigation -->
+<nav class="flex items-center justify-start h-10 w-full gap-8 mt-1 overflow-x-auto no-scrollbar">
+<!-- Step 1: Active -->
+<div aria-current="step" class="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-bold border-b-2 border-blue-700 dark:border-blue-400 pb-1 shrink-0 cursor-default">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold">1</span>
+<span class="text-sm tracking-tight">Datos Generales</span>
+</div>
+<!-- Step 2: Inactive -->
+<div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-medium pb-1 shrink-0 hover:text-blue-600 dark:hover:text-blue-300 transition-colors cursor-pointer group">
+<span class="flex items-center justify-center w-5 h-5 rounded-full border border-outline-variant text-[10px] font-bold group-hover:border-primary group-hover:text-primary transition-colors">2</span>
+<span class="text-sm tracking-tight">Ubicaciones</span>
+</div>
+<!-- Step 3: Inactive -->
+<div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-medium pb-1 shrink-0 hover:text-blue-600 dark:hover:text-blue-300 transition-colors cursor-pointer group">
+<span class="flex items-center justify-center w-5 h-5 rounded-full border border-outline-variant text-[10px] font-bold group-hover:border-primary group-hover:text-primary transition-colors">3</span>
+<span class="text-sm tracking-tight">Coberturas</span>
+</div>
+<!-- Step 4: Inactive -->
+<div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-medium pb-1 shrink-0 hover:text-blue-600 dark:hover:text-blue-300 transition-colors cursor-pointer group">
+<span class="flex items-center justify-center w-5 h-5 rounded-full border border-outline-variant text-[10px] font-bold group-hover:border-primary group-hover:text-primary transition-colors">4</span>
+<span class="text-sm tracking-tight">Resultados</span>
+</div>
+</nav>
+</header>
+<!-- Main Content Area -->
+<main class="max-w-6xl mx-auto mt-12 px-6">
+<div class="bg-surface-container-lowest p-12 rounded-xl shadow-sm border border-outline-variant/10 min-h-[600px] flex flex-col gap-8">
+<header class="space-y-2">
+<h1 class="text-3xl font-bold text-on-surface tracking-tight">Datos Generales</h1>
+<p class="text-on-surface-variant text-base">Complete la información básica del asegurado para comenzar con la cotización.</p>
+</header>
+<!-- Bento Layout for Form Sections -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Main Form Column -->
+<div class="md:col-span-2 space-y-8">
+<section class="p-6 bg-surface-container-low rounded-lg space-y-4">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Información del Cliente</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-semibold text-on-surface-variant">Nombre o Razón Social</label>
+<input class="w-full bg-white border-none rounded-md shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm h-10 px-3" placeholder="Ej. Constructora del Norte S.A." type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-semibold text-on-surface-variant">RFC / Identificación Fiscal</label>
+<input class="w-full bg-white border-none rounded-md shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm h-10 px-3" placeholder="ABC123456XYZ" type="text"/>
+</div>
+</div>
+</section>
+<section class="p-6 bg-surface-container-low rounded-lg space-y-4">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Detalles de la Póliza</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-semibold text-on-surface-variant">Inicio de Vigencia</label>
+<input class="w-full bg-white border-none rounded-md shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm h-10 px-3" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-semibold text-on-surface-variant">Moneda</label>
+<select class="w-full bg-white border-none rounded-md shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm h-10 px-3">
+<option>MXN - Peso Mexicano</option>
+<option>USD - Dólar Estadounidense</option>
+</select>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Summary/Guide -->
+<div class="md:col-span-1">
+<div class="bg-primary/5 border border-primary/10 p-6 rounded-lg sticky top-32 space-y-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<h3 class="font-bold text-on-primary-container">Guía de Llenado</h3>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                            Asegúrese de que los datos fiscales coincidan con la constancia de situación fiscal vigente para evitar retrasos en la emisión.
+                        </p>
+<div class="pt-4 border-t border-primary/10">
+<button class="w-full bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-bold py-3 rounded-lg shadow-lg shadow-primary/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+<span>Siguiente Paso</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Placeholder Visualization of content height -->
+<div class="mt-8 border-2 border-dashed border-outline-variant/30 rounded-xl p-12 flex items-center justify-center bg-surface-container-lowest/50">
+<div class="text-center space-y-2">
+<span class="material-symbols-outlined text-4xl text-outline-variant/50" data-icon="description">description</span>
+<p class="text-sm font-medium text-on-surface-variant">Contenido del Paso 1: Información detallada de riesgos y formularios adicionales</p>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-24 pb-12 text-center">
+<p class="text-xs text-on-surface-variant font-medium tracking-wide">Underwriting Systems Premium Dashboard • © 2026</p>
+</footer>
+</body></html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-high": "#dee8ff", surface: "#f9f9ff", "on-secondary": "#fff7f4", secondary: "#914d00", "on-primary-container": "#000000", "on-surface": "#24334a", background: "#f9f9ff", "secondary-container": "#ffdcc3", "on-error": "#fff7f7", "surface-variant": "#d5e3ff", "surface-container": "#e7eeff", outline: "#6c7b96", "on-background": "#24334a", "secondary-fixed": "#ffdcc3", "on-tertiary-fixed": "#004c1d", "surface-bright": "#f9f9ff", "on-secondary-fixed-variant": "#8c4a00", "on-tertiary-container": "#006127", "inverse-primary": "#638aff", "on-error-container": "#6e0523", "on-primary-fixed-variant": "#fefcff", error: "#a8364b", "surface-tint": "#1554d9", "on-primary": "#faf8ff", primary: "#1554d9", "surface-dim": "#cbdbf9", "surface-container-highest": "#d5e3ff", "primary-fixed-dim": "#386bef", "on-primary-fixed": "#ffffff", "tertiary-fixed": "#82ff99", "inverse-on-surface": "#969dac", "surface-container-lowest": "#ffffff", "on-tertiary-fixed-variant": "#006c2d", "outline-variant": "#a3b3cf", "on-secondary-container": "#7e4200", "surface-container-low": "#f0f3ff", "secondary-fixed-dim": "#ffcaa1", "primary-container": "#4878fd", "inverse-surface": "#070e19", "on-surface-variant": "#506079", tertiary: "#006e2e", "primary-fixed": "#4878fd", "tertiary-fixed-dim": "#73f08c", "on-tertiary": "#e9ffe6", "tertiary-container": "#82ff99", "on-secondary-fixed": "#633300", "error-container": "#f97386", "tertiary-dim": "#006127", "primary-dim": "#0047c6", "error-dim": "#6b0221", "secondary-dim": "#804300"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f9f9ff;
+      }
+      h1, h2, h3, h4 {
+        font-family: 'Manrope', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Bar (Shared Component) -->
+<nav class="flex justify-between items-center px-8 py-3 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-950 fixed top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-800 dark:text-blue-300 uppercase tracking-tight">COTIZADOR DE DAÑOS</span>
+<div class="hidden md:flex gap-6">
+<a class="text-blue-700 dark:text-blue-400 font-bold border-b-2 border-blue-700 dark:border-blue-400 pb-1" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Polizas</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Siniestros</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Reportes</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full object-cover" data-alt="Professional portrait of a male insurance underwriter in a crisp white shirt against a neutral office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE23eApOVR5cuaUbRyK8--af1U4KW-HEr_znzPHVdUK3J6lIvygStmJMBbsI8a-5FXEs3GwJ7iQpfozBgRcamBhQixsfeiQerb_HKYRvmbyVXpikn6_dfZeJLhjJai3f0p_eCmJRXOWqwJELp2rZaat98oXZl579v-VGDpP33VmsCU7JCRUGFgWfbKqZ1shyKEvQLoIj0U8VXWvb4Ko3kZP3__0fZHIZgCoAiTtnfidfNiP1zZcV_rXDo0VYV2A8FZFec8_jBiO7Q"/>
+</div>
+</nav>
+<!-- Main Content Simulation -->
+<main class="pt-20 px-8 pb-8 pr-[400px] min-h-screen">
+<div class="max-w-5xl mx-auto space-y-8">
+<header class="flex justify-between items-end">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface">Panel de Control de Riesgos</h1>
+<p class="text-on-surface-variant font-medium mt-1">Gestión técnica de carteras e inmuebles</p>
+</div>
+</header>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-8 p-6 bg-surface-container-lowest rounded-xl border-none shadow-[0_4px_20px_0_rgba(27,49,64,0.05)]">
+<h2 class="text-lg font-bold mb-4">Siniestralidad por Zona</h2>
+<div class="h-64 bg-surface-container-low rounded-lg flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-4xl" data-icon="analytics">analytics</span>
+<span class="ml-2 font-medium">Visualización de Datos</span>
+</div>
+</div>
+<div class="col-span-4 p-6 bg-surface-container-lowest rounded-xl border-none shadow-[0_4px_20px_0_rgba(27,49,64,0.05)]">
+<h2 class="text-lg font-bold mb-4">Alertas</h2>
+<div class="space-y-4">
+<div class="flex items-start gap-3 p-3 bg-tertiary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-tertiary" data-icon="warning">warning</span>
+<div>
+<p class="text-sm font-bold text-tertiary">Riesgo Alto Detectado</p>
+<p class="text-xs text-on-surface-variant mt-1">CP 06700 presenta incremento en...</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 bg-primary-fixed/30 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<div>
+<p class="text-sm font-bold text-primary">Actualización de Tasas</p>
+<p class="text-xs text-on-surface-variant mt-1">Nuevas coberturas disponibles...</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Configuration Panel (Right Sidebar) -->
+<aside class="fixed top-0 right-0 h-screen w-[360px] bg-surface-container-lowest z-[60] shadow-[-4px_0_20px_0_rgba(27,49,64,0.05)] flex flex-col border-l border-outline-variant/15">
+<!-- Header Section -->
+<div class="p-6 pb-4">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<h2 class="text-xl font-extrabold text-on-surface tracking-tight">Configurar vista</h2>
+<span class="bg-surface-container-high text-on-surface-variant text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Personalizada</span>
+</div>
+<button class="p-1 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-outline" data-icon="close">close</span>
+</button>
+</div>
+<!-- Segmented Control -->
+<div class="bg-surface-dim p-1 rounded-xl flex items-center mb-8 h-11">
+<button class="flex-1 flex items-center justify-center gap-2 h-full bg-surface-container-lowest text-primary rounded-lg font-bold shadow-sm transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="list">list</span>
+<span class="text-sm">Lista</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 h-full text-on-surface-variant hover:text-on-surface transition-all font-medium">
+<span class="material-symbols-outlined text-[20px]" data-icon="grid_view">grid_view</span>
+<span class="text-sm">Grilla</span>
+</button>
+</div>
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-sm font-bold text-on-surface">Columnas Visibles</h3>
+<span class="text-sm font-semibold text-primary">(8 de 15)</span>
+</div>
+</div>
+<!-- Scrollable Content Section -->
+<div class="flex-1 overflow-y-auto px-6 space-y-8 pb-10">
+<!-- Group 1: Identificacion -->
+<section class="space-y-3">
+<button class="flex items-center justify-between w-full group">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Identificación</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+<div class="space-y-3 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">ID de Propiedad</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Nombre comercial</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">RFC Titular</span>
+</label>
+</div>
+</section>
+<!-- Group 2: Ubicacion geografica -->
+<section class="space-y-3">
+<button class="flex items-center justify-between w-full">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Ubicación geográfica</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+<div class="space-y-3 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Código postal</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Estado</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Municipio</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Colonia</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Ciudad</span>
+</label>
+</div>
+</section>
+<!-- Group 3: Caracteristicas del inmueble -->
+<section class="space-y-3">
+<button class="flex items-center justify-between w-full">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Características del inmueble</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+<div class="space-y-3 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Tipo constructivo</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Nivel</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Año de construcción</span>
+</label>
+</div>
+</section>
+<!-- Group 4: Clasificacion y estado -->
+<section class="space-y-3">
+<button class="flex items-center justify-between w-full">
+<span class="text-xs font-bold uppercase tracking-widest text-outline">Clasificación y estado</span>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+<div class="space-y-3 pl-1">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Giro comercial</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Coberturas</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant bg-surface-container-high text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Zona catastrófica</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Estado de validación</span>
+</label>
+</div>
+</section>
+</div>
+<!-- Footer Section -->
+<div class="p-6 bg-surface-container-low border-t border-outline-variant/10 flex items-center justify-between">
+<button class="text-sm font-semibold text-secondary hover:text-primary transition-colors underline decoration-secondary/30 underline-offset-4">
+                Restaurar predeterminados
+            </button>
+<button class="bg-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-[0_2px_8px_rgba(0,63,177,0.25)] hover:bg-primary-container transition-all active:scale-95">
+                Guardar configuración
+            </button>
+</div>
+</aside>
+<!-- Side Navigation Bar (Shared Component - Mini/Hidden on this view context) -->
+<aside class="fixed left-0 top-[57px] h-full w-20 flex flex-col items-center py-6 bg-surface-container-low border-r border-outline-variant/15 z-40 hidden md:flex">
+<div class="space-y-6">
+<button class="w-12 h-12 flex items-center justify-center text-primary bg-primary-fixed rounded-xl">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container transition-all rounded-xl">
+<span class="material-symbols-outlined" data-icon="percent">percent</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container transition-all rounded-xl">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container transition-all rounded-xl">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container transition-all rounded-xl">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+</button>
+</div>
+</aside>
+</body></html>
