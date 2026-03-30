@@ -10,7 +10,7 @@ const validBase = {
   subscriberCode: 'SUB-001',
   officeName: 'Oficina Central',
   agentCode: 'AGT-001',
-  businessType: 'NUEVO',
+  businessType: 'commercial',
   riskClassification: 'ClaseA',
 };
 
@@ -94,7 +94,7 @@ describe('generalInfoFormSchema', () => {
   });
 
   describe('businessType', () => {
-    it.each(['NUEVO', 'RENOVACION', 'ENDOSO'])(
+    it.each(['commercial', 'industrial', 'residential'])(
       'accepts "%s" as a valid businessType',
       (businessType) => {
         const result = generalInfoFormSchema.safeParse({ ...validBase, businessType });
@@ -103,7 +103,7 @@ describe('generalInfoFormSchema', () => {
     );
 
     it('rejects an unknown businessType', () => {
-      const result = generalInfoFormSchema.safeParse({ ...validBase, businessType: 'INVALID' });
+      const result = generalInfoFormSchema.safeParse({ ...validBase, businessType: 'NUEVO' });
       expect(result.success).toBe(false);
       const err = result.error?.issues.find((i) => i.path.includes('businessType'));
       expect(err?.message).toMatch(/tipo de negocio/i);

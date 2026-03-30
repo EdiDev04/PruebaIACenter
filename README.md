@@ -17,7 +17,7 @@ Sistema de cotización de seguros para pólizas de daños (incendio, CAT, equipo
        ↓
  cotizador-backend
  .NET 8 + ASP.NET Core + MongoDB
- Puerto: 5000
+ Puerto: 5001
        |
        | HTTP (HttpClient)
        ↓
@@ -44,7 +44,7 @@ Sistema de cotización de seguros para pólizas de daños (incendio, CAT, equipo
 
 - Node.js 20+
 - .NET SDK 8
-- MongoDB 7+ (local o Docker)
+- MongoDB 7+ (local o Docker o Atlas)
 - npm 9+
 
 ---
@@ -61,7 +61,7 @@ cp cotizador-webapp/.env.example cotizador-webapp/.env.local
 
 | Variable | Valor por defecto (desarrollo) | Descripción |
 |----------|-------------------------------|-------------|
-| `VITE_API_URL` | `http://localhost:5000` | URL base del backend |
+| `VITE_API_URL` | `http://localhost:5001` | URL base del backend |
 | `VITE_API_USER` | `admin` | Usuario para Basic Auth |
 | `VITE_API_PASSWORD` | `cotizador2026` | Contraseña para Basic Auth |
 | `VITE_CORE_MOCK_URL` | `http://localhost:3001` | URL del core mock (referencia) |
@@ -86,8 +86,6 @@ cp cotizador-webapp/.env.example cotizador-webapp/.env.local
   }
 }
 ```
-
-> **Importante:** el archivo `appsettings.Development.json` incluido en el repositorio tiene `AllowedOrigins: ["http://localhost:3000"]`. Actualiza ese valor a `http://localhost:5173` para que el webapp pueda llamar al backend sin errores CORS.
 
 ### cotizador-core-mock
 
@@ -117,7 +115,7 @@ npm run dev
 cd cotizador-backend
 dotnet restore
 dotnet run --project src/Cotizador.API/Cotizador.API.csproj
-# Servicio disponible en: http://localhost:5000
+# Servicio disponible en: http://localhost:5001
 ```
 
 > Asegúrate de que `appsettings.Development.json` tenga las credenciales y la URL de CORS correctas antes de iniciar.
@@ -132,6 +130,20 @@ npm run dev
 # Aplicación disponible en: http://localhost:5173
 ```
 
+### Script unificado (macOS/Linux)
+
+```bash
+./start-local.sh
+```
+
+### Script unificado (Windows PowerShell)
+
+```powershell
+.\start-local.ps1
+```
+
+Ambos scripts levantan los 3 servicios en orden, instalan dependencias si es necesario y detienen todo al presionar `Ctrl+C`.
+
 ### Opción alternativa — MongoDB con Docker
 
 Si no tienes MongoDB instalado localmente:
@@ -139,6 +151,26 @@ Si no tienes MongoDB instalado localmente:
 ```bash
 docker run -d --name mongo-cotizador -p 27017:27017 mongo:7
 ```
+
+---
+
+## Fixtures y datos de prueba
+
+El servicio `cotizador-core-mock` sirve datos estáticos desde `cotizador-core-mock/src/fixtures/`. No requiere base de datos ni configuración adicional.
+
+| Fixture | Descripción |
+|---------|-------------|
+| `agents.json` | Catálogo de agentes con código, nombre y comisión |
+| `businessLines.json` | Giros comerciales con `fireKey` para lookup de tarifas |
+| `calculationParameters.json` | Parámetros globales: gastos, comisión, derechos, IVA |
+| `fireTariffs.json` | Tarifas de incendio indexadas por `fireKey` |
+| `catTariffs.json` | Factores CAT (TEV + FHM) indexados por zona |
+| `fhmTariffs.json` | Tarifas de fenómenos hidrometeorológicos |
+| `electronicEquipmentFactors.json` | Factores por clase de equipo y nivel técnico |
+| `guarantees.json` | Catálogo completo de garantías disponibles |
+| `riskClassification.json` | Clasificaciones de riesgo |
+| `subscribers.json` | Catálogo de suscriptores/asegurados |
+| `zipCodes.json` | Códigos postales → zona + nivel técnico |
 
 ---
 
@@ -160,6 +192,121 @@ npm test
 
 ---
 
+## Modelo de datos principal
+
+Colección MongoDB: `property_quotes`. Un documento por folio.
+
+```
+PropertyQuote
+├── folioNumber          string        "DAN-2026-00001"
+├── quoteStatus          string        draft | in_progress | calculated
+├── version              int           versionado optimista (incrementa en cada escritura)
+├── insuredData          object        nombre asegurado, RFC, dirección fiscal
+├── conductionData       object        fecha inicio/fin de vigencia, moneda
+├── agentCode            string        código del agente (lookup en core-mock)
+├── riskClassification   string        clasificación de riesgo
+├── businessType         string        tipo de negocio
+├── layoutConfiguration  object        número de ubicaciones habilitadas
+├── coverageOptions      object        garantías habilitadas para el folio
+├── locations[]          array         una entrada por ubicación de riesgo
+│   ├── index            int
+│   ├── locationName     string
+│   ├── zipCode          string        CP de 5 dígitos
+│   ├── businessLine     object        giro comercial + fireKey
+│   ├── catZone          string        zona CAT (para tarifas TEV/FHM)
+│   ├── validationStatus string        calculable | incomplete
+│   └── guarantees[]     array         garantías con sumaAsegurada por ubicación
+├── netPremium           decimal       prima neta total del folio
+├── commercialPremiumBeforeTax decimal  prima comercial sin IVA
+├── commercialPremium    decimal       prima comercial con IVA
+├── premiumsByLocation[] array         desglose financiero por ubicación
+└── metadata             object        timestamps, idempotencyKey, lastWizardStep
+```
+
+Documentación extendida: [`docs/output/api/modelo-datos.md`](docs/output/api/modelo-datos.md)
+
+---
+
+## Lógica de cálculo de primas
+
+El motor de cálculo está implementado en `Cotizador.Domain.Services.PremiumCalculator` y es invocado por `CalculateQuoteUseCase`. Opera en 3 fases: **calculabilidad → prima por cobertura → consolidación comercial**.
+
+### 1. Criterios de calculabilidad por ubicación
+
+Una ubicación participa en el cálculo solo si cumple los 3 criterios:
+
+$$\text{calculable} = \text{CP válido} \;\land\; \text{FireKey definida} \;\land\; \text{Garantías} \geq 1$$
+
+Las ubicaciones que no cumplen quedan con `validationStatus = "incomplete"` y `netPremium = 0`. Nunca bloquean el folio.
+
+### 2. Prima neta por cobertura
+
+Para cada garantía de una ubicación calculable:
+
+$$P_{\text{cobertura}} = \text{SumaAsegurada} \times \text{Tasa}$$
+
+La tasa se resuelve por `guaranteeKey` según la siguiente tabla:
+
+| Cobertura (`guaranteeKey`) | Fuente de tasa |
+|---|---|
+| `building_fire`, `contents_fire`, `coverage_extension` | `fireTariffs[fireKey].baseRate` |
+| `cat_tev` | `catTariffs[zone].tevFactor` |
+| `cat_fhm` | `catTariffs[zone].fhmFactor` |
+| `debris_removal`, `extraordinary_expenses` | Fija: `0.0010` |
+| `rent_loss`, `business_interruption` | Fija: `0.0015` |
+| `theft`, `cash_and_securities` | Fija: `0.0020` |
+| `electronic_equipment` | `electronicEquipmentFactors[equipmentClass=A, zoneLevel=technicalLevel].factor` |
+| `glass`, `illuminated_signs` | Tarifa plana (monto fijo, tasa ignorada) |
+
+El `technicalLevel` para equipo electrónico se obtiene del servicio de códigos postales del core (`GET /zip-codes/{cp}`).
+
+### 3. Prima neta por ubicación
+
+$$P_{\text{ubicación}} = \sum_{i=1}^{n} P_{\text{cobertura}_i}$$
+
+### 4. Prima neta total del folio
+
+Solo se suman las ubicaciones calculables:
+
+$$P_{\text{neta}} = \sum_{\text{ubicaciones calculables}} P_{\text{ubicación}}$$
+
+### 5. Prima comercial
+
+Se aplica un **loading factor** con los parámetros globales del core (`GET /calculation-parameters`):
+
+$$\text{loadingFactor} = 1 + \text{expeditionExpenses} + \text{agentCommission} + \text{issuingRights} + \text{surcharges}$$
+
+Con los parámetros estándar configurados en los fixtures:
+
+$$\text{loadingFactor} = 1 + 0.05 + 0.10 + 0.03 + 0.02 = 1.20$$
+
+$$P_{\text{comercial sin IVA}} = \text{round}(P_{\text{neta}} \times 1.20,\; 2)$$
+
+$$P_{\text{comercial con IVA}} = \text{round}(P_{\text{comercial sin IVA}} \times (1 + 0.16),\; 2)$$
+
+### Ejemplo numérico
+
+| Variable | Valor |
+|---|---|
+| Suma asegurada edificio | $1,000,000 |
+| Tasa incendio (`fireRate`) | 0.0025 |
+| Prima incendio | $2,500.00 |
+| Prima neta total (1 ubicación) | $2,500.00 |
+| Prima comercial sin IVA | $2,500 × 1.20 = **$3,000.00** |
+| Prima comercial con IVA | $3,000 × 1.16 = **$3,480.00** |
+
+### Referencia de código fuente
+
+| Clase | Responsabilidad |
+|---|---|
+| `Cotizador.Domain.Services.PremiumCalculator` | Fórmulas puras de cálculo (sin dependencias externas) |
+| `Cotizador.Application.UseCases.CalculateQuoteUseCase` | Orquestación: lee folio, consulta tarifas, itera ubicaciones, persiste |
+| `Cotizador.Infrastructure.ExternalServices.CoreOhsClient` | Consulta paralela de tarifas al core-mock |
+
+Documentación extendida: [`docs/output/api/calculo-prima.md`](docs/output/api/calculo-prima.md)
+
+---
+
 ## Endpoints disponibles
 
 Todos los endpoints requieren `Authorization: Basic <base64(user:password)>`.
@@ -175,6 +322,22 @@ Todos los endpoints requieren `Authorization: Basic <base64(user:password)>`.
 **Formato de folio:** `DAN-YYYY-NNNNN` (ejemplo: `DAN-2026-00001`)
 
 **Autenticación:** Basic Auth — `admin` / `cotizador2026`
+
+### Contratos API detallados
+
+La documentación completa de contratos (request/response, códigos de error, ejemplos) está en [`docs/output/api/`](docs/output/api/):
+
+| Archivo | Contenido |
+|---------|-----------|
+| [`README.md`](docs/output/api/README.md) | Índice general de contratos |
+| [`contracts-spec-003-004.md`](docs/output/api/contracts-spec-003-004.md) | Contratos de creación de folio y datos generales |
+| [`spec-003-004-contracts.md`](docs/output/api/spec-003-004-contracts.md) | Requests/responses con ejemplos JSON |
+| [`quote-state-progress-api.md`](docs/output/api/quote-state-progress-api.md) | Contrato de `GET /v1/quotes/{folio}/state` |
+| [`premium-calculation-engine-api.md`](docs/output/api/premium-calculation-engine-api.md) | Contrato de `POST /v1/quotes/{folio}/calculate` |
+| [`adr-008-quote-state-design.md`](docs/output/api/adr-008-quote-state-design.md) | ADR — diseño de la máquina de estados del folio |
+| [`calculo-prima.md`](docs/output/api/calculo-prima.md) | Lógica de cálculo paso a paso con código |
+| [`modelo-datos.md`](docs/output/api/modelo-datos.md) | Esquema MongoDB completo |
+| [`technical-reference.md`](docs/output/api/technical-reference.md) | Referencia técnica general |
 
 ---
 

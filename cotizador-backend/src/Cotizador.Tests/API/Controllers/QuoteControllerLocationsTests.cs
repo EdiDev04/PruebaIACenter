@@ -143,8 +143,9 @@ public class QuoteControllerLocationsTests
     private void SetupUpdateLocationsValidatorFailure()
     {
         _mockUpdateLocationsValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateLocationsRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult(
+            .As<FluentValidation.IValidator>()
+            .Setup(v => v.ValidateAsync(It.IsAny<FluentValidation.IValidationContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException(
                 new[] { new ValidationFailure("Locations[0].Index", "El índice de ubicación es obligatorio") }));
     }
 
@@ -158,8 +159,9 @@ public class QuoteControllerLocationsTests
     private void SetupPatchLocationValidatorFailure()
     {
         _mockPatchLocationValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<PatchLocationRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult(
+            .As<FluentValidation.IValidator>()
+            .Setup(v => v.ValidateAsync(It.IsAny<FluentValidation.IValidationContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException(
                 new[] { new ValidationFailure("Version", "Conflicto de versión") }));
     }
 

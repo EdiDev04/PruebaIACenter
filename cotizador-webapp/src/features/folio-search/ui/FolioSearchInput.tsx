@@ -11,9 +11,9 @@ export const FolioSearchInput = forwardRef<HTMLInputElement, FolioSearchInputPro
       <TextInput
         ref={ref}
         label="Número de folio"
-        placeholder="202600001"
+        placeholder="DAN-YYYY-NNNNN"
         error={error}
-        helperText="Ingrese año y número, ej: 20260001"
+        helperText="Ej: DAN-2026-00001"
         autoComplete="off"
         {...rest}
       />

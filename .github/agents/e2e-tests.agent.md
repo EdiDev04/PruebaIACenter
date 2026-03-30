@@ -151,7 +151,7 @@ export default defineConfig({
   },
   webServer: [
     { command: 'npm run dev', url: 'http://localhost:5173', cwd: '../cotizador-webapp' },
-    { command: 'dotnet run', url: 'http://localhost:5000', cwd: '../cotizador-backend' },
+    { command: 'dotnet run', url: 'http://localhost:5001', cwd: '../cotizador-backend' },
     { command: 'npm run dev', url: 'http://localhost:3001', cwd: '../cotizador-core-mock' },
   ],
 });

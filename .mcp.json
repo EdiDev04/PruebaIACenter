@@ -19,6 +19,14 @@
         "SONARQUBE_TOKEN": "squ_21e77107c9768262f25686f8d2d0572b99379da7",
         "SONARQUBE_IDE_PORT": "64121"
       }
+    },
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ya29.a0Aa7MYir2rqGWvnqw8p7Z7NirHisIw2O3hHW7foTXenDAAU0p9wJEWZKIAsxorAHvPe5ta4Jx7KPV7KQNeyYQOJ8AglAhtbe2KFsd4oq6cudAvh_i7rDje8PWreYgey96pFz3K7iOlAKjkQCvY4TqrMuzJEah3J_yFSEBauQSIS2xUwz1TBSeWWJbVxafIqvepnqS9UHLaCgYKAaoSARASFQHGX2MiRCtuc6Ves4m9Ga3BDwcD4w0207",
+        "X-Goog-User-Project": "proyecto-ia-center"
+      }
     }
   }
 }

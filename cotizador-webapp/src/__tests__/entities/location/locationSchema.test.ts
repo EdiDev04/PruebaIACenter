@@ -126,7 +126,7 @@ describe('locationFormSchema (full schema)', () => {
       constructionType: 'Tipo 1 - Macizo' as const,
       level: 2,
       constructionYear: 1998,
-      businessLine: { description: 'Storage warehouse', fireKey: 'B-03' },
+      businessLine: { code: 'BL-001', description: 'Storage warehouse', fireKey: 'B-03', riskLevel: 'medium' },
       guarantees: [{ guaranteeKey: 'building_fire', insuredAmount: 5000000 }],
     };
 

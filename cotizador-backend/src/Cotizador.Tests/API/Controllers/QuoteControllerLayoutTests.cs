@@ -88,8 +88,9 @@ public class QuoteControllerLayoutTests
     private void SetupLayoutValidatorFailure(string propertyName = "DisplayMode", string errorMessage = "Modo inválido")
     {
         _mockLayoutValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateLayoutRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult(new[] { new ValidationFailure(propertyName, errorMessage) }));
+            .As<FluentValidation.IValidator>()
+            .Setup(v => v.ValidateAsync(It.IsAny<FluentValidation.IValidationContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException(new[] { new ValidationFailure(propertyName, errorMessage) }));
     }
 
     // ─── GET /v1/quotes/{folio}/locations/layout ───────────────────────────────
