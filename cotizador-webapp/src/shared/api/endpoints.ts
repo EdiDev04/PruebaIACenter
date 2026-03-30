@@ -15,4 +15,12 @@ export const endpoints = {
     get: (cp: string) => `/v1/zip-codes/${cp}`,
   },
   businessLines: '/v1/business-lines',
+  coverageOptions: {
+    get: (folio: string) => `/v1/quotes/${folio}/coverage-options`,
+    update: (folio: string) => `/v1/quotes/${folio}/coverage-options`,
+  },
+  catalogs: {
+    guarantees: '/v1/catalogs/guarantees',
+  },
+  quoteState: (folio: string) => `/v1/quotes/${folio}/state`,
 };

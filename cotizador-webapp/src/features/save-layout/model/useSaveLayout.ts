@@ -21,6 +21,7 @@ export function useSaveLayout({ folio, onSuccess, onFolioNotFound }: UseSaveLayo
     mutationFn: (request: UpdateLayoutRequest) => updateLayout(folio, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['layout', folio] });
+      queryClient.invalidateQueries({ queryKey: ['quote-state', folio] });
       onSuccess?.();
     },
     onError: (err: unknown) => {

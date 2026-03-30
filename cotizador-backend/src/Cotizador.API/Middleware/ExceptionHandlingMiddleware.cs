@@ -36,7 +36,7 @@ public class ExceptionHandlingMiddleware
         catch (VersionConflictException ex)
         {
             _logger.LogWarning(ex, "Version conflict on folio: {FolioNumber}", ex.FolioNumber);
-            await WriteErrorResponseAsync(context, StatusCodes.Status409Conflict, "versionConflict", ex.Message);
+            await WriteErrorResponseAsync(context, StatusCodes.Status409Conflict, "versionConflict", "El folio fue modificado por otro proceso. Recargue para continuar");
         }
         catch (InvalidQuoteStateException ex)
         {

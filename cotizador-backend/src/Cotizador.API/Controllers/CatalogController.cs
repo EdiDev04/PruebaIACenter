@@ -19,19 +19,22 @@ public class CatalogController : ControllerBase
     private readonly IGetRiskClassificationsUseCase _getRiskClassificationsUseCase;
     private readonly IGetZipCodeUseCase _getZipCodeUseCase;
     private readonly IGetBusinessLinesUseCase _getBusinessLinesUseCase;
+    private readonly IGetGuaranteesUseCase _getGuaranteesUseCase;
 
     public CatalogController(
         IGetSubscribersUseCase getSubscribersUseCase,
         IGetAgentByCodeUseCase getAgentByCodeUseCase,
         IGetRiskClassificationsUseCase getRiskClassificationsUseCase,
         IGetZipCodeUseCase getZipCodeUseCase,
-        IGetBusinessLinesUseCase getBusinessLinesUseCase)
+        IGetBusinessLinesUseCase getBusinessLinesUseCase,
+        IGetGuaranteesUseCase getGuaranteesUseCase)
     {
         _getSubscribersUseCase = getSubscribersUseCase;
         _getAgentByCodeUseCase = getAgentByCodeUseCase;
         _getRiskClassificationsUseCase = getRiskClassificationsUseCase;
         _getZipCodeUseCase = getZipCodeUseCase;
         _getBusinessLinesUseCase = getBusinessLinesUseCase;
+        _getGuaranteesUseCase = getGuaranteesUseCase;
     }
 
     /// <summary>GET /v1/subscribers — Obtiene el catálogo de suscriptores desde core-ohs.</summary>
@@ -114,5 +117,13 @@ public class CatalogController : ControllerBase
     {
         List<BusinessLineDto> businessLines = await _getBusinessLinesUseCase.ExecuteAsync(ct);
         return Ok(new { data = businessLines });
+    }
+
+    /// <summary>GET /v1/catalogs/guarantees — Proxy a core-ohs: obtiene el catálogo de garantías disponibles.</summary>
+    [HttpGet("catalogs/guarantees")]
+    public async Task<IActionResult> GetGuaranteesAsync(CancellationToken ct)
+    {
+        List<GuaranteeDto> guarantees = await _getGuaranteesUseCase.ExecuteAsync(ct);
+        return Ok(new { data = guarantees });
     }
 }

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sovereign Ledger | Cotizador de Daños</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-primary": "#faf8ff", "error-container": "#f97386", "inverse-primary": "#638aff", "on-tertiary-container": "#006127", "on-secondary-container": "#7e4200", "secondary-fixed-dim": "#ffcaa1", "secondary-fixed": "#ffdcc3", "outline-variant": "#a3b3cf", "primary-fixed-dim": "#386bef", surface: "#f9f9ff", background: "#f9f9ff", "on-primary-fixed-variant": "#fefcff", "on-primary-fixed": "#ffffff", "tertiary-container": "#82ff99", "surface-container": "#e7eeff", "surface-container-high": "#dee8ff", "on-surface-variant": "#506079", error: "#a8364b", "surface-bright": "#f9f9ff", "inverse-surface": "#070e19", "on-primary-container": "#000000", "primary-fixed": "#4878fd", "surface-tint": "#1554d9", "surface-dim": "#cbdbf9", "on-tertiary-fixed": "#004c1d", "tertiary-fixed-dim": "#73f08c", secondary: "#914d00", "on-error-container": "#6e0523", "on-secondary-fixed-variant": "#8c4a00", "on-secondary-fixed": "#633300", "surface-container-low": "#f0f3ff", "on-tertiary": "#e9ffe6", "on-background": "#24334a", "tertiary-fixed": "#82ff99", "surface-variant": "#d5e3ff", "on-error": "#fff7f7", tertiary: "#006e2e", outline: "#6c7b96", "on-surface": "#24334a", primary: "#1554d9", "surface-container-highest": "#d5e3ff", "secondary-container": "#ffdcc3", "on-secondary": "#fff7f4", "on-tertiary-fixed-variant": "#006c2d", "primary-container": "#4878fd", "inverse-on-surface": "#969dac", "surface-container-lowest": "#ffffff", "primary-dim": "#0047c6", "tertiary-dim": "#006127", "secondary-dim": "#804300", "error-dim": "#6b0221"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container antialiased">
+<!-- Section 1: TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-slate-50 dark:bg-slate-950">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto h-16">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-slate-300 dark:bg-slate-700 rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400 text-lg">account_balance</span>
+</div>
+<div class="flex flex-col">
+<nav class="flex items-center gap-2 text-sm tracking-tight font-['Inter'] antialiased">
+<span class="text-blue-700 dark:text-blue-400 font-semibold font-mono">DAN-2026-00001</span>
+<span class="text-slate-400">/</span>
+<span class="text-blue-700 dark:text-blue-400 font-semibold">Ubicaciones</span>
+</nav>
+<span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider leading-none mt-1">v5.0.2</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase tracking-wider">
+                    En progreso
+                </div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/15">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional headshot of a business executive in a dark suit with a clean neutral background, corporate style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdIzSjqk-weWdx-Dhc6ddWLqtMS149t_2tFdEurSLDQ6kCBhrmyRlpIYSnkL-xKFrzCbQCkYdSq73bawQI5HAnGRndgGAXick9PawyvLX9qzDNKo1spxCCkDEe31ekwBpTv4G6tzbeCDYsIUukgqxI_rk-nvOMMhKQq_Ufo2Cxk5m1Jy9QNOgo1Jm701zwUgiumWRoUIyi_ZlwIsHQC2FN4drZhTXCQZ8i606y5epIQseH4hxxbdTQRdsGngxXeyOfD51FjyGWSl0"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-[1200px] mx-auto flex flex-col gap-6">
+<!-- Section 2: Progress Bar Card -->
+<section class="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant/10 shadow-sm overflow-x-auto">
+<div class="flex items-center justify-between min-w-[800px] relative">
+<!-- Progress Line Background -->
+<div class="absolute top-5 left-10 right-10 h-px flex">
+<div class="w-1/3 border-t-2 border-secondary"></div>
+<div class="w-1/3 border-t-2 border-dashed border-outline-variant"></div>
+<div class="w-1/3 border-t-2 border-dashed border-outline-variant"></div>
+</div>
+<!-- Node 1 -->
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="text-xs font-bold text-on-surface text-center uppercase tracking-tighter">Datos Generales</span>
+</div>
+<!-- Node 2 -->
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="text-xs font-bold text-on-surface text-center uppercase tracking-tighter">Layout</span>
+</div>
+<!-- Node 3: ACTIVE -->
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed border-[3px] border-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<span class="text-xs font-semibold text-primary text-center uppercase tracking-tighter">Ubicaciones</span>
+</div>
+<!-- Node 4 -->
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">verified_user</span>
+</div>
+<span class="text-xs font-medium text-outline text-center uppercase tracking-tighter">Opciones de Cobertura</span>
+</div>
+</div>
+</section>
+<!-- Section 3: Calculability Banner -->
+<section class="bg-[#F0FDF4] border-l-[3px] border-secondary px-4 py-3 flex items-center justify-between rounded-r-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-semibold text-[#166534]">2 ubicaciones listas para calcular</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-4 w-px bg-secondary/20"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#92400E] text-lg">pending</span>
+<span class="text-sm font-medium text-[#92400E]">1 con datos pendientes</span>
+</div>
+</div>
+</section>
+<!-- Section 4: Main Content Area -->
+<section class="bg-surface-container-lowest p-8 rounded-lg shadow-sm border border-outline-variant/10">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h2 class="text-xl font-bold text-on-surface tracking-tight leading-none mb-1">Ubicaciones de Riesgo</h2>
+<p class="text-sm text-on-surface-variant">Agregue y configure las ubicaciones a asegurar para el programa comercial.</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant text-primary text-xs font-bold uppercase tracking-widest hover:bg-surface-container-low transition-colors rounded">
+<span class="material-symbols-outlined text-sm">add_location_alt</span>
+                    Nueva Ubicación
+                </button>
+</div>
+<!-- Exposure Grid / Table -->
+<div class="flex flex-col gap-3">
+<!-- Header Labels (Institutional Style) -->
+<div class="grid grid-cols-12 px-4 py-2 bg-surface-container-low rounded-t-lg">
+<div class="col-span-6 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Nombre de la Ubicación</div>
+<div class="col-span-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Estatus de Cálculo</div>
+<div class="col-span-3 text-right text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Acciones</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 items-center px-4 py-4 bg-surface-container-lowest border-b border-surface-container hover:bg-surface-container-low/30 transition-colors group">
+<div class="col-span-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">factory</span>
+</div>
+<span class="text-sm font-semibold text-on-surface">Bodega Central CDMX</span>
+</div>
+<div class="col-span-3">
+<span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Calculable
+                        </span>
+</div>
+<div class="col-span-3 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 items-center px-4 py-4 bg-surface-container-lowest border-b border-surface-container hover:bg-surface-container-low/30 transition-colors group">
+<div class="col-span-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">corporate_fare</span>
+</div>
+<span class="text-sm font-semibold text-on-surface">Oficinas Monterrey</span>
+</div>
+<div class="col-span-3">
+<span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            Calculable
+                        </span>
+</div>
+<div class="col-span-3 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 items-center px-4 py-4 bg-surface-container-lowest hover:bg-surface-container-low/30 transition-colors group">
+<div class="col-span-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">storefront</span>
+</div>
+<span class="text-sm font-semibold text-on-surface">Local sin CP</span>
+</div>
+<div class="col-span-3">
+<span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-tertiary-fixed text-tertiary text-[11px] font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                            Datos pendientes
+                        </span>
+</div>
+<div class="col-span-3 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bento Hint/Help Section -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined text-primary mb-2">info</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-2">Validación de CP</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">El Código Postal es obligatorio para determinar la zona sísmica y de riesgos hidrometeorológicos.</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined text-primary mb-2">analytics</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-2">Suma Asegurada</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Asegúrese de declarar valores a reposición para evitar infraseguro en caso de siniestro.</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/5">
+<span class="material-symbols-outlined text-primary mb-2">shield</span>
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-2">COV Limit</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Los límites de cobertura se aplican por ubicación o de forma global según el esquema seleccionado.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Section 5: BottomNavBar -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-between items-center px-10 py-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-[0_-12px_32px_-4px_rgba(25,28,29,0.06)] z-50">
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-slate-600 dark:text-slate-400 border border-slate-200/15 px-8 py-3 rounded-[4px] font-['Inter'] font-medium text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                &lt; Anterior
+            </button>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 bg-gradient-to-br from-blue-700 to-blue-600 text-white px-8 py-3 rounded-[4px] shadow-sm font-['Inter'] font-medium text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
+                Siguiente &gt;
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</footer>
+</body></html>

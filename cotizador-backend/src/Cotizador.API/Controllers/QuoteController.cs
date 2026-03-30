@@ -26,6 +26,10 @@ public class QuoteController : ControllerBase
     private readonly IGetLocationsSummaryUseCase _getLocationsSummaryUseCase;
     private readonly IValidator<UpdateLocationsRequest> _updateLocationsValidator;
     private readonly IValidator<PatchLocationRequest> _patchLocationValidator;
+    private readonly IGetCoverageOptionsUseCase _getCoverageOptionsUseCase;
+    private readonly IUpdateCoverageOptionsUseCase _updateCoverageOptionsUseCase;
+    private readonly IValidator<UpdateCoverageOptionsRequest> _coverageOptionsValidator;
+    private readonly IGetQuoteStateUseCase _getQuoteStateUseCase;
 
     public QuoteController(
         IGetGeneralInfoUseCase getGeneralInfoUseCase,
@@ -39,7 +43,11 @@ public class QuoteController : ControllerBase
         IPatchLocationUseCase patchLocationUseCase,
         IGetLocationsSummaryUseCase getLocationsSummaryUseCase,
         IValidator<UpdateLocationsRequest> updateLocationsValidator,
-        IValidator<PatchLocationRequest> patchLocationValidator)
+        IValidator<PatchLocationRequest> patchLocationValidator,
+        IGetCoverageOptionsUseCase getCoverageOptionsUseCase,
+        IUpdateCoverageOptionsUseCase updateCoverageOptionsUseCase,
+        IValidator<UpdateCoverageOptionsRequest> coverageOptionsValidator,
+        IGetQuoteStateUseCase getQuoteStateUseCase)
     {
         _getGeneralInfoUseCase = getGeneralInfoUseCase;
         _updateGeneralInfoUseCase = updateGeneralInfoUseCase;
@@ -53,6 +61,10 @@ public class QuoteController : ControllerBase
         _getLocationsSummaryUseCase = getLocationsSummaryUseCase;
         _updateLocationsValidator = updateLocationsValidator;
         _patchLocationValidator = patchLocationValidator;
+        _getCoverageOptionsUseCase = getCoverageOptionsUseCase;
+        _updateCoverageOptionsUseCase = updateCoverageOptionsUseCase;
+        _coverageOptionsValidator = coverageOptionsValidator;
+        _getQuoteStateUseCase = getQuoteStateUseCase;
     }
 
     /// <summary>GET /v1/quotes/{folio}/general-info — Obtiene la información general de una cotización.</summary>
@@ -228,5 +240,64 @@ public class QuoteController : ControllerBase
 
         var result = await _getLocationsSummaryUseCase.ExecuteAsync(folio, ct);
         return Ok(new { data = result });
+    }
+
+    /// <summary>GET /v1/quotes/{folio}/coverage-options — Obtiene las opciones de cobertura de una cotización.</summary>
+    [HttpGet("{folio}/coverage-options")]
+    public async Task<IActionResult> GetCoverageOptionsAsync(string folio, CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        var dto = await _getCoverageOptionsUseCase.ExecuteAsync(folio, ct);
+        return Ok(new { data = dto });
+    }
+
+    /// <summary>GET /v1/quotes/{folio}/state — Obtiene el estado completo del folio: progreso por sección, ubicaciones, flag de calculabilidad y resultado financiero.</summary>
+    [HttpGet("{folio}/state")]
+    public async Task<IActionResult> GetQuoteStateAsync(string folio, CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        var dto = await _getQuoteStateUseCase.ExecuteAsync(folio, ct);
+        return Ok(new { data = dto });
+    }
+
+    /// <summary>PUT /v1/quotes/{folio}/coverage-options — Actualiza las opciones de cobertura de una cotización.</summary>
+    [HttpPut("{folio}/coverage-options")]
+    public async Task<IActionResult> UpdateCoverageOptionsAsync(
+        string folio,
+        [FromBody] UpdateCoverageOptionsRequest request,
+        CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        await _coverageOptionsValidator.ValidateAndThrowAsync(request, ct);
+
+        var dto = await _updateCoverageOptionsUseCase.ExecuteAsync(folio, request, ct);
+        return Ok(new { data = dto });
     }
 }

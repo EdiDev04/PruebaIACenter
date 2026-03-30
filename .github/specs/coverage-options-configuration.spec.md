@@ -1,6 +1,6 @@
 ---
 id: SPEC-007
-status: APPROVED
+status: IMPLEMENTED
 feature: coverage-options-configuration
 feature_type: full-stack
 requires_design_spec: true

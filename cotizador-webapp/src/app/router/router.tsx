@@ -4,7 +4,8 @@ import { FolioCreatedPage } from '@/pages/FolioCreatedPage';
 import { GeneralInfoPage } from '@/pages/GeneralInfoPage';
 import { LocationsPage } from '@/pages/LocationsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
-import { WizardLayout } from '@/widgets/WizardLayout';
+import { TechnicalInfoPage } from '@/pages/TechnicalInfoPage';
+import { WizardLayout } from '../WizardLayout';
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="general-info" replace /> },
       { path: 'general-info', element: <GeneralInfoPage /> },
       { path: 'locations', element: <LocationsPage /> },
-      { path: 'coverages', element: <PlaceholderPage label="Coberturas" stepNumber={3} /> },
+      { path: 'technical-info', element: <TechnicalInfoPage /> },
       { path: 'results', element: <PlaceholderPage label="Resultados" stepNumber={4} /> },
     ],
   },

@@ -3,10 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import type { LocationDto } from '@/entities/location';
 import { useLocationsQuery, useLocationsSummaryQuery } from '@/entities/location';
 import { LocationForm } from '@/features/save-locations/ui/LocationForm';
-import { LocationsSummaryBanner } from '@/features/save-locations/ui/LocationsSummaryBanner';
 import { useDeleteLocation } from '@/features/delete-location/model/useDeleteLocation';
 import { DeleteLocationModal } from '@/features/delete-location/ui/DeleteLocationModal';
 import { LocationsGrid } from '@/widgets/locations-grid';
+import { LayoutConfigPanel } from '@/widgets/layout-config';
 import { Button, ToastContainer } from '@/shared/ui';
 import type { ToastMessage } from '@/shared/ui';
 import styles from './LocationsPage.module.css';
@@ -24,6 +24,7 @@ export function LocationsPage() {
   const [formState, setFormState] = useState<FormState | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ index: number; name: string } | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [showLayoutConfig, setShowLayoutConfig] = useState(false);
 
   const { data: summaryData } = useLocationsSummaryQuery(folio);
   const { data: locationsData } = useLocationsQuery(folio);
@@ -78,7 +79,7 @@ export function LocationsPage() {
   const canContinue = (summaryData?.totalCalculable ?? 0) >= 1;
 
   function handleContinue() {
-    navigate(`/quotes/${folio}/coverages`);
+    navigate(`/quotes/${folio}/technical-info`);
   }
 
   return (
@@ -98,11 +99,33 @@ export function LocationsPage() {
         </Button>
       </div>
 
-      {summaryData && summaryData.totalIncomplete > 0 && (
-        <LocationsSummaryBanner summary={summaryData} />
-      )}
+      <div className={styles.gridToolbar}>
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={() => setShowLayoutConfig((prev) => !prev)}
+          aria-pressed={showLayoutConfig}
+          aria-label="Configurar vista de la grilla"
+        >
+          <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: '1.1rem' }}>tune</span>{' '}
+          Configurar vista
+        </Button>
+      </div>
 
       <LocationsGrid folio={folio} onEdit={handleOpenEdit} onDelete={handleOpenDelete} />
+
+      {showLayoutConfig && (
+        <>
+          <div
+            className={styles.drawerBackdrop}
+            onClick={() => setShowLayoutConfig(false)}
+            aria-hidden="true"
+          />
+          <aside className={styles.drawerSide}>
+            <LayoutConfigPanel folio={folio} onClose={() => setShowLayoutConfig(false)} />
+          </aside>
+        </>
+      )}
 
       <footer className={styles.nav}>
         <Button variant="ghost" type="button" onClick={() => navigate(`/quotes/${folio}/general-info`)}>

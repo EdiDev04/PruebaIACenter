@@ -17,6 +17,7 @@ export function useDeleteLocation({ folio, onSuccess, onError }: UseDeleteLocati
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['locations', folio] });
       queryClient.invalidateQueries({ queryKey: ['locations-summary', folio] });
+      queryClient.invalidateQueries({ queryKey: ['quote-state', folio] });
       onSuccess?.();
     },
     onError: (err: unknown) => {

@@ -16,6 +16,7 @@ export function useSaveLocations({ folio, onSuccess, onError }: UseSaveLocations
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['locations', folio] });
       queryClient.invalidateQueries({ queryKey: ['locations-summary', folio] });
+      queryClient.invalidateQueries({ queryKey: ['quote-state', folio] });
       onSuccess?.();
     },
     onError: (err: unknown) => {

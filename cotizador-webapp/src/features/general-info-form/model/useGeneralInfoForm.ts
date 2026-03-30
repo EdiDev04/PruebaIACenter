@@ -1,12 +1,13 @@
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppSelector } from '@/app/hooks';
 import { getGeneralInfo, putGeneralInfo } from '../api/generalInfoApi';
 import { generalInfoFormSchema, type GeneralInfoFormData } from './generalInfoSchema';
 
 export function useGeneralInfoForm(folioNumber: string) {
+  const queryClient = useQueryClient();
   const folioVersion = useAppSelector((s) => s.quoteWizard.folioVersion);
 
   const { data: serverData, isLoading: isLoadingData, refetch } = useQuery({
@@ -50,6 +51,9 @@ export function useGeneralInfoForm(folioNumber: string) {
   const mutation = useMutation({
     mutationFn: (data: GeneralInfoFormData) =>
       putGeneralInfo(folioNumber, { ...data, version: resolvedVersion }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quote-state', folioNumber] });
+    },
   });
 
   const reloadData = useCallback(() => refetch(), [refetch]);

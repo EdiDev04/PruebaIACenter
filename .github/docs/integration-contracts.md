@@ -878,3 +878,502 @@ Bloquea Fase 3:    No
 1. Crear `LocationMapper.cs` con `ToDto`, `ToEntity` y `ToSingleResponse`
 2. Agregar 4 action methods de ubicaciones a `QuoteController.cs`
 3. Agregar 2 action methods de catálogos a `CatalogController.cs`
+
+---
+
+## SPEC-007 — coverage-options-configuration
+
+> Verificación realizada el 2026-03-29.
+> Spec: `.github/specs/coverage-options-configuration.spec.md`
+> Backend verificado: `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs` · `CatalogController.cs`
+> DTOs verificados: `Cotizador.Application/DTOs/CoverageOptionsDto.cs` · `UpdateCoverageOptionsRequest.cs` · `GuaranteeDto.cs`
+> Use cases verificados: `GetCoverageOptionsUseCase.cs` · `UpdateCoverageOptionsUseCase.cs` · `GetGuaranteesUseCase.cs`
+> Validator verificado: `Cotizador.Application/Validators/UpdateCoverageOptionsRequestValidator.cs`
+> Middleware verificado: `Cotizador.API/Middleware/ExceptionHandlingMiddleware.cs`
+> Infrastructure verificado: `Cotizador.Infrastructure/ExternalServices/CoreOhsClient.cs`
+> Mock verificado: `cotizador-core-mock/src/routes/catalogRoutes.ts` · `cotizador-core-mock/src/fixtures/guarantees.json`
+> Frontend verificado: `entities/coverage-options/api/coverageOptionsApi.ts` · `entities/coverage-options/model/types.ts` · `entities/coverage-options/model/useCoverageOptionsQuery.ts` · `entities/guarantee/api/guaranteeApi.ts` · `entities/guarantee/model/types.ts` · `entities/guarantee/model/useGuaranteesQuery.ts` · `features/save-coverage-options/model/useSaveCoverageOptions.ts` · `features/save-coverage-options/strings.ts` · `shared/api/endpoints.ts`
+
+---
+
+## Contratos BE ↔ core-ohs
+
+### GET /v1/catalogs/guarantees (core-ohs mock)
+
+**Contrato verificado:** Sí
+**Fecha verificación:** 2026-03-29
+
+#### Definición del contrato
+
+| Componente | Valor |
+|---|---|
+| Ruta en core-ohs mock | `GET /v1/catalogs/guarantees` (montado via `router.get('/guarantees', ...)`) |
+| Consumido por (BE) | `GetGuaranteesUseCase` → `ICoreOhsClient.GetGuaranteesAsync()` |
+| Propósito | Obtener las 14 garantías disponibles para el catálogo de opciones de cobertura |
+
+**Response 200 (fixture):**
+```json
+{
+  "data": [
+    { "key": "building_fire", "name": "Incendio Edificios", "description": "Cobertura base sobre la construcción contra incendio", "category": "fire", "requiresInsuredAmount": true },
+    { "key": "contents_fire", "name": "Incendio Contenidos", "description": "...", "category": "fire", "requiresInsuredAmount": true },
+    { "key": "glass", "name": "Vidrios", "description": "...", "category": "special", "requiresInsuredAmount": false },
+    { "key": "illuminated_signs", "name": "Anuncios Luminosos", "description": "...", "category": "special", "requiresInsuredAmount": false }
+  ]
+}
+```
+> Total: 14 garantías — 3 fire · 2 cat · 4 additional · 5 special.
+
+#### Verificación contra mock (`cotizador-core-mock/`)
+
+| Punto de verificación | Spec §3.5.1 | Mock real | Estado |
+|---|---|---|---|
+| Ruta | `GET /v1/catalogs/guarantees` | `router.get('/guarantees', ...)` montado en `/v1/catalogs` | ✅ Coincide |
+| Envelope response 200 | `{ "data": [...] }` | `{ data: guarantees }` con `ApiResponse<Guarantee[]>` | ✅ Coincide |
+| Campo `key` | `string` | `"building_fire"`, `"contents_fire"`, etc. en fixture | ✅ Presente (14 ítems) |
+| Campo `name` | `string` | `"Incendio Edificios"` etc. | ✅ Presente |
+| Campo `description` | `string` | `"Cobertura base sobre la construcción..."` | ✅ Presente |
+| Campo `category` | `string` (`"fire"` \| `"cat"` \| `"additional"` \| `"special"`) | Todos los valores están dentro de los 4 valores válidos | ✅ Coincide |
+| Campo `requiresInsuredAmount` | `boolean` | `true`/`false` — `glass` y `illuminated_signs` son `false`, resto `true` | ✅ Coincide |
+| Cantidad de garantías | 14 | 14 ítems en fixture | ✅ Coincide |
+| Manejo 503 | No simulado en mock | No implementado (mock simula uptime) | ℹ️ Esperado |
+
+#### Verificación CoreOhsClient.GetGuaranteesAsync()
+
+| Punto de verificación | Spec §3.5.1 | Implementación real | Estado |
+|---|---|---|---|
+| Ruta llamada | `/v1/catalogs/guarantees` | `GetDataAsync<List<GuaranteeDto>>("/v1/catalogs/guarantees", ct)` | ✅ Coincide |
+| Extracción de `"data"` | Sí | `GetDataAsync` lee `doc.RootElement.GetProperty("data")` | ✅ Coincide |
+| Deserialización | `PropertyNameCaseInsensitive = true` | `JsonOptions = new() { PropertyNameCaseInsensitive = true }` | ✅ Coincide |
+| Campo `key` | `GuaranteeDto.Key` | `record GuaranteeDto(string Key, ...)` → `key` en JSON | ✅ Correcto |
+| Campo `name` | `GuaranteeDto.Name` | `string Name` → `name` | ✅ Correcto |
+| Campo `description` | `GuaranteeDto.Description` | `string Description` → `description` | ✅ Correcto |
+| Campo `category` | `GuaranteeDto.Category` | `string Category` → `category` | ✅ Correcto |
+| Campo `requiresInsuredAmount` | `GuaranteeDto.RequiresInsuredAmount` | `bool RequiresInsuredAmount` → `requiresInsuredAmount` | ✅ Correcto |
+| Error HTTP/timeout → 503 | `CoreOhsUnavailableException` | `catch (HttpRequestException)` + `catch (TaskCanceledException)` ambos → `CoreOhsUnavailableException` en `GetGuaranteesUseCase` | ✅ Correcto |
+| 503 middleware | `{ "type": "coreOhsUnavailable", "message": "Servicio de catálogos no disponible..." }` | `ExceptionHandlingMiddleware`: `catch (CoreOhsUnavailableException)` → 503 `coreOhsUnavailable` | ✅ Coincide |
+
+**Status:** ✅ CONFORME — Sin drifts
+
+---
+
+## Contratos FE ↔ BE
+
+### GET /v1/quotes/{folio}/coverage-options
+
+**Contrato verificado:** Sí (con drift menor — ver DRIFT-007-01)
+**Fecha verificación:** 2026-03-29
+
+#### Definición del contrato
+
+**Consumido por (FE):**
+- Archivo: `entities/coverage-options/api/coverageOptionsApi.ts` → `getCoverageOptions(folio)`
+- Hook/Query: `useCoverageOptionsQuery` (TanStack Query `useQuery`)
+- Query Key: `['coverage-options', folio]`
+- Endpoint resuelto: `endpoints.coverageOptions.get(folio)` → `/v1/quotes/${folio}/coverage-options`
+
+**Response 200 esperado por el FE (con opciones configuradas):**
+```json
+{
+  "data": {
+    "enabledGuarantees": ["building_fire", "contents_fire", "cat_tev", "theft", "glass"],
+    "deductiblePercentage": 0.05,
+    "coinsurancePercentage": 0.10,
+    "version": 4
+  }
+}
+```
+
+**Response 200 esperado por el FE (sin opciones configuradas — defaults):**
+```json
+{
+  "data": {
+    "enabledGuarantees": ["building_fire", "contents_fire", "coverage_extension", "cat_tev", "cat_fhm", "debris_removal", "extraordinary_expenses", "rent_loss", "business_interruption", "electronic_equipment", "theft", "cash_and_securities", "glass", "illuminated_signs"],
+    "deductiblePercentage": 0,
+    "coinsurancePercentage": 0,
+    "version": 1
+  }
+}
+```
+
+**Errores manejados por el FE (§3.5b):**
+- 404: notificación "El folio no existe"
+- 500: notificación genérica de error
+
+#### §3.4 vs §3.5b — Spec interna
+
+| Punto de verificación | §3.4 (Backend contract) | §3.5b (FE ↔ BE contract) | Estado |
+|---|---|---|---|
+| Response envelope | `{ "data": { ... } }` | `{ "data": { ... } }` | ✅ Consistente |
+| Campo `enabledGuarantees` | `string[]` | `string[]` | ✅ Consistente |
+| Campo `deductiblePercentage` | `decimal` | `number` | ✅ Consistente |
+| Campo `coinsurancePercentage` | `decimal` | `number` | ✅ Consistente |
+| Campo `version` | `int` | `number` | ✅ Consistente |
+| Query key | N/A | `['coverage-options', folio]` | ✅ Correcto |
+| Error 400 (folio inválido) | ✅ Definido en §3.4 | ❌ No listado en §3.5b | ⚠️ Drift menor (folio válido producido por router) |
+| Error 401 | ✅ Definido en §3.4 | ❌ No listado (global) | ℹ️ Interceptor global |
+| Error 404 | ✅ Definido en §3.4 | ✅ Listado en §3.5b | ✅ Consistente |
+| Error 500 | ✅ Definido en §3.4 | ✅ Listado en §3.5b | ✅ Consistente |
+
+#### §3.4 vs Implementación real del backend
+
+| Punto de verificación | Spec §3.4 | Implementación real | Estado |
+|---|---|---|---|
+| Ruta | `GET /v1/quotes/{folio}/coverage-options` | `[HttpGet("{folio}/coverage-options")]` en `[Route("v1/quotes")]` | ✅ Coincide |
+| Autorización | Basic Auth `[Authorize]` | `[Authorize]` en controller | ✅ Coincide |
+| Validación folio | `^DAN-\d{4}-\d{5}$` → 400 | `Regex.IsMatch(folio, FolioConstants.FolioPattern)` → 400 con envelope | ✅ Coincide |
+| Response envelope | `{ "data": { ... } }` | `Ok(new { data = dto })` | ✅ Coincide |
+| Use case | `GetCoverageOptionsUseCase` | `_getCoverageOptionsUseCase.ExecuteAsync(folio, ct)` | ✅ Coincide |
+| Default (sin config) | Todas las 14 garantías, deducible 0, coaseguro 0 | `coverageOptions is null \|\| EnabledGuarantees.Count == 0` → retorna `new(GuaranteeKeys.All, 0m, 0m, quote.Version)` | ✅ Coincide |
+| Error 404 | `folioNotFound` | Middleware: `FolioNotFoundException` → 404 `folioNotFound` | ✅ Coincide |
+| Error 500 | `internal` | Middleware: `Exception` general → 500 `internal` | ✅ Coincide |
+
+#### Verificación FE (hook y error handling)
+
+| Punto de verificación | §3.5b | Implementación FE | Estado |
+|---|---|---|---|
+| Query key | `['coverage-options', folio]` | `queryKey: ['coverage-options', folio] as const` | ✅ Coincide |
+| Enabled | Cuando llega un folio | `enabled: !!folio` | ✅ Correcto |
+| Select | Extrae `res.data` | `select: (res) => res.data` | ✅ Correcto |
+| Error 404 | Notificación "El folio no existe" | Sin `onError` explícito en el hook — depende del componente consumidor | ⚠️ Ver DRIFT-007-01 |
+| Error 500 | Notificación genérica | Sin `onError` explícito en el hook — depende del componente consumidor | ⚠️ Ver DRIFT-007-01 |
+
+**Status:** ⚠️ CONTRACT_DRIFT menor (ver DRIFT-007-01)
+
+---
+
+### PUT /v1/quotes/{folio}/coverage-options
+
+**Contrato verificado:** Sí (con drift menor — ver DRIFT-007-02 y DRIFT-007-04)
+**Fecha verificación:** 2026-03-29
+
+#### Definición del contrato
+
+**Consumido por (FE):**
+- Archivo: `features/save-coverage-options/model/useSaveCoverageOptions.ts`
+- Hook/Query: `useMutation` (TanStack Query)
+- Invalida: `['coverage-options', folio]` tras mutación exitosa
+
+**Request FE → BE:**
+```json
+{
+  "enabledGuarantees": ["building_fire", "contents_fire", "cat_tev", "theft", "glass"],
+  "deductiblePercentage": 0.05,
+  "coinsurancePercentage": 0.10,
+  "version": 3
+}
+```
+
+**Response 200 BE → FE:**
+```json
+{
+  "data": {
+    "enabledGuarantees": ["building_fire", "contents_fire", "cat_tev", "theft", "glass"],
+    "deductiblePercentage": 0.05,
+    "coinsurancePercentage": 0.10,
+    "version": 4
+  }
+}
+```
+> `version` siempre retorna `N+1` — el use case re-lee desde MongoDB tras el `UpdateCoverageOptionsAsync`.
+
+#### §3.4 vs §3.5b — Spec interna
+
+| Punto de verificación | §3.4 (Backend contract) | §3.5b (FE ↔ BE contract) | Estado |
+|---|---|---|---|
+| Request campos | `enabledGuarantees`, `deductiblePercentage`, `coinsurancePercentage`, `version` | Mismos 4 campos | ✅ Consistente |
+| Response envelope | `{ "data": { ... } }` | `{ "data": { ... } }` | ✅ Consistente |
+| Response campos | Mismos 4 campos con `version` incrementado | Mismos 4 campos con `version` incrementado | ✅ Consistente |
+| Invalidación caché | N/A | `['coverage-options', folio]` — coincide con query key del GET | ✅ Correcto |
+| Error 400 (validación) | ✅ Definido en §3.4 | ✅ Manejado en §3.5b | ✅ Consistente |
+| Error 401 | ✅ Definido en §3.4 | ❌ No listado (global) | ℹ️ Interceptor global |
+| Error 404 (folio no existe) | ✅ Definido en §3.4 | ❌ **No listado** en §3.5b como error manejado | ⚠️ DRIFT spec-interno |
+| Error 409 (versionConflict) | ✅ Definido en §3.4 | ✅ Manejado en §3.5b | ✅ Consistente |
+| Error 500 | ✅ Definido en §3.4 | ✅ Manejado en §3.5b | ✅ Consistente |
+
+#### §3.4 vs Implementación real del backend
+
+| Punto de verificación | Spec §3.4 | Implementación real | Estado |
+|---|---|---|---|
+| Ruta | `PUT /v1/quotes/{folio}/coverage-options` | `[HttpPut("{folio}/coverage-options")]` en `[Route("v1/quotes")]` | ✅ Coincide |
+| Autorización | Basic Auth `[Authorize]` | `[Authorize]` en controller | ✅ Coincide |
+| Validación folio | `^DAN-\d{4}-\d{5}$` → 400 | `Regex.IsMatch(folio, FolioConstants.FolioPattern)` → 400 | ✅ Coincide |
+| Request body campos | 4 campos esperados | `UpdateCoverageOptionsRequest(List<string> EnabledGuarantees, decimal DeductiblePercentage, decimal CoinsurancePercentage, int Version)` | ✅ Coincide |
+| Validación `enabledGuarantees` | No vacío + keys en `GuaranteeKeys.All` → 400 | `NotEmpty()` + `RuleForEach.Must(key => GuaranteeKeys.All.Contains(key))` | ✅ Coincide |
+| Mensaje "sin garantías" | `"Debe habilitar al menos una garantía"` | `"Debe habilitar al menos una garantía"` | ✅ Coincide |
+| Mensaje key inválida | `"Clave de garantía inválida: {key}"` | `$"Clave de garantía inválida: {key}"` (interpolado) | ✅ Coincide |
+| Validación `deductiblePercentage` | `>= 0 && <= 1` → 400 | `InclusiveBetween(0m, 1m)` | ✅ Coincide |
+| Mensaje deducible | `"El porcentaje de deducible debe estar entre 0 y 1"` | Mensaje exacto en validator | ✅ Coincide |
+| Validación `coinsurancePercentage` | `>= 0 && <= 1` → 400 | `InclusiveBetween(0m, 1m)` | ✅ Coincide |
+| Mensaje coaseguro | `"El porcentaje de coaseguro debe estar entre 0 y 1"` | Mensaje exacto en validator | ✅ Coincide |
+| Validación `version` | Requerido, entero > 0 | `GreaterThan(0).WithMessage("La versión es obligatoria")` | ✅ Coincide |
+| Versionado optimista | `version` debe coincidir con persistida → 409 | `IQuoteRepository.UpdateCoverageOptionsAsync(folioNumber, request.Version, ...)` → `VersionConflictException` → 409 | ✅ Coincide |
+| Response envelope | `{ "data": { ... } }` | `Ok(new { data = dto })` | ✅ Coincide |
+| Version en response | `N+1` | Re-lectura desde MongoDB tras `UpdateCoverageOptionsAsync` — `updated.Version` | ✅ Coincide |
+| `metadata.lastWizardStep` actualizado a 3 | Sí (RN-007-07) | Responsabilidad del repositorio `UpdateCoverageOptionsAsync` (SPEC-002) | ✅ OK (fuera del scope del controller/use case) |
+| Error 400 | `validationError` | Middleware: `ValidationException` → 400 `validationError` | ✅ Coincide |
+| Error 404 | `folioNotFound` | Middleware: `FolioNotFoundException` → 404 `folioNotFound` | ✅ Coincide |
+| Error 409 | `versionConflict` + mensaje en español | `VersionConflictException.Message` = `"Version conflict on folio '...'. Expected version: N"` (inglés) | ⚠️ Ver DRIFT-007-04 |
+| Error 500 | `"Error interno del servidor"` | Middleware: `"Internal server error"` (inglés) | ⚠️ Ver DRIFT-007-05 |
+
+#### Verificación FE (mutation y error handling)
+
+| Punto de verificación | §3.5b | Implementación FE | Estado |
+|---|---|---|---|
+| mutationFn | `updateCoverageOptions(folio, body)` | `updateCoverageOptions(folio, body)` via `httpClient.put` | ✅ Coincide |
+| Invalidación caché | `['coverage-options', folio]` | `queryClient.invalidateQueries({ queryKey: ['coverage-options', folio] })` | ✅ Coincide |
+| Error 400 (`validationError`) | Errores de validación en formulario | `apiErr.type === 'validationError' && apiErr.field` → `onValidationError(field, message)` | ✅ Correcto |
+| Error 409 (`versionConflict`) | Alerta "El folio fue modificado, recarga para continuar" | `apiErr.type === 'versionConflict'` → `onError(STRINGS.errorVersionConflict, 'versionConflict')` — usa string local, no el message del BE | ✅ Correcto (aislado del drift del BE) |
+| Error 500 | Notificación genérica | `else onError(apiErr?.message ?? STRINGS.errorGeneric, 'generic')` | ✅ Correcto |
+| Error 404 (`folioNotFound`) | No listado en §3.5b | `apiErr.type === 'folioNotFound'` → cae en `else` → `onError(apiErr.message, 'generic')` — `STRINGS.errorFolioNotFound` definido pero **no enlazado** | ⚠️ Ver DRIFT-007-02 |
+
+**Status:** ⚠️ CONTRACT_DRIFT (2 menores / 1 medio — ver DRIFT-007-02, DRIFT-007-04, DRIFT-007-05)
+
+---
+
+### GET /v1/catalogs/guarantees (proxy FE → BE → core-ohs)
+
+**Contrato verificado:** Sí (con drift menor — ver DRIFT-007-03)
+**Fecha verificación:** 2026-03-29
+
+#### Definición del contrato
+
+**Consumido por (FE):**
+- Archivo: `entities/guarantee/api/guaranteeApi.ts` → `getGuarantees()`
+- Hook/Query: `useGuaranteesQuery` (TanStack Query `useQuery`)
+- Query Key: `['guarantees']`
+- Endpoint resuelto: `endpoints.catalogs.guarantees` → `/v1/catalogs/guarantees`
+- staleTime: 30 min
+
+**Response 200 BE → FE:**
+```json
+{
+  "data": [
+    { "key": "building_fire", "name": "Incendio Edificios", "description": "Cobertura base sobre la construcción contra incendio", "category": "fire", "requiresInsuredAmount": true },
+    "...13 garantías más..."
+  ]
+}
+```
+
+**Errores manejados por el FE (§3.5b):**
+- 503: alerta global "Servicio no disponible"
+- 500: notificación genérica de error
+
+#### §3.4 vs Implementación real del backend
+
+| Punto de verificación | Spec §3.4/§3.5 | Implementación real | Estado |
+|---|---|---|---|
+| Ruta | `GET /v1/catalogs/guarantees` | `[HttpGet("catalogs/guarantees")]` en `[Route("v1")]` de `CatalogController` | ✅ Coincide |
+| Autorización | Basic Auth `[Authorize]` | `[Authorize]` en controller | ✅ Coincide |
+| Response envelope | `{ "data": [...] }` | `Ok(new { data = guarantees })` | ✅ Coincide |
+| Use case | `GetGuaranteesUseCase` (passthrough) | `_getGuaranteesUseCase.ExecuteAsync(ct)` | ✅ Coincide |
+| Proxy hacia core-ohs | `ICoreOhsClient.GetGuaranteesAsync()` | Sí — `_coreOhsClient.GetGuaranteesAsync(ct)` | ✅ Coincide |
+| Error 503 (core-ohs no disponible) | `coreOhsUnavailable` | `CoreOhsUnavailableException` → middleware → 503 `coreOhsUnavailable` | ✅ Coincide |
+| Error 500 | `internal` | Middleware `Exception` → 500 `internal` | ✅ Coincide |
+
+#### Compatibilidad de tipos FE ↔ BE
+
+| Campo | BE `GuaranteeDto` (C#) | JSON serializado (camelCase) | FE `GuaranteeDto` (TypeScript) | Compatible |
+|---|---|---|---|---|
+| `key` | `string Key` | `key` | `string` | ✅ Sí |
+| `name` | `string Name` | `name` | `string` | ✅ Sí |
+| `description` | `string Description` | `description` | `string` | ✅ Sí |
+| `category` | `string Category` | `category` | `'fire' \| 'cat' \| 'additional' \| 'special'` (union type) | ✅ Sí — todos los valores del fixture están en la union |
+| `requiresInsuredAmount` | `bool RequiresInsuredAmount` | `requiresInsuredAmount` | `boolean` | ✅ Sí |
+
+#### Verificación FE (hook y error handling)
+
+| Punto de verificación | §3.5b | Implementación FE | Estado |
+|---|---|---|---|
+| Query key | `['guarantees']` | `queryKey: ['guarantees'] as const` | ✅ Coincide |
+| staleTime | 30 min | `const THIRTY_MINUTES = 30 * 60 * 1000` → `staleTime: THIRTY_MINUTES` | ✅ Coincide |
+| Select | Extrae array del `data` | `select: (res) => res.data` | ✅ Correcto |
+| Error 503 | "alerta global" | Sin `onError` explícito en hook; `QueryClient` sin `onError` global definido | ⚠️ Ver DRIFT-007-03 |
+| Error 500 | Notificación genérica | Sin `onError` explícito en hook; depende del componente consumidor | ⚠️ Ver DRIFT-007-03 |
+
+**Status:** ⚠️ CONTRACT_DRIFT menor (ver DRIFT-007-03)
+
+---
+
+### Compatibilidad de tipos FE ↔ BE (coverage-options)
+
+| Campo | BE C# | JSON serializado | TypeScript FE | Compatible |
+|---|---|---|---|---|
+| `enabledGuarantees` | `List<string> EnabledGuarantees` | `enabledGuarantees` | `string[]` | ✅ Sí |
+| `deductiblePercentage` | `decimal DeductiblePercentage` | `deductiblePercentage` | `number` | ✅ Sí |
+| `coinsurancePercentage` | `decimal CoinsurancePercentage` | `coinsurancePercentage` | `number` | ✅ Sí |
+| `version` | `int Version` | `version` | `number` | ✅ Sí |
+
+> Serialización JSON: `AddControllers()` aplica `JsonNamingPolicy.CamelCase` por defecto. `EnabledGuarantees` → `enabledGuarantees`, etc. ✅
+> Nota sobre precisión decimal: `decimal` de C# se serializa como número JSON. Para porcentajes como `0.05` / `0.10`, la precisión es suficiente. No hay riesgo de overflow con valores en rango `[0, 1]`. ✅
+
+---
+
+## Drifts detectados
+
+### DRIFT-007-01
+
+```
+Integración:       FE ↔ BE
+Endpoint:          GET /v1/quotes/{folio}/coverage-options
+Tipo:              Error handling no explícito en el hook
+Severidad:         Menor
+Detalle:           §3.5b especifica: "404: notificación 'El folio no existe'" y "500: notificación
+                   genérica de error". El hook useCoverageOptionsQuery.ts no define onError ni
+                   callbacks de error — depende completamente del componente consumidor para
+                   renderizar el estado de error (vía isError + error de TanStack Query).
+                   El QueryClient configurado en queryClient.ts no define onError global.
+                   Sin leer el componente CoverageOptionsForm, no puede confirmarse que el
+                   tratamiento de 404 y 500 estén implementados correctamente.
+Impacto:           Bajo — el patrón sin onError en el hook es válido en TanStack Query v5
+                   (los errores se exponen vía 'isError'/'error' para el componente).
+                   Sin embargo, el "alerta global" para 503 esperado en el catálogo de garantías
+                   requiere infraestructura global que no está confirmada.
+Acción requerida:  Verificar que el componente CoverageOptionsForm maneje isError + error
+                   para mostrar la notificación correcta según el type ('folioNotFound' → 404,
+                   'internal' → 500). Si no lo hace, agregar el handling.
+Responsable:       frontend-developer
+Bloquea Fase 3:    No
+```
+
+### DRIFT-007-02
+
+```
+Integración:       FE ↔ BE
+Endpoint:          PUT /v1/quotes/{folio}/coverage-options
+Tipo:              Error 404 (folioNotFound) no enlazado — string definido pero sin usar
+Severidad:         Menor
+Detalle:           §3.4 define HTTP 404 para PUT (folio eliminado entre el GET y el PUT).
+                   §3.5b no lista 404 como error manejado para PUT (es una gap en la spec).
+                   El string `SAVE_COVERAGE_OPTIONS_STRINGS.errorFolioNotFound = 'El folio no existe'`
+                   está definido en strings.ts pero NO está enlazado en useSaveCoverageOptions.ts.
+                   Cuando ocurre un 404, el handler genérico muestra apiErr.message = 
+                   "El folio DAN-... no existe" (mensaje del BE), que es comprensible pero no
+                   usa el string local ni ejecuta redirección.
+Impacto:           Bajo — el usuario ve el mensaje del BE vía el handler genérico, pero sin
+                   redirección a la página de búsqueda de folios. El string pre-definido queda
+                   huérfano (código muerto).
+Acción requerida:  En useSaveCoverageOptions.ts, agregar el caso explícito:
+                   if (apiErr?.type === 'folioNotFound') {
+                     onError?.(SAVE_COVERAGE_OPTIONS_STRINGS.errorFolioNotFound, 'generic');
+                     // opcional: redirigir a /quotes
+                   }
+                   Decisión de redirección alineada con DRIFT-005-02 y DRIFT-006-05.
+Responsable:       frontend-developer
+Bloquea Fase 3:    No
+```
+
+### DRIFT-007-03
+
+```
+Integración:       FE ↔ BE
+Endpoint:          GET /v1/catalogs/guarantees
+Tipo:              Error 503 sin handler global confirmado
+Severidad:         Menor-Medio
+Detalle:           §3.5b especifica "503: alerta global 'Servicio no disponible'".
+                   La palabra "global" implica que este error se maneja a nivel de infraestructura
+                   (interceptor o QueryClient.onError), no en el componente individual.
+                   useGuaranteesQuery.ts no define onError. El QueryClient en queryClient.ts
+                   tampoco define onError global. Si core-ohs no está disponible, el 503 llega
+                   al componente como error de TanStack Query (isError: true) pero sin un
+                   mecanismo de "alerta global" confirmado.
+Impacto:           Medio — si el catálogo de garantías falla, el formulario de CoverageOptionsForm
+                   no puede cargar los checkboxes. Sin un handler global que muestre la alerta,
+                   el comportamiento visible depende de lo que el componente haga con isError.
+Acción requerida:  Opción A: Agregar onError en useGuaranteesQuery.ts:
+                     onError: () => toast.error(STRINGS.errorCatalogUnavailable)
+                   Opción B: Configurar QueryClient.onError global para errores con
+                     type === 'coreOhsUnavailable' → alerta global.
+                   El string SAVE_COVERAGE_OPTIONS_STRINGS.errorCatalogUnavailable ya existe
+                   y tiene el mensaje correcto en español.
+Responsable:       frontend-developer
+Bloquea Fase 3:    No
+```
+
+### DRIFT-007-04
+
+```
+Integración:       BE (contrato API — mensaje de error)
+Endpoint:          PUT /v1/quotes/{folio}/coverage-options
+Tipo:              Mensaje de error 409 en inglés (viola RN-007-09)
+Severidad:         Medio
+Detalle:           La spec §3.4 define la respuesta 409 con mensaje en español:
+                     { "type": "versionConflict", "message": "El folio fue modificado por otro proceso. Recargue para continuar", "field": null }
+                   La regla RN-007-09 establece: "Mensajes de error en español".
+                   La implementación real retorna el mensaje de VersionConflictException:
+                     "Version conflict on folio 'DAN-2026-00001'. Expected version: 3"
+                   Esto es porque el middleware usa ex.Message directamente:
+                     catch (VersionConflictException ex) → WriteErrorResponseAsync(... ex.Message)
+                   y VersionConflictException.cs define el mensaje en inglés.
+Impacto:           Bajo a nivel funcional — el FE (useSaveCoverageOptions.ts) ignora el mensaje
+                   del BE para el caso versionConflict y usa su propio string local
+                   (SAVE_COVERAGE_OPTIONS_STRINGS.errorVersionConflict). El usuario ve el texto
+                   correcto en español. Sin embargo, la API devuelve un mensaje en inglés que
+                   viola el contrato definido en §3.4 y RN-007-09.
+Acción requerida:  Cambiar el mensaje en VersionConflictException.cs:
+                   : base($"El folio '{folioNumber}' fue modificado por otro proceso. Recargue para continuar.")
+                   Este cambio es transversal y beneficia a todos los features que usan versionado
+                   optimista (SPEC-005, SPEC-006, SPEC-007).
+Responsable:       backend-developer
+Bloquea Fase 3:    No
+```
+
+### DRIFT-007-05
+
+```
+Integración:       BE (contrato API — mensaje de error — pre-existente)
+Endpoint:          Todos los endpoints (transversal)
+Tipo:              Mensaje de error 500 en inglés (viola RN-007-09)
+Severidad:         Menor
+Detalle:           La spec §3.4 define la respuesta 500 con mensaje:
+                     { "type": "internal", "message": "Error interno del servidor", "field": null }
+                   La spec establece RN-007-09: mensajes en español.
+                   El middleware ExceptionHandlingMiddleware.cs retorna:
+                     WriteErrorResponseAsync(... "Internal server error")
+                   Este drift es pre-existente y transcurre desde SPEC-001. No fue detectado en
+                   SPEC-005/006 porque la verificación se centró en el type, no en el message.
+Impacto:           Bajo — los errores 500 son manejados por los handlers genéricos del FE
+                   que no muestran el mensaje del BE directamente (usan strings locales como
+                   STRINGS.errorGeneric). Sin embargo, el contrato API viola lo especificado.
+Acción requerida:  Cambiar en ExceptionHandlingMiddleware.cs el mensaje de 500:
+                   "Error interno del servidor" (en español).
+Responsable:       backend-developer
+Bloquea Fase 3:    No
+```
+
+---
+
+### Conclusión SPEC-007
+
+**Resultado:** `CONTRACT_DRIFT_DETECTED — SIN BLOQUEO A FASE 3`
+
+**Discrepancias encontradas:** 5 drifts (0 críticos, 2 medios, 3 menores). Ningún drift bloquea Fase 3.
+
+| # | Drift | Integración | Severidad | Bloquea Fase 3 |
+|---|---|---|---|---|
+| DRIFT-007-01 | `useCoverageOptionsQuery` sin `onError` explícito para 404/500 | FE ↔ BE | Menor | No |
+| DRIFT-007-02 | `errorFolioNotFound` string definido pero no enlazado en `useSaveCoverageOptions` | FE ↔ BE | Menor | No |
+| DRIFT-007-03 | 503 de guarantees sin handler global ("alerta global" no confirmada) | FE ↔ BE | Menor-Medio | No |
+| DRIFT-007-04 | Mensaje 409 en inglés en `VersionConflictException` (viola RN-007-09) | BE (transversal) | Medio | No |
+| DRIFT-007-05 | Mensaje 500 en inglés en middleware (pre-existente desde SPEC-001) | BE (transversal) | Menor | No |
+
+**Contratos verificados sin drift:**
+- ✅ BE ↔ core-ohs: `GET /v1/catalogs/guarantees` — mock, cliente HTTP, use case y controller totalmente conformes
+- ✅ Rutas de los 3 endpoints expuestos por el backend
+- ✅ DTOs `CoverageOptionsDto` y `UpdateCoverageOptionsRequest` — campos exactos en BE y FE
+- ✅ `GuaranteeDto` — compatibilidad total entre BE y FE (incluyendo union type de category)
+- ✅ Query keys: `['coverage-options', folio]` y `['guarantees']` — ambas conformes
+- ✅ staleTime de 30 min en `useGuaranteesQuery`
+- ✅ Invalidación de caché `['coverage-options', folio]` tras PUT exitoso
+- ✅ Mensajes de validación §2.3 — todos coinciden exactamente con el validator
+- ✅ Comportamiento de defaults (folio sin opciones → todas las 14 garantías, deducible 0, coaseguro 0)
+- ✅ Versionado optimista: filtro `{ folioNumber, version }` → `VersionConflictException` → 409
+
+**Bloqueo a Fase 3:** **No bloqueado.** El contrato funcional (rutas, campos, tipos, query keys, invalidación, validator messages) es completamente consistente entre spec, backend e implementación frontend. Los 5 drifts son de mensajes de error, handlers de borde y conexión de strings ya definidos — no afectan el flujo nominal ni los contratos de request/response.
+
+**Acciones recomendadas antes de cerrar Fase 2 (no bloqueantes):**
+1. `frontend-developer`: Verificar handling de `isError` en `CoverageOptionsForm` para 404/500 (DRIFT-007-01)
+2. `frontend-developer`: Enlazar `STRINGS.errorFolioNotFound` en `useSaveCoverageOptions.ts` (DRIFT-007-02)
+3. `frontend-developer`: Agregar `onError` en `useGuaranteesQuery` o configurar QueryClient global para 503 (DRIFT-007-03)
+4. `backend-developer`: Cambiar mensaje en `VersionConflictException.cs` a español (DRIFT-007-04)
+5. `backend-developer`: Cambiar mensaje de 500 en middleware a `"Error interno del servidor"` (DRIFT-007-05)

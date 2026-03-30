@@ -144,6 +144,26 @@
       "model": "GEMINI_3_1_PRO",
       "designSystemApplied": true,
       "status": "approved"
+    },
+    "quote-state-progress/wizard-layout-progressbar": {
+      "screenName": "projects/3802726589783048530/screens/3c93731b4459409eb9a9ac79e33cedd6",
+      "screenId": "3c93731b4459409eb9a9ac79e33cedd6",
+      "screenIdOriginal": "b9b6d920229c450b8a95842533ec8fa3",
+      "htmlFile": ".github/design-specs/screens/quote-state-progress/wizard-layout-progressbar.html",
+      "title": "WizardLayout con ProgressBar — Estado intermedio (Ubicaciones activo)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "quote-state-progress/panel-location-alerts": {
+      "screenName": "projects/3802726589783048530/screens/b4d5f5f6d1b842c6b1c2841d1396b473",
+      "screenId": "b4d5f5f6d1b842c6b1c2841d1396b473",
+      "screenIdOriginal": "c70736a769114987afac4ea89d07b255",
+      "htmlFile": ".github/design-specs/screens/quote-state-progress/panel-location-alerts.html",
+      "title": "Panel LocationAlerts — estados múltiples (con alertas, sin alertas, sin ubicaciones)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
     }
   }
 }
