@@ -1,5 +1,5 @@
 .row {
-  display: contents;
+  /* display: table-row por defecto del navegador */
 }
 
 .cell {
