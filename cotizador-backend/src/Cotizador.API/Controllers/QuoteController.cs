@@ -30,6 +30,8 @@ public class QuoteController : ControllerBase
     private readonly IUpdateCoverageOptionsUseCase _updateCoverageOptionsUseCase;
     private readonly IValidator<UpdateCoverageOptionsRequest> _coverageOptionsValidator;
     private readonly IGetQuoteStateUseCase _getQuoteStateUseCase;
+    private readonly ICalculateQuoteUseCase _calculateQuoteUseCase;
+    private readonly IValidator<CalculateRequest> _calculateValidator;
 
     public QuoteController(
         IGetGeneralInfoUseCase getGeneralInfoUseCase,
@@ -47,7 +49,9 @@ public class QuoteController : ControllerBase
         IGetCoverageOptionsUseCase getCoverageOptionsUseCase,
         IUpdateCoverageOptionsUseCase updateCoverageOptionsUseCase,
         IValidator<UpdateCoverageOptionsRequest> coverageOptionsValidator,
-        IGetQuoteStateUseCase getQuoteStateUseCase)
+        IGetQuoteStateUseCase getQuoteStateUseCase,
+        ICalculateQuoteUseCase calculateQuoteUseCase,
+        IValidator<CalculateRequest> calculateValidator)
     {
         _getGeneralInfoUseCase = getGeneralInfoUseCase;
         _updateGeneralInfoUseCase = updateGeneralInfoUseCase;
@@ -65,6 +69,8 @@ public class QuoteController : ControllerBase
         _updateCoverageOptionsUseCase = updateCoverageOptionsUseCase;
         _coverageOptionsValidator = coverageOptionsValidator;
         _getQuoteStateUseCase = getQuoteStateUseCase;
+        _calculateQuoteUseCase = calculateQuoteUseCase;
+        _calculateValidator = calculateValidator;
     }
 
     /// <summary>GET /v1/quotes/{folio}/general-info — Obtiene la información general de una cotización.</summary>
@@ -299,5 +305,28 @@ public class QuoteController : ControllerBase
 
         var dto = await _updateCoverageOptionsUseCase.ExecuteAsync(folio, request, ct);
         return Ok(new { data = dto });
+    }
+
+    /// <summary>POST /v1/quotes/{folio}/calculate — Ejecuta el motor de cálculo de primas sobre el folio.</summary>
+    [HttpPost("{folio}/calculate")]
+    public async Task<IActionResult> CalculateAsync(
+        string folio,
+        [FromBody] CalculateRequest request,
+        CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        await _calculateValidator.ValidateAndThrowAsync(request, ct);
+
+        CalculateResultResponse result = await _calculateQuoteUseCase.ExecuteAsync(folio, request, ct);
+        return Ok(new { data = result });
     }
 }

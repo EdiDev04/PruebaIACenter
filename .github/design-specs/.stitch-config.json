@@ -164,6 +164,47 @@
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
       "status": "approved"
+    },
+    "results-display/estado-no-calculado": {
+      "screenName": "projects/3802726589783048530/screens/9da42423ae724e509b92007844d492d8",
+      "screenId": "9da42423ae724e509b92007844d492d8",
+      "screenIdOriginal": "cd3889e6bc344b24b45a1296b06559a2",
+      "htmlFile": ".github/design-specs/screens/results-display/estado-no-calculado.html",
+      "title": "Resultados - Estado No Calculado (ready + not-ready)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "results-display/resumen-financiero": {
+      "screenName": "projects/3802726589783048530/screens/6c20ff595e63417794884b66f293b024",
+      "screenId": "6c20ff595e63417794884b66f293b024",
+      "screenIdOriginal": "c19cf8055fa14afba5c01b17ca5a78e6",
+      "htmlFile": ".github/design-specs/screens/results-display/resumen-financiero.html",
+      "title": "Resultados - Resumen Financiero (3 tarjetas de prima)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "results-display/desglose-ubicaciones": {
+      "screenName": "projects/3802726589783048530/screens/8bb928c175454d40bb6888203ce712ae",
+      "screenId": "8bb928c175454d40bb6888203ce712ae",
+      "screenIdOriginal": "1876061cd6f940beb97f417768f24413",
+      "htmlFile": ".github/design-specs/screens/results-display/desglose-ubicaciones.html",
+      "title": "Resultados - Desglose por Ubicaciones (tabla + accordeon)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "results-display/panel-alertas-incompletas": {
+      "screenName": "projects/3802726589783048530/screens/0c29a56483f146529457d4190a210470",
+      "screenId": "0c29a56483f146529457d4190a210470",
+      "screenIdOriginal": "2e060dbadb514de29ede7e9c18d22556",
+      "htmlFile": ".github/design-specs/screens/results-display/panel-alertas-incompletas.html",
+      "title": "Resultados - Panel Alertas Ubicaciones Incompletas",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "deprecated",
+      "deprecationNote": "Ya diseñado e implementado en quote-state-progress/panel-location-alerts. El frontend-developer debe reutilizar el componente existente LocationAlerts."
     }
   }
 }

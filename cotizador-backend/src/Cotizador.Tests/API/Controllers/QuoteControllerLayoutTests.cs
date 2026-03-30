@@ -31,6 +31,8 @@ public class QuoteControllerLayoutTests
     private readonly Mock<IUpdateCoverageOptionsUseCase> _mockUpdateCoverageOptionsUseCase = new();
     private readonly Mock<IValidator<UpdateCoverageOptionsRequest>> _mockCoverageOptionsValidator = new();
     private readonly Mock<IGetQuoteStateUseCase> _mockGetQuoteStateUseCase = new();
+    private readonly Mock<ICalculateQuoteUseCase> _mockCalculateQuoteUseCase = new();
+    private readonly Mock<IValidator<CalculateRequest>> _mockCalculateValidator = new();
 
     private QuoteController CreateController()
     {
@@ -50,7 +52,9 @@ public class QuoteControllerLayoutTests
             _mockGetCoverageOptionsUseCase.Object,
             _mockUpdateCoverageOptionsUseCase.Object,
             _mockCoverageOptionsValidator.Object,
-            _mockGetQuoteStateUseCase.Object);
+            _mockGetQuoteStateUseCase.Object,
+            _mockCalculateQuoteUseCase.Object,
+            _mockCalculateValidator.Object);
 
         controller.ControllerContext = new ControllerContext
         {

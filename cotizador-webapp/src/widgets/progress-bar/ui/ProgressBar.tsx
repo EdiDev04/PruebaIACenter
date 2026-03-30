@@ -1,28 +1,62 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import type { ProgressDto } from '@/entities/quote-state';
 import styles from './ProgressBar.module.css';
 
 interface Step {
-  key: keyof ProgressDto;
+  key: string;
   label: string;
   path: string;
+  getCompleted: (progress: ProgressDto, hasCalculation: boolean) => boolean;
 }
 
 const STEPS: Step[] = [
-  { key: 'generalInfo', label: 'Datos Generales', path: 'general-info' },
-  { key: 'layoutConfiguration', label: 'Layout', path: 'locations' },
-  { key: 'locations', label: 'Ubicaciones', path: 'locations' },
-  { key: 'coverageOptions', label: 'Opciones de Cobertura', path: 'technical-info' },
+  {
+    key: 'generalInfo',
+    label: 'Datos Generales',
+    path: 'general-info',
+    getCompleted: (p) => p.generalInfo,
+  },
+  {
+    key: 'locations',
+    label: 'Ubicaciones',
+    path: 'locations',
+    getCompleted: (p) => p.locations,
+  },
+  {
+    key: 'coverageOptions',
+    label: 'Coberturas',
+    path: 'technical-info',
+    getCompleted: (p) => p.coverageOptions,
+  },
+  {
+    key: 'results',
+    label: 'Resultados',
+    path: 'results',
+    getCompleted: (_p, hasCalculation) => hasCalculation,
+  },
 ];
+
+/** Map URL path segment → step key */
+const PATH_TO_STEP: Record<string, string> = {
+  'general-info': 'generalInfo',
+  locations: 'locations',
+  'technical-info': 'coverageOptions',
+  results: 'results',
+};
 
 interface ProgressBarProps {
   readonly progress: ProgressDto;
-  readonly currentStep?: string;
+  readonly hasCalculation?: boolean;
 }
 
-export function ProgressBar({ progress, currentStep }: ProgressBarProps) {
+export function ProgressBar({ progress, hasCalculation = false }: ProgressBarProps) {
   const navigate = useNavigate();
   const { folioNumber } = useParams<{ folioNumber: string }>();
+  const { pathname } = useLocation();
+
+  const parts = pathname.split('/');
+  const pathSegment = parts[parts.length - 1] ?? '';
+  const activeKey = PATH_TO_STEP[pathSegment] ?? '';
 
   const handleStepClick = (path: string) => {
     if (folioNumber) navigate(`/quotes/${folioNumber}/${path}`);
@@ -31,8 +65,8 @@ export function ProgressBar({ progress, currentStep }: ProgressBarProps) {
   return (
     <nav className={styles.bar} aria-label="Progreso de cotización">
       {STEPS.map((step, idx) => {
-        const completed = progress[step.key];
-        const isActive = currentStep === step.key;
+        const completed = step.getCompleted(progress, hasCalculation);
+        const isActive = activeKey === step.key;
         return (
           <div key={step.key} className={styles.stepWrapper}>
             <button
@@ -46,7 +80,7 @@ export function ProgressBar({ progress, currentStep }: ProgressBarProps) {
                 className={`${styles.circle} ${completed ? styles.circleCompleted : styles.circlePending}`}
                 aria-hidden="true"
               >
-                {completed ? '✓' : ''}
+                {completed ? '✓' : idx + 1}
               </span>
               <span className={styles.label}>{step.label}</span>
             </button>

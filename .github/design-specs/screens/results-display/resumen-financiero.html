@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"tertiary-fixed": "#82ff99", "on-tertiary": "#e9ffe6", "on-primary-fixed": "#ffffff", "on-primary-fixed-variant": "#fefcff", "surface-tint": "#1554d9", "secondary-container": "#ffdcc3", "surface-container-highest": "#d5e3ff", "on-surface-variant": "#506079", "on-tertiary-fixed-variant": "#006c2d", "on-secondary-fixed": "#633300", "on-secondary-container": "#7e4200", "primary-fixed-dim": "#386bef", "on-tertiary-container": "#006127", "inverse-surface": "#070e19", "on-secondary-fixed-variant": "#8c4a00", "on-secondary": "#fff7f4", "on-surface": "#24334a", "on-background": "#24334a", error: "#a8364b", "on-primary": "#faf8ff", "primary-container": "#4878fd", "inverse-on-surface": "#969dac", "surface-dim": "#cbdbf9", "primary-fixed": "#4878fd", "outline-variant": "#a3b3cf", "surface-container": "#e7eeff", "surface-container-high": "#dee8ff", "secondary-fixed-dim": "#ffcaa1", tertiary: "#006e2e", "error-container": "#f97386", "tertiary-container": "#82ff99", background: "#f9f9ff", "on-error": "#fff7f7", secondary: "#914d00", "tertiary-fixed-dim": "#73f08c", primary: "#1554d9", "surface-container-low": "#f0f3ff", "on-primary-container": "#000000", "inverse-primary": "#638aff", outline: "#6c7b96", "surface-container-lowest": "#ffffff", "surface-variant": "#d5e3ff", surface: "#f9f9ff", "surface-bright": "#f9f9ff", "on-error-container": "#6e0523", "secondary-fixed": "#ffdcc3", "on-tertiary-fixed": "#004c1d", "secondary-dim": "#804300", "tertiary-dim": "#006127", "error-dim": "#6b0221", "primary-dim": "#0047c6"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 flex items-center justify-between px-8 h-16 w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-800 dark:text-blue-200">Cotizador Institucional</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="font-manrope text-sm font-semibold tracking-tight text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Soporte</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">Documentación</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 bg-primary text-on-primary text-sm font-semibold rounded-md active:opacity-80 transition-all">Guardar Progreso</button>
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined cursor-pointer hover:text-blue-600">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-blue-600">account_circle</span>
+</div>
+</div>
+</nav>
+<div class="flex min-h-[calc(100vh-64px)]">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-slate-50 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col pt-8 pb-8 z-40">
+<div class="px-6 mb-8">
+<h3 class="font-manrope font-bold text-blue-900 dark:text-blue-100 text-lg">Expediente #2024-001</h3>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Suscripción en Progreso</p>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="flex items-center px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 cursor-pointer transition-all duration-300 hover:translate-x-1">
+<span class="material-symbols-outlined mr-3">description</span>
+<span class="font-inter text-sm font-medium">Datos Generales</span>
+</div>
+<div class="flex items-center px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 cursor-pointer transition-all duration-300 hover:translate-x-1">
+<span class="material-symbols-outlined mr-3">location_on</span>
+<span class="font-inter text-sm font-medium">Ubicaciones</span>
+</div>
+<div class="flex items-center px-6 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 cursor-pointer transition-all duration-300 hover:translate-x-1">
+<span class="material-symbols-outlined mr-3">shield</span>
+<span class="font-inter text-sm font-medium">Coberturas</span>
+</div>
+<!-- Active Tab: Resultados -->
+<div class="flex items-center px-6 py-3 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 border-l-4 border-blue-700 font-bold shadow-sm cursor-pointer transition-all duration-300">
+<span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-inter text-sm">Resultados</span>
+</div>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 bg-primary text-on-primary rounded-md font-semibold text-sm active:opacity-80 transition-all shadow-md">
+                    Finalizar Cotización
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 p-12 bg-surface">
+<!-- Hero Results Section -->
+<section aria-labelledby="results-title" class="max-w-6xl mx-auto space-y-8">
+<!-- Header Row -->
+<div class="flex items-center justify-between w-full">
+<h2 class="text-[20px] font-semibold text-on-surface tracking-tight" id="results-title">
+                        Resultados de la Cotización
+                    </h2>
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant bg-surface-container-lowest text-on-secondary-fixed-variant hover:bg-surface-container-low transition-colors rounded-lg font-medium text-sm">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+                        Recalcular
+                    </button>
+</div>
+<!-- Financial Ledger Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-[16px]">
+<!-- Card 1: Prima Neta Total -->
+<article aria-label="Prima Neta Total: $85.230,00" class="bg-surface-container-lowest p-[24px] rounded-xl shadow-[0px_12px_32px_rgba(25,28,30,0.04)] border-l-[4px] border-primary-container flex flex-col justify-between" role="region">
+<div>
+<p class="text-on-surface-variant text-[14px] font-medium font-body mb-2">Prima Neta Total</p>
+<p class="text-on-surface text-[24px] font-semibold font-headline">$85.230,00</p>
+</div>
+<p class="text-outline text-[12px] mt-4 font-body">Solo riesgo puro</p>
+</article>
+<!-- Card 2: Prima Comercial (sin IVA) -->
+<article aria-label="Prima Comercial (sin IVA): $102.276,00" class="bg-surface-container-lowest p-[24px] rounded-xl shadow-[0px_12px_32px_rgba(25,28,30,0.04)] border-l-[4px] border-primary-container flex flex-col justify-between" role="region">
+<div>
+<p class="text-on-surface-variant text-[14px] font-medium font-body mb-2">Prima Comercial (sin IVA)</p>
+<p class="text-on-surface text-[24px] font-semibold font-headline">$102.276,00</p>
+</div>
+<p class="text-outline text-[12px] mt-4 font-body">Incluye gastos de expedición</p>
+</article>
+<!-- Card 3: Prima Comercial Total (con IVA) - Featured -->
+<article aria-label="Prima Comercial Total: $118.640,16" class="bg-[#f0f9f6] p-[24px] rounded-xl shadow-[0px_16px_48px_rgba(0,84,57,0.08)] border-l-[4px] border-tertiary-container relative overflow-hidden flex flex-col justify-between" role="region">
+<!-- Decorative background element for institutional feel -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-tertiary opacity-[0.03] rounded-full -mr-16 -mt-16"></div>
+<div>
+<div class="flex items-center justify-between mb-2">
+<p class="text-on-surface-variant text-[14px] font-medium font-body">Prima Comercial Total</p>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Precio final</span>
+</div>
+<p class="text-tertiary text-[32px] font-bold font-headline">$118.640,16</p>
+</div>
+<p class="text-on-tertiary-fixed-variant opacity-70 text-[12px] mt-4 font-body font-medium">IVA incluido</p>
+</article>
+</div>
+<!-- Descriptive Information Block (Editorial Style) -->
+<div class="mt-12 bg-surface-container-low p-8 rounded-xl border-l-[4px] border-primary flex flex-col md:flex-row gap-8 items-start">
+<div class="flex-1 space-y-4">
+<h3 class="text-primary font-bold text-lg">Resumen de Evaluación de Riesgos</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">
+                            Los cálculos presentados reflejan la suscripción institucional bajo el expediente <span class="font-bold">#2024-001</span>. Se han aplicado los coeficientes de siniestralidad proyectada según el último reporte actuarial. Esta cotización mantiene su validez por 15 días hábiles a partir de la fecha de expedición.
+                        </p>
+<div class="flex gap-4">
+<span class="flex items-center gap-1.5 text-xs font-semibold text-tertiary">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                                Riesgo Nivel Bajo
+                            </span>
+<span class="flex items-center gap-1.5 text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-sm">verified</span>
+                                Verificado Actuarialmente
+                            </span>
+</div>
+</div>
+<div class="w-full md:w-64">
+<img alt="Análisis Financiero" class="w-full h-32 object-cover rounded-lg shadow-inner grayscale opacity-80" data-alt="close-up of professional financial ledger documents with fountain pen and subtle calculations in a bright institutional office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRbAAHwga6C-p7SW-zDAxCHfjkpIp8ABJfpO_xXGOx9k6KQaZU4h2qGM1rC4kFTsdkWM4a1CT404M_ab7U0kNQ1rOpIpssv5UcpXoKKMZGS82dWNKEUHHTxe6iXiSmef_H8fh5I5bi2FVrH9yerb472ZqqX2Y9PGWtKkxgnnvdnHYO79m1nprBd7KPCEUzW4PSlrpCp_KAQPW9hV17ClR9rtJHZ2VEIF3TutELWYyyJqB1TD3glroTiFmv5I5-MOjrMHST8ZUCe70"/>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

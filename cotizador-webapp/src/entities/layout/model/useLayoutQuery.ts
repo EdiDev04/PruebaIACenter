@@ -45,5 +45,6 @@ export function useLayoutQuery(
       }
       return failureCount < 1;
     },
+    staleTime: 0,
   });
 }

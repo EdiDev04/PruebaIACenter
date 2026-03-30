@@ -7,5 +7,6 @@ export function useLocationsQuery(folio: string) {
     queryFn: () => getLocations(folio),
     select: (res) => res.data,
     enabled: !!folio,
+    staleTime: 0,
   });
 }

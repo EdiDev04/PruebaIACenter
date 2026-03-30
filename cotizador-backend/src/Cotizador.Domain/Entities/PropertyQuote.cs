@@ -16,6 +16,7 @@ public class PropertyQuote
     public CoverageOptions CoverageOptions { get; set; } = new();
     public List<Location> Locations { get; set; } = new();
     public decimal NetPremium { get; set; }
+    public decimal CommercialPremiumBeforeTax { get; set; }
     public decimal CommercialPremium { get; set; }
     public List<LocationPremium> PremiumsByLocation { get; set; } = new();
     public int Version { get; set; } = 1;

@@ -1,3 +1,248 @@
+# Reporte de calidad — SPEC-009 Amendment v1.1 + results-display (SPEC-010) — 2026-03-30
+
+> **Nota:** Este archivo consolida los reportes de calidad activos. La sección "SPEC-009 Amendment v1.1" cubre el cruce `enabledGuaranteeKeys` del motor de cálculo. La sección "SPEC-010" cubre el display de resultados.
+
+---
+
+# Reporte de calidad — SPEC-009 Amendment v1.1 — 2026-03-30
+
+## Parte 1 — Auditoría de arquitectura (Amendment v1.1)
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 1     | Sí              |
+| MAYOR     | 1     | No              |
+| MENOR     | 0     | No              |
+
+---
+
+### Violaciones críticas
+
+#### CRIT-001 — Null guard incompleto rompe backward compatibility
+
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/CalculateQuoteUseCase.cs`
+- **Línea:** 54
+- **Regla:** Lógica de negocio con efecto regresivo en escenarios previos al amendment
+- **Detalle:**
+
+  ```csharp
+  // Línea 54 — código actual
+  var enabledGuaranteeKeys = new HashSet<string>(quote.CoverageOptions.EnabledGuarantees ?? new List<string>());
+  ```
+
+  El guard `?? new List<string>()` protege contra `null` literal, pero **no protege contra la lista vacía** — que es el estado por defecto de `CoverageOptions.EnabledGuarantees` (inicializada como `= new List<string>()` en la entidad `CoverageOptions`). Con un `HashSet` vacío:
+
+  - `!enabledGuaranteeKeys.Contains(g.GuaranteeKey)` devuelve `true` para **cualquier** garantía
+  - **Toda ubicación con al menos una garantía** queda `hasDisabledGuarantee = true` → status `Incomplete`, `netPremium = 0`
+  - Si todas las ubicaciones caen en ese estado → se lanza `InvalidQuoteStateException`
+
+  **Impacto en tests existentes (pre-amendment):** los tests que usan `BuildQuoteWith2CalculableAnd1Incomplete()` sin configurar `CoverageOptions.EnabledGuarantees` fallarán con `InvalidQuoteStateException` inesperado:
+
+  | Test | Categoría | Estado esperado con código actual |
+  |------|-----------|----------------------------------|
+  | `ExecuteAsync_Should_ReturnCalculateResultResponse_WhenTwoCalculableAndOneIncomplete` | Smoke | FAIL |
+  | `ExecuteAsync_Should_SetIncompleteLocation_WithZeroNetPremium` | Regression | FAIL |
+  | `ExecuteAsync_Should_CalculateCommercialPremium_Correctly` | Regression | FAIL |
+  | `ExecuteAsync_Should_NotModifyNonFinancialFields_WhenPersisting` | Regression | FAIL |
+  | `ExecuteAsync_Should_UseDefaultEquipmentClass_ForElectronicEquipment` | Regression | FAIL |
+  | `ExecuteAsync_Should_UseFireRateZeroAndLogWarning_WhenFireKeyNotFound` | Regression | FAIL |
+
+  **Raíz del error:** la semántica correcta de `EnabledGuarantees` vacío para backward compatibility es **"sin filtro — todas las garantías están habilitadas"**, no "todas las garantías están deshabilitadas".
+
+- **Acción requerida:** Tratar `EnabledGuarantees` vacío como "sin filtro". Corrección mínima:
+
+  ```csharp
+  // Línea 54 — corrección propuesta
+  bool hasEnabledGuaranteeFilter = quote.CoverageOptions.EnabledGuarantees?.Count > 0;
+  var enabledGuaranteeKeys = hasEnabledGuaranteeFilter
+      ? new HashSet<string>(quote.CoverageOptions.EnabledGuarantees!)
+      : (HashSet<string>?)null;
+
+  // Paso 4 — where de calculableZipCodes
+  .Where(l => enabledGuaranteeKeys == null
+      || l.Guarantees == null
+      || !l.Guarantees.Any(g => !enabledGuaranteeKeys.Contains(g.GuaranteeKey)))
+
+  // Paso 5 — hasDisabledGuarantee
+  bool hasDisabledGuarantee = enabledGuaranteeKeys != null
+      && location.Guarantees != null
+      && location.Guarantees.Any(g => !enabledGuaranteeKeys.Contains(g.GuaranteeKey));
+  ```
+
+---
+
+### Violaciones mayores
+
+#### MAJOR-001 — SRP: lógica `hasDisabledGuarantee` inline en el use case
+
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/CalculateQuoteUseCase.cs`
+- **Líneas:** 79–81
+- **Regla:** Single Responsibility Principle
+- **Detalle:** `LocationCalculabilityEvaluator` existe para encapsular exactamente este tipo de evaluación de calculabilidad. La lógica del amendment queda inline en el use case en lugar de delegarla al evaluador. No bloquea, pero aumenta la carga de responsabilidades del use case conforme crezcan las reglas.
+- **Acción sugerida:** Agregar overload `LocationCalculabilityEvaluator.Evaluate(Location, HashSet<string>?)`.
+
+---
+
+### Verificación de Clean Architecture
+
+| Regla | Resultado |
+|-------|-----------|
+| Use case solo usa interfaces de Application/Ports | PASS |
+| No acceso directo a MongoDB en use case | PASS |
+| No dependencias de Infrastructure en Application | PASS |
+| No `new()` de servicios de negocio fuera de su capa | PASS |
+
+---
+
+### Verificación de Tests RN-009-02b
+
+| Test | AAA | Asserts suficientes | Independiente del orden |
+|------|-----|---------------------|------------------------|
+| `ExecuteAsync_LocationWithDisabledGuarantee_TreatsAsIncomplete` | PASS | PASS | PASS — folio `DAN-2026-00020` |
+| `ExecuteAsync_MixedGuarantees_OnlyEnabledOnesCalculated` | PASS | PASS | PASS — folio `DAN-2026-00021` |
+| `ExecuteAsync_AllLocationsHaveDisabledGuarantees_ThrowsInvalidQuoteStateException` | PASS | PASS | PASS — folio `DAN-2026-00022` |
+
+Los 3 tests nuevos son correctos. Configuran `EnabledGuarantees` explícitamente y pasarían con el código actual. El problema es que el código nuevo rompe los tests pre-existentes.
+
+---
+
+## Parte 2 — Análisis estático SonarQube (Amendment v1.1)
+
+- **Project Key:** no vinculado a servidor remoto (modo no conectado)
+- **Archivos analizados:** 2 (`CalculateQuoteUseCase.cs`, `CalculateQuoteUseCaseTests.cs`)
+- **Análisis Roslyn local:** sin issues BLOCKER ni CRITICAL reportados en PROBLEMS view
+- **Security Hotspots remotos:** no disponible (requiere Connected Mode)
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 0     |
+| MAJOR     | 0     |
+| MINOR     | 0     |
+
+El único riesgo identificado es lógico (CRIT-001 de auditoría de arquitectura), no una vulnerabilidad de seguridad OWASP.
+
+---
+
+## Veredicto SPEC-009 Amendment v1.1
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura | FAIL — 1 crítico (CRIT-001) |
+| SonarQube | PASS — 0 BLOCKER / 0 CRITICAL |
+| **Gate final** | **FAILED** |
+
+**Causa raíz:** `enabledGuaranteeKeys` vacío trata todas las garantías como deshabilitadas, rompiendo 6 tests Smoke/Regression pre-existentes que no configuran `CoverageOptions.EnabledGuarantees`.
+
+---
+
+# Reporte de calidad — results-display (SPEC-010) — 2026-03-30
+
+---
+
+> Auditoría de los archivos generados por la implementación de SPEC-010.
+
+---
+
+## Parte 1 — Auditoría de arquitectura
+
+### Archivos auditados
+
+| Capa | Archivo |
+|------|---------|
+| Shared | `cotizador-webapp/src/shared/lib/formatCurrency.ts` |
+| Widget | `cotizador-webapp/src/widgets/financial-summary/ui/FinancialSummary.tsx` |
+| Widget | `cotizador-webapp/src/widgets/location-breakdown/ui/LocationBreakdown.tsx` |
+| Widget | `cotizador-webapp/src/widgets/location-breakdown/ui/CoverageAccordion.tsx` |
+| Widget | `cotizador-webapp/src/widgets/incomplete-alerts/ui/IncompleteAlerts.tsx` |
+| Page | `cotizador-webapp/src/pages/ResultsPage.tsx` |
+| App | `cotizador-webapp/src/app/router/router.tsx` |
+| Feature | `cotizador-webapp/src/features/calculate-quote/ui/CalculateButton.tsx` |
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 0     | No              |
+| MAYOR     | 2     | No              |
+| MENOR     | 1     | No              |
+
+### Violaciones críticas
+
+Ninguna.
+
+### Violaciones mayores
+
+#### MAJOR-FE-001
+- **Archivo:** `src/widgets/location-breakdown/ui/LocationBreakdown.tsx`
+- **Líneas:** 44–47 y 79–84
+- **Regla:** Roles ARIA semánticos huérfanos — `role="row"` y `role="columnheader"` sin contenedor `role="table"`
+- **Detalle:** El encabezado de la tabla (`tableHeader`) y la fila de totales (`totalRow`) usan `role="row"` y `role="columnheader"`, pero el elemento contenedor de ambos (la `<section>`) no tiene `role="table"`. Contrasta con `CoverageAccordion.tsx` que sí aplica `role="table"` correctamente en su contenedor. Lectores de pantalla no podrán interpretar la estructura como tabla.
+- **Acción:** Agregar `role="table"` (o convertir a `<table>` semántico) al contenedor que envuelve el header, las filas y el total.
+
+#### MAJOR-FE-002
+- **Archivo:** `src/widgets/incomplete-alerts/ui/IncompleteAlerts.tsx`
+- **Línea:** 4, 30
+- **Regla:** Lógica de navegación en capa Widget — acoplamiento a routing
+- **Detalle:** El widget importa `useNavigate` de `react-router-dom` y llama `navigate('/quotes/${folio}/locations')` en el handler del botón. Los widgets no deben conocer rutas de aplicación; la navegación es responsabilidad de la capa `pages`. Si la ruta cambia, el widget se rompe silenciosamente.
+- **Acción:** Reemplazar `useNavigate` por una prop `onEdit: () => void` y delegar la navegación a `ResultsPage`.
+
+### Sugerencias menores
+
+#### MINOR-FE-001
+- **Archivo:** `src/pages/ResultsPage.tsx`
+- **Línea:** 34
+- **Regla:** Parámetro de callback no utilizado (`_result`)
+- **Detalle:** `handleCalcSuccess` recibe `_result: CalculateResultResponse` pero no lo usa. El prefijo `_` indica intención de supresión, pero el parámetro podría eliminarse completamente del tipo de la prop `onSuccess` si la página nunca consumirá el resultado directamente.
+- **Acción:** Cambiar la firma a `() => void` en `ResultsPage` o eliminar el parámetro si no se planea usar.
+
+---
+
+## Parte 2 — Análisis estático SonarQube
+
+### Resumen ejecutivo
+
+- **Archivos analizados:** 8
+- **Gate SonarQube:** No disponible (workspace no conectado a servidor SonarQube en modo Connected)
+- **Análisis Roslyn activado:** Sí (análisis triggered en PROBLEMS view para todos los archivos)
+
+### Hallazgos de seguridad
+
+- `dangerouslySetInnerHTML`: No detectado en ningún archivo — sin riesgo XSS.
+- Ejecución de datos de usuario como código: No detectada.
+- Credenciales hardcodeadas: No detectadas.
+- URLs hardcodeadas: No detectadas (se usan `import.meta.env` y parámetros de ruta).
+
+### Conteo de issues SonarQube
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 0     |
+| MAJOR     | 0     |
+| MINOR     | 0     |
+| INFO      | 0     |
+
+> SonarQube for IDE no reportó issues en los archivos analizados. El workspace no está en Connected Mode; los Security Hotspots de servidor no están disponibles.
+
+### Issues BLOCKER y CRITICAL — Acción requerida
+
+Ninguno.
+
+---
+
+## Veredicto consolidado
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura | PASS — 0 críticos, 2 mayores, 1 menor |
+| SonarQube | PASS — 0 BLOCKER, 0 CRITICAL |
+| **Gate final** | **PASSED** |
+
+---
+
 # Reporte de calidad — coverage-options-configuration (SPEC-007) — 2026-03-29 (Auditoría Final)
 
 > **Auditoría final post-corrección.** Todas las correcciones aplicadas desde la auditoría anterior han sido verificadas. Este reporte registra el estado definitivo para habilitación del `qa-agent`.

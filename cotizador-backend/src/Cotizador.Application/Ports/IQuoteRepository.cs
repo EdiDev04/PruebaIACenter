@@ -74,13 +74,14 @@ public interface IQuoteRepository
 
     /// <summary>
     /// Updates financial result without touching other sections.
-    /// $set: netPremium, commercialPremium, premiumsByLocation, quoteStatus="calculated",
+    /// $set: netPremium, commercialPremiumBeforeTax, commercialPremium, premiumsByLocation, quoteStatus="calculated",
     ///       version+1, metadata.updatedAt, metadata.lastWizardStep=4
     /// </summary>
     Task UpdateFinancialResultAsync(
         string folioNumber,
         int expectedVersion,
         decimal netPremium,
+        decimal commercialPremiumBeforeTax,
         decimal commercialPremium,
         List<LocationPremium> premiumsByLocation,
         CancellationToken ct = default);

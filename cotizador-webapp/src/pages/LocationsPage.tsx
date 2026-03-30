@@ -29,6 +29,8 @@ export function LocationsPage() {
   const { data: summaryData } = useLocationsSummaryQuery(folio);
   const { data: locationsData } = useLocationsQuery(folio);
 
+  const canContinue = (summaryData?.totalCalculable ?? 0) >= 1;
+
   const addToast = (message: string, type: ToastMessage['type'] = 'error') =>
     setToasts((prev) => [...prev, { id: crypto.randomUUID(), message, type }]);
 
@@ -76,7 +78,7 @@ export function LocationsPage() {
     );
   }
 
-  const canContinue = (summaryData?.totalCalculable ?? 0) >= 1;
+
 
   function handleContinue() {
     navigate(`/quotes/${folio}/technical-info`);

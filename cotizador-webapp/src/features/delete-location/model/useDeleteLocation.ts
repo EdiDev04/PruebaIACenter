@@ -36,7 +36,7 @@ export function useDeleteLocation({ folio, onSuccess, onError }: UseDeleteLocati
 
     const updatedList = locations
       .filter((loc) => loc.index !== index)
-      .map((loc, i) => ({ ...loc, index: i }));
+      .map((loc, i) => ({ ...loc, index: i + 1 }));
 
     mutation.mutate({ locations: updatedList, version });
   }

@@ -57,6 +57,12 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IValidator<PatchLocationRequest>, PatchLocationRequestValidator>();
         services.AddScoped<IValidator<UpdateCoverageOptionsRequest>, UpdateCoverageOptionsRequestValidator>();
 
+        // Use Cases — SPEC-009
+        services.AddScoped<ICalculateQuoteUseCase, CalculateQuoteUseCase>();
+
+        // FluentValidation — SPEC-009
+        services.AddScoped<IValidator<CalculateRequest>, CalculateRequestValidator>();
+
         return services;
     }
 }
