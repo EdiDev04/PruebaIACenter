@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { GuaranteeGroup } from '@/features/save-locations/ui/GuaranteeGroup';
 import type { GuaranteeGroup as GuaranteeGroupType } from '@/entities/location/model/guaranteeCatalog';
 import type { LocationFormValues } from '@/entities/location';
@@ -23,14 +25,35 @@ const catGroup: GuaranteeGroupType = {
   ],
 };
 
-function makeFormMocks(guarantees: LocationFormValues['guarantees'] = []) {
-  const getValues = vi.fn().mockImplementation((key: string) => {
-    if (key === 'guarantees') return guarantees;
-    return undefined;
-  }) as unknown as import('react-hook-form').UseFormGetValues<LocationFormValues>;
-
-  const setValue = vi.fn() as unknown as import('react-hook-form').UseFormSetValue<LocationFormValues>;
-  return { getValues, setValue };
+/** Wrapper component that provides a real useForm context */
+function GuaranteeGroupWrapper({
+  group,
+  defaultGuarantees = [],
+  defaultOpen = false,
+  onSetValue,
+}: {
+  group: GuaranteeGroupType;
+  defaultGuarantees?: LocationFormValues['guarantees'];
+  defaultOpen?: boolean;
+  onSetValue?: ReturnType<typeof vi.fn>;
+}) {
+  const { control, setValue } = useForm<LocationFormValues>({
+    defaultValues: { guarantees: defaultGuarantees },
+  });
+  const wrappedSetValue: typeof setValue = onSetValue
+    ? ((...args) => {
+        onSetValue(...args);
+        return setValue(...args);
+      }) as typeof setValue
+    : setValue;
+  return (
+    <GuaranteeGroup
+      group={group}
+      control={control}
+      setValue={wrappedSetValue}
+      defaultOpen={defaultOpen}
+    />
+  );
 }
 
 describe('GuaranteeGroup', () => {
@@ -39,35 +62,24 @@ describe('GuaranteeGroup', () => {
   });
 
   it('renders the group label', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks();
-
-    // Act
-    render(<GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} />);
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={baseGroup} />);
 
     // Assert
     expect(screen.getByRole('button', { name: /Coberturas base/ })).toBeInTheDocument();
   });
 
   it('starts collapsed by default (defaultOpen=false) — items are hidden', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks();
-
-    // Act
-    render(<GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} />);
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={baseGroup} />);
 
     // Assert — checkboxes are not visible until expanded
     expect(screen.queryByRole('checkbox', { name: 'Incendio de edificio' })).not.toBeInTheDocument();
   });
 
   it('starts expanded when defaultOpen=true', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks();
-
-    // Act
-    render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
-    );
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={baseGroup} defaultOpen />);
 
     // Assert — items visible
     expect(screen.getByRole('checkbox', { name: 'Incendio de edificio' })).toBeInTheDocument();
@@ -75,8 +87,7 @@ describe('GuaranteeGroup', () => {
 
   it('expands when the header button is clicked', async () => {
     // Arrange
-    const { getValues, setValue } = makeFormMocks();
-    render(<GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} />);
+    render(<GuaranteeGroupWrapper group={baseGroup} />);
     expect(screen.queryByRole('checkbox', { name: 'Incendio de edificio' })).not.toBeInTheDocument();
 
     // Act
@@ -87,72 +98,66 @@ describe('GuaranteeGroup', () => {
   });
 
   it('shows counter "0 de 2 seleccionadas" when collapsed with no guarantees selected', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks([]);
-
-    // Act
-    render(<GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} />);
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={baseGroup} defaultGuarantees={[]} />);
 
     // Assert
     expect(screen.getByText('0 de 2 seleccionadas')).toBeInTheDocument();
   });
 
   it('shows counter "1 de 2 seleccionadas" when one guarantee is pre-selected', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks([
-      { guaranteeKey: 'building_fire', insuredAmount: 0 },
-    ]);
-
-    // Act
-    render(<GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} />);
+    // Arrange & Act
+    render(
+      <GuaranteeGroupWrapper
+        group={baseGroup}
+        defaultGuarantees={[{ guaranteeKey: 'building_fire', insuredAmount: 0 }]}
+      />,
+    );
 
     // Assert
     expect(screen.getByText('1 de 2 seleccionadas')).toBeInTheDocument();
   });
 
-  it('calls setValue to add the guaranteeKey when a checkbox is checked', async () => {
+  it('checkbox becomes checked when clicked (adds guarantee)', async () => {
     // Arrange
-    const { getValues, setValue } = makeFormMocks([]);
-    render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
-    );
+    render(<GuaranteeGroupWrapper group={baseGroup} defaultGuarantees={[]} defaultOpen />);
+    const checkbox = screen.getByRole('checkbox', { name: 'Incendio de edificio' });
+    expect(checkbox).not.toBeChecked();
 
     // Act
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Incendio de edificio' }));
+    await userEvent.click(checkbox);
 
     // Assert
-    expect(setValue).toHaveBeenCalledWith(
-      'guarantees',
-      [{ guaranteeKey: 'building_fire', insuredAmount: 0 }],
-      { shouldValidate: true },
-    );
+    expect(screen.getByRole('checkbox', { name: 'Incendio de edificio' })).toBeChecked();
   });
 
-  it('calls setValue to remove the guaranteeKey when a checkbox is unchecked', async () => {
+  it('checkbox becomes unchecked when clicked again (removes guarantee)', async () => {
     // Arrange — building_fire starts checked
-    const { getValues, setValue } = makeFormMocks([
-      { guaranteeKey: 'building_fire', insuredAmount: 5000000 },
-    ]);
     render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
+      <GuaranteeGroupWrapper
+        group={baseGroup}
+        defaultGuarantees={[{ guaranteeKey: 'building_fire', insuredAmount: 5000000 }]}
+        defaultOpen
+      />,
     );
+    const checkbox = screen.getByRole('checkbox', { name: 'Incendio de edificio' });
+    expect(checkbox).toBeChecked();
 
     // Act — uncheck building_fire
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Incendio de edificio' }));
+    await userEvent.click(checkbox);
 
-    // Assert — setValue called with empty array (building_fire removed)
-    expect(setValue).toHaveBeenCalledWith('guarantees', [], { shouldValidate: true });
+    // Assert
+    expect(screen.getByRole('checkbox', { name: 'Incendio de edificio' })).not.toBeChecked();
   });
 
   it('shows insured amount input when a guarantee with requiresInsuredAmount is selected', () => {
     // Arrange — building_fire is already selected
-    const { getValues, setValue } = makeFormMocks([
-      { guaranteeKey: 'building_fire', insuredAmount: 0 },
-    ]);
-
-    // Act
     render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
+      <GuaranteeGroupWrapper
+        group={baseGroup}
+        defaultGuarantees={[{ guaranteeKey: 'building_fire', insuredAmount: 0 }]}
+        defaultOpen
+      />,
     );
 
     // Assert — amount input is visible
@@ -163,13 +168,12 @@ describe('GuaranteeGroup', () => {
 
   it('does not show insured amount input for glass (requiresInsuredAmount=false)', () => {
     // Arrange — glass is selected but doesn't need amount
-    const { getValues, setValue } = makeFormMocks([
-      { guaranteeKey: 'glass', insuredAmount: 0 },
-    ]);
-
-    // Act
     render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
+      <GuaranteeGroupWrapper
+        group={baseGroup}
+        defaultGuarantees={[{ guaranteeKey: 'glass', insuredAmount: 0 }]}
+        defaultOpen
+      />,
     );
 
     // Assert — glass doesn't show an amount input
@@ -179,26 +183,16 @@ describe('GuaranteeGroup', () => {
   });
 
   it('shows "Recomendado" badge for recommended items', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks();
-
-    // Act
-    render(
-      <GuaranteeGroup group={baseGroup} getValues={getValues} setValue={setValue} defaultOpen />,
-    );
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={baseGroup} defaultOpen />);
 
     // Assert
     expect(screen.getByText('Recomendado')).toBeInTheDocument();
   });
 
   it('renders a different group correctly', () => {
-    // Arrange
-    const { getValues, setValue } = makeFormMocks();
-
-    // Act
-    render(
-      <GuaranteeGroup group={catGroup} getValues={getValues} setValue={setValue} defaultOpen />,
-    );
+    // Arrange & Act
+    render(<GuaranteeGroupWrapper group={catGroup} defaultOpen />);
 
     // Assert
     expect(

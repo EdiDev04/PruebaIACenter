@@ -8,6 +8,7 @@ tools:
   - read/readFile
   - search/listDirectory
   - search
+  - execute/runInTerminal
 agents: []
 handoffs:
   - label: Volver al Orchestrator

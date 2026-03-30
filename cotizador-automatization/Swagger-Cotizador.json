@@ -1,0 +1,872 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Cotizador de Daños API",
+    "description": "API REST del Cotizador de Seguros de Daños a la Propiedad. Gestiona folios, datos generales, ubicaciones de riesgo, opciones de cobertura y cálculo de primas.",
+    "contact": {
+      "name": "Equipo Cotizador",
+      "email": "cotizador@empresa.com"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/v1/subscribers": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/subscribers — Obtiene el catálogo de suscriptores desde core-ohs.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/agents": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/agents?code=AGT-001 — Obtiene un agente por código desde core-ohs.",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/catalogs/risk-classification": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/catalogs/risk-classification — Obtiene el catálogo de clasificaciones de riesgo desde core-ohs.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/zip-codes/{zipCode}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/zip-codes/{zipCode} — Proxy a core-ohs: resuelve datos geográficos por código postal.",
+        "parameters": [
+          {
+            "name": "zipCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/business-lines": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/business-lines — Proxy a core-ohs: obtiene el catálogo de giros comerciales.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/catalogs/guarantees": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "GET /v1/catalogs/guarantees — Proxy a core-ohs: obtiene el catálogo de garantías disponibles.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/folios": {
+      "post": {
+        "tags": [
+          "Folio"
+        ],
+        "summary": "POST /v1/folios — Genera un nuevo folio de cotización.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}": {
+      "get": {
+        "tags": [
+          "Folio"
+        ],
+        "summary": "GET /v1/quotes/{folio} — Obtiene el resumen de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/general-info": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/general-info — Obtiene la información general de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "PUT /v1/quotes/{folio}/general-info — Actualiza la información general de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeneralInfoRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeneralInfoRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeneralInfoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/locations/layout": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/locations/layout — Obtiene la configuración de layout de ubicaciones.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "PUT /v1/quotes/{folio}/locations/layout — Actualiza la configuración de layout de ubicaciones.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLayoutRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLayoutRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLayoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/locations": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/locations — Obtiene las ubicaciones de riesgo de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "PUT /v1/quotes/{folio}/locations — Reemplaza el array completo de ubicaciones del folio.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/locations/{index}": {
+      "patch": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "PATCH /v1/quotes/{folio}/locations/{index} — Actualiza una ubicación específica del folio.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchLocationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchLocationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchLocationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/locations/summary": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/locations/summary — Obtiene el resumen de validación de ubicaciones.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/coverage-options": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/coverage-options — Obtiene las opciones de cobertura de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "PUT /v1/quotes/{folio}/coverage-options — Actualiza las opciones de cobertura de una cotización.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoverageOptionsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoverageOptionsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCoverageOptionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/state": {
+      "get": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "GET /v1/quotes/{folio}/state — Obtiene el estado completo del folio: progreso por sección, ubicaciones, flag de calculabilidad y resultado financiero.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/quotes/{folio}/calculate": {
+      "post": {
+        "tags": [
+          "Quote"
+        ],
+        "summary": "POST /v1/quotes/{folio}/calculate — Ejecuta el motor de cálculo de primas sobre el folio.",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BusinessLineDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "fireKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "riskLevel": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CalculateRequest": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConductionDataDto": {
+        "type": "object",
+        "properties": {
+          "subscriberCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "officeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "branchOffice": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InsuredDataDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "municipality": {
+            "type": "string",
+            "nullable": true
+          },
+          "neighborhood": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "constructionType": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "constructionYear": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locationBusinessLine": {
+            "$ref": "#/components/schemas/BusinessLineDto"
+          },
+          "guarantees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationGuaranteeDto"
+            },
+            "nullable": true
+          },
+          "catZone": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockingAlerts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "validationStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationGuaranteeDto": {
+        "type": "object",
+        "properties": {
+          "guaranteeKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "insuredAmount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PatchLocationRequest": {
+        "type": "object",
+        "properties": {
+          "locationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "municipality": {
+            "type": "string",
+            "nullable": true
+          },
+          "neighborhood": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "constructionType": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "constructionYear": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "locationBusinessLine": {
+            "$ref": "#/components/schemas/BusinessLineDto"
+          },
+          "guarantees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationGuaranteeDto"
+            },
+            "nullable": true
+          },
+          "catZone": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCoverageOptionsRequest": {
+        "type": "object",
+        "properties": {
+          "enabledGuarantees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "deductiblePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "coinsurancePercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateGeneralInfoRequest": {
+        "type": "object",
+        "properties": {
+          "insuredData": {
+            "$ref": "#/components/schemas/InsuredDataDto"
+          },
+          "conductionData": {
+            "$ref": "#/components/schemas/ConductionDataDto"
+          },
+          "agentCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "businessType": {
+            "type": "string",
+            "nullable": true
+          },
+          "riskClassification": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateLayoutRequest": {
+        "type": "object",
+        "properties": {
+          "displayMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "visibleColumns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateLocationsRequest": {
+        "type": "object",
+        "properties": {
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationDto"
+            },
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "description": "Autenticación HTTP Basic. Use las credenciales configuradas en appsettings.",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "BasicAuth": [ ]
+    }
+  ]
+}

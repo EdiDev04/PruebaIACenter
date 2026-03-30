@@ -64,7 +64,7 @@ describe('LocationBreakdown', () => {
 
     // Assert — total = 5 000 → formatted contains "5.000"
     expect(screen.getByText('Total')).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: '' }).closest('div')?.textContent ?? '').toBeTruthy();
+    expect(screen.getByRole('row', { name: /Total/ })).toBeInTheDocument();
     // Verify the formatted total appears somewhere in the doc
     expect(document.body.textContent).toContain('5.000');
   });
@@ -78,8 +78,8 @@ describe('LocationBreakdown', () => {
     ];
     render(<LocationBreakdown premiumsByLocation={locations} />);
 
-    // Initially collapsed
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    // Initially collapsed — the inner CoverageAccordion table should not be visible yet
+    expect(screen.queryByRole('table', { name: /Desglose de coberturas/i })).not.toBeInTheDocument();
 
     // Act
     await user.click(screen.getByRole('button', { name: /Bodega Norte/i }));

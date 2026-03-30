@@ -1,6 +1,6 @@
 ---
 id: SPEC-005
-status: DRAFT
+status: IMPLEMENTED
 feature: location-layout-configuration
 feature_type: full-stack
 requires_design_spec: true
@@ -19,7 +19,7 @@ estimated-complexity: S
 
 # Spec: Configuración del Layout de Ubicaciones
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `IMPLEMENTED` → aprobar con `status: APPROVED` antes de iniciar implementación.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---

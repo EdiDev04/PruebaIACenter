@@ -224,8 +224,9 @@ describe('ResultsPage', () => {
       renderPage();
 
       // Assert
-      expect(screen.getByRole('generic', { hidden: true })).toBeTruthy();
-      expect(document.querySelector('[aria-busy="true"]')).toBeInTheDocument();
+      const skeleton = screen.getByLabelText('Cargando resultados...');
+      expect(skeleton).toBeInTheDocument();
+      expect(skeleton).toHaveAttribute('aria-busy', 'true');
     });
 
     it('shows error state when fetch fails', () => {

@@ -1,6 +1,6 @@
 ---
 id: SPEC-003
-status: APPROVED
+status: IMPLEMENTED
 feature: folio-creation
 feature_type: full-stack
 requires_design_spec: true
@@ -18,7 +18,7 @@ estimated-complexity: M
 
 # Spec: Creación y Apertura de Folio
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `IMPLEMENTED` 
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---

@@ -20,9 +20,9 @@ describe('GUARANTEE_GROUPS', () => {
     expect(baseGroup.label).toBe('Coberturas base');
   });
 
-  it('"Coberturas base" group has exactly 4 items', () => {
+  it('"Coberturas base" group has exactly 5 items', () => {
     const baseGroup = GUARANTEE_GROUPS.find((g) => g.groupKey === 'base');
-    expect(baseGroup?.items).toHaveLength(4);
+    expect(baseGroup?.items).toHaveLength(5);
   });
 
   it('"Coberturas base" group includes building_fire, contents_fire, glass and illuminated_signs', () => {
@@ -51,10 +51,10 @@ describe('GUARANTEE_GROUPS', () => {
     expect(catGroup?.items.every((i) => i.requiresInsuredAmount)).toBe(true);
   });
 
-  it('has a "Catastrofes naturales" group with groupKey "cat"', () => {
+  it('has a "Catástrofes naturales" group with groupKey "cat"', () => {
     const catGroup = GUARANTEE_GROUPS.find((g) => g.groupKey === 'cat');
     expect(catGroup).toBeDefined();
-    expect(catGroup?.label).toBe('Catastrofes naturales');
+    expect(catGroup?.label).toBe('Catástrofes naturales');
   });
 
   it('has a "Complementarias" group with groupKey "complementary"', () => {

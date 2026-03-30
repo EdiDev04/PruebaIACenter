@@ -67,8 +67,8 @@ describe('LocationRow', () => {
     // Arrange & Act
     renderRow(incompleteLocation);
 
-    // Assert
-    expect(screen.getByText('–')).toBeInTheDocument();
+    // Assert — at least one "–" is shown (zipCode and/or businessLine are empty)
+    expect(screen.getAllByText('–').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows business line description when present', () => {
@@ -108,11 +108,10 @@ describe('LocationRow', () => {
     const onEdit = vi.fn();
     renderRow(calculableLocation, onEdit);
 
-    // Act — open dropdown then click Editar
+    // Act
     await userEvent.click(
-      screen.getByRole('button', { name: `Opciones para ${calculableLocation.locationName}` }),
+      screen.getByRole('button', { name: `Editar ${calculableLocation.locationName}` }),
     );
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Editar' }));
 
     // Assert
     expect(onEdit).toHaveBeenCalledTimes(1);
@@ -124,29 +123,13 @@ describe('LocationRow', () => {
     const onDelete = vi.fn();
     renderRow(calculableLocation, vi.fn(), onDelete);
 
-    // Act — open dropdown then click Eliminar
+    // Act
     await userEvent.click(
-      screen.getByRole('button', { name: `Opciones para ${calculableLocation.locationName}` }),
+      screen.getByRole('button', { name: `Eliminar ${calculableLocation.locationName}` }),
     );
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Eliminar' }));
 
     // Assert
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledWith(calculableLocation);
-  });
-
-  it('closes the dropdown after clicking Editar', async () => {
-    // Arrange
-    renderRow(calculableLocation);
-    await userEvent.click(
-      screen.getByRole('button', { name: `Opciones para ${calculableLocation.locationName}` }),
-    );
-    expect(screen.getByRole('menuitem', { name: 'Editar' })).toBeInTheDocument();
-
-    // Act
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Editar' }));
-
-    // Assert
-    expect(screen.queryByRole('menuitem', { name: 'Editar' })).not.toBeInTheDocument();
   });
 });

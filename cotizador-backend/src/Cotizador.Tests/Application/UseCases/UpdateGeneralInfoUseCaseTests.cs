@@ -269,6 +269,11 @@ public class UpdateGeneralInfoUseCaseTests
         // Arrange
         const string folioNumber = "DAN-2024-00001";
         var request = BuildValidRequest(version: 1);
+        var existingQuote = BuildPropertyQuote(folioNumber, QuoteStatus.Draft, version: 1);
+
+        _mockRepository
+            .Setup(r => r.GetByFolioNumberAsync(folioNumber, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingQuote);
 
         _mockCoreOhsClient
             .Setup(c => c.GetAgentByCodeAsync(request.AgentCode, It.IsAny<CancellationToken>()))
@@ -280,7 +285,7 @@ public class UpdateGeneralInfoUseCaseTests
         // Assert
         await act.Should().ThrowAsync<InvalidQuoteStateException>();
 
-        _mockRepository.Verify(r => r.GetByFolioNumberAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockRepository.Verify(r => r.GetByFolioNumberAsync(folioNumber, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

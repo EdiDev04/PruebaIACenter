@@ -1,0 +1,1519 @@
+{
+  "info": {
+    "_postman_id": "84299231-3c38-43b5-bb22-6e9fec447707",
+    "name": "Cotizador de Daños API",
+    "description": "API REST del Cotizador de Seguros de Daños a la Propiedad. Gestiona folios, datos generales, ubicaciones de riesgo, opciones de cobertura y cálculo de primas.\n\nContact Support:\n Name: Equipo Cotizador\n Email: cotizador@empresa.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21620602",
+    "_collection_link": "https://go.postman.co/collection/21620602-84299231-3c38-43b5-bb22-6e9fec447707?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "subscribers",
+          "item": [
+            {
+              "name": "GET /v1/subscribers — Obtiene el catálogo de suscriptores desde core-ohs.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/subscribers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "subscribers"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "OK",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: basic",
+                        "key": "Authorization",
+                        "value": "Basic <credentials>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscribers",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscribers"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "agents",
+          "item": [
+            {
+              "name": "GET /v1/agents?code=AGT-001 — Obtiene un agente por código desde core-ohs.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/agents?code=string",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "agents"
+                  ],
+                  "query": [
+                    {
+                      "key": "code",
+                      "value": "string"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "OK",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: basic",
+                        "key": "Authorization",
+                        "value": "Basic <credentials>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/agents?code=string",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "agents"
+                      ],
+                      "query": [
+                        {
+                          "key": "code",
+                          "value": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "catalogs",
+          "item": [
+            {
+              "name": "risk-classification",
+              "item": [
+                {
+                  "name": "GET /v1/catalogs/risk-classification — Obtiene el catálogo de clasificaciones de riesgo desde core-ohs.",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/catalogs/risk-classification",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "catalogs",
+                        "risk-classification"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: basic",
+                            "key": "Authorization",
+                            "value": "Basic <credentials>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/catalogs/risk-classification",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "catalogs",
+                            "risk-classification"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "guarantees",
+              "item": [
+                {
+                  "name": "GET /v1/catalogs/guarantees — Proxy a core-ohs: obtiene el catálogo de garantías disponibles.",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/catalogs/guarantees",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "catalogs",
+                        "guarantees"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: basic",
+                            "key": "Authorization",
+                            "value": "Basic <credentials>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/catalogs/guarantees",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "catalogs",
+                            "guarantees"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "zip-codes",
+          "item": [
+            {
+              "name": "{zipCode}",
+              "item": [
+                {
+                  "name": "GET /v1/zip-codes/{zipCode} — Proxy a core-ohs: resuelve datos geográficos por código postal.",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/zip-codes/:zipCode",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "zip-codes",
+                        ":zipCode"
+                      ],
+                      "variable": [
+                        {
+                          "key": "zipCode",
+                          "value": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: basic",
+                            "key": "Authorization",
+                            "value": "Basic <credentials>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/zip-codes/:zipCode",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "zip-codes",
+                            ":zipCode"
+                          ],
+                          "variable": [
+                            {
+                              "key": "zipCode",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "business-lines",
+          "item": [
+            {
+              "name": "GET /v1/business-lines — Proxy a core-ohs: obtiene el catálogo de giros comerciales.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/business-lines",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "business-lines"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "OK",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: basic",
+                        "key": "Authorization",
+                        "value": "Basic <credentials>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/business-lines",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "business-lines"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "folios",
+          "item": [
+            {
+              "name": "POST /v1/folios — Genera un nuevo folio de cotización.",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/folios",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "folios"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "OK",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: basic",
+                        "key": "Authorization",
+                        "value": "Basic <credentials>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/folios",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "folios"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "quotes",
+          "item": [
+            {
+              "name": "{folio}",
+              "item": [
+                {
+                  "name": "general-info",
+                  "item": [
+                    {
+                      "name": "GET /v1/quotes/{folio}/general-info — Obtiene la información general de una cotización.",
+                      "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/general-info",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "general-info"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/general-info",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "general-info"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "PUT /v1/quotes/{folio}/general-info — Actualiza la información general de una cotización.",
+                      "request": {
+                        "method": "PUT",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"insuredData\": {\n    \"name\": \"string\",\n    \"taxId\": \"string\",\n    \"email\": \"string\",\n    \"phone\": \"string\"\n  },\n  \"conductionData\": {\n    \"subscriberCode\": \"string\",\n    \"officeName\": \"string\",\n    \"branchOffice\": \"string\"\n  },\n  \"agentCode\": \"string\",\n  \"businessType\": \"string\",\n  \"riskClassification\": \"string\",\n  \"version\": 6126\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/general-info",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "general-info"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"insuredData\": {\n    \"name\": \"string\",\n    \"taxId\": \"string\",\n    \"email\": \"string\",\n    \"phone\": \"string\"\n  },\n  \"conductionData\": {\n    \"subscriberCode\": \"string\",\n    \"officeName\": \"string\",\n    \"branchOffice\": \"string\"\n  },\n  \"agentCode\": \"string\",\n  \"businessType\": \"string\",\n  \"riskClassification\": \"string\",\n  \"version\": 6126\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/general-info",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "general-info"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "locations",
+                  "item": [
+                    {
+                      "name": "layout",
+                      "item": [
+                        {
+                          "name": "GET /v1/quotes/{folio}/locations/layout — Obtiene la configuración de layout de ubicaciones.",
+                          "request": {
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations/layout",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations",
+                                "layout"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: basic",
+                                    "key": "Authorization",
+                                    "value": "Basic <credentials>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/quotes/:folio/locations/layout",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "quotes",
+                                    ":folio",
+                                    "locations",
+                                    "layout"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "folio",
+                                      "value": "string"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "body": null
+                            }
+                          ]
+                        },
+                        {
+                          "name": "PUT /v1/quotes/{folio}/locations/layout — Actualiza la configuración de layout de ubicaciones.",
+                          "request": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"displayMode\": \"string\",\n  \"visibleColumns\": [\n    \"string\",\n    \"string\"\n  ],\n  \"version\": 3479\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations/layout",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations",
+                                "layout"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: basic",
+                                    "key": "Authorization",
+                                    "value": "Basic <credentials>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"displayMode\": \"string\",\n  \"visibleColumns\": [\n    \"string\",\n    \"string\"\n  ],\n  \"version\": 3479\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/quotes/:folio/locations/layout",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "quotes",
+                                    ":folio",
+                                    "locations",
+                                    "layout"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "folio",
+                                      "value": "string"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "body": null
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "{index}",
+                      "item": [
+                        {
+                          "name": "PATCH /v1/quotes/{folio}/locations/{index} — Actualiza una ubicación específica del folio.",
+                          "request": {
+                            "method": "PATCH",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"locationName\": \"string\",\n  \"address\": \"string\",\n  \"zipCode\": \"string\",\n  \"state\": \"string\",\n  \"municipality\": \"string\",\n  \"neighborhood\": \"string\",\n  \"city\": \"string\",\n  \"constructionType\": \"string\",\n  \"level\": 178,\n  \"constructionYear\": 5097,\n  \"locationBusinessLine\": {\n    \"code\": \"string\",\n    \"description\": \"string\",\n    \"fireKey\": \"string\",\n    \"riskLevel\": \"string\"\n  },\n  \"guarantees\": [\n    {\n      \"guaranteeKey\": \"string\",\n      \"insuredAmount\": 3420.1774863492183\n    },\n    {\n      \"guaranteeKey\": \"string\",\n      \"insuredAmount\": 8298.882485817281\n    }\n  ],\n  \"catZone\": \"string\",\n  \"version\": 3454\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations/:index",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations",
+                                ":index"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                },
+                                {
+                                  "key": "index",
+                                  "value": "603"
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "PATCH",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: basic",
+                                    "key": "Authorization",
+                                    "value": "Basic <credentials>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"locationName\": \"string\",\n  \"address\": \"string\",\n  \"zipCode\": \"string\",\n  \"state\": \"string\",\n  \"municipality\": \"string\",\n  \"neighborhood\": \"string\",\n  \"city\": \"string\",\n  \"constructionType\": \"string\",\n  \"level\": 178,\n  \"constructionYear\": 5097,\n  \"locationBusinessLine\": {\n    \"code\": \"string\",\n    \"description\": \"string\",\n    \"fireKey\": \"string\",\n    \"riskLevel\": \"string\"\n  },\n  \"guarantees\": [\n    {\n      \"guaranteeKey\": \"string\",\n      \"insuredAmount\": 3420.1774863492183\n    },\n    {\n      \"guaranteeKey\": \"string\",\n      \"insuredAmount\": 8298.882485817281\n    }\n  ],\n  \"catZone\": \"string\",\n  \"version\": 3454\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/quotes/:folio/locations/:index",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "quotes",
+                                    ":folio",
+                                    "locations",
+                                    ":index"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "folio",
+                                      "value": "string"
+                                    },
+                                    {
+                                      "key": "index",
+                                      "value": "603"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "body": null
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "summary",
+                      "item": [
+                        {
+                          "name": "GET /v1/quotes/{folio}/locations/summary — Obtiene el resumen de validación de ubicaciones.",
+                          "request": {
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations/summary",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations",
+                                "summary"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "response": [
+                            {
+                              "name": "OK",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: basic",
+                                    "key": "Authorization",
+                                    "value": "Basic <credentials>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/quotes/:folio/locations/summary",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "quotes",
+                                    ":folio",
+                                    "locations",
+                                    "summary"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "folio",
+                                      "value": "string"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "body": null
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "GET /v1/quotes/{folio}/locations — Obtiene las ubicaciones de riesgo de una cotización.",
+                      "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/locations",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "locations"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "PUT /v1/quotes/{folio}/locations — Reemplaza el array completo de ubicaciones del folio.",
+                      "request": {
+                        "method": "PUT",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"locations\": [\n    {\n      \"index\": 7263,\n      \"locationName\": \"string\",\n      \"address\": \"string\",\n      \"zipCode\": \"string\",\n      \"state\": \"string\",\n      \"municipality\": \"string\",\n      \"neighborhood\": \"string\",\n      \"city\": \"string\",\n      \"constructionType\": \"string\",\n      \"level\": 2896,\n      \"constructionYear\": 5219,\n      \"locationBusinessLine\": {\n        \"code\": \"string\",\n        \"description\": \"string\",\n        \"fireKey\": \"string\",\n        \"riskLevel\": \"string\"\n      },\n      \"guarantees\": [\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 1335.2139065070912\n        },\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 3670.5405449373106\n        }\n      ],\n      \"catZone\": \"string\",\n      \"blockingAlerts\": [\n        \"string\",\n        \"string\"\n      ],\n      \"validationStatus\": \"string\"\n    },\n    {\n      \"index\": 3706,\n      \"locationName\": \"string\",\n      \"address\": \"string\",\n      \"zipCode\": \"string\",\n      \"state\": \"string\",\n      \"municipality\": \"string\",\n      \"neighborhood\": \"string\",\n      \"city\": \"string\",\n      \"constructionType\": \"string\",\n      \"level\": 5763,\n      \"constructionYear\": 7522,\n      \"locationBusinessLine\": {\n        \"code\": \"string\",\n        \"description\": \"string\",\n        \"fireKey\": \"string\",\n        \"riskLevel\": \"string\"\n      },\n      \"guarantees\": [\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 8525.682747749426\n        },\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 8538.981607728008\n        }\n      ],\n      \"catZone\": \"string\",\n      \"blockingAlerts\": [\n        \"string\",\n        \"string\"\n      ],\n      \"validationStatus\": \"string\"\n    }\n  ],\n  \"version\": 7439\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/locations",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "locations"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"locations\": [\n    {\n      \"index\": 7263,\n      \"locationName\": \"string\",\n      \"address\": \"string\",\n      \"zipCode\": \"string\",\n      \"state\": \"string\",\n      \"municipality\": \"string\",\n      \"neighborhood\": \"string\",\n      \"city\": \"string\",\n      \"constructionType\": \"string\",\n      \"level\": 2896,\n      \"constructionYear\": 5219,\n      \"locationBusinessLine\": {\n        \"code\": \"string\",\n        \"description\": \"string\",\n        \"fireKey\": \"string\",\n        \"riskLevel\": \"string\"\n      },\n      \"guarantees\": [\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 1335.2139065070912\n        },\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 3670.5405449373106\n        }\n      ],\n      \"catZone\": \"string\",\n      \"blockingAlerts\": [\n        \"string\",\n        \"string\"\n      ],\n      \"validationStatus\": \"string\"\n    },\n    {\n      \"index\": 3706,\n      \"locationName\": \"string\",\n      \"address\": \"string\",\n      \"zipCode\": \"string\",\n      \"state\": \"string\",\n      \"municipality\": \"string\",\n      \"neighborhood\": \"string\",\n      \"city\": \"string\",\n      \"constructionType\": \"string\",\n      \"level\": 5763,\n      \"constructionYear\": 7522,\n      \"locationBusinessLine\": {\n        \"code\": \"string\",\n        \"description\": \"string\",\n        \"fireKey\": \"string\",\n        \"riskLevel\": \"string\"\n      },\n      \"guarantees\": [\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 8525.682747749426\n        },\n        {\n          \"guaranteeKey\": \"string\",\n          \"insuredAmount\": 8538.981607728008\n        }\n      ],\n      \"catZone\": \"string\",\n      \"blockingAlerts\": [\n        \"string\",\n        \"string\"\n      ],\n      \"validationStatus\": \"string\"\n    }\n  ],\n  \"version\": 7439\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/locations",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "locations"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "coverage-options",
+                  "item": [
+                    {
+                      "name": "GET /v1/quotes/{folio}/coverage-options — Obtiene las opciones de cobertura de una cotización.",
+                      "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/coverage-options",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "coverage-options"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/coverage-options",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "coverage-options"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    },
+                    {
+                      "name": "PUT /v1/quotes/{folio}/coverage-options — Actualiza las opciones de cobertura de una cotización.",
+                      "request": {
+                        "method": "PUT",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"enabledGuarantees\": [\n    \"string\",\n    \"string\"\n  ],\n  \"deductiblePercentage\": 5886.908700388202,\n  \"coinsurancePercentage\": 3928.2023176892267,\n  \"version\": 8469\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/coverage-options",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "coverage-options"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"enabledGuarantees\": [\n    \"string\",\n    \"string\"\n  ],\n  \"deductiblePercentage\": 5886.908700388202,\n  \"coinsurancePercentage\": 3928.2023176892267,\n  \"version\": 8469\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/coverage-options",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "coverage-options"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "state",
+                  "item": [
+                    {
+                      "name": "GET /v1/quotes/{folio}/state — Obtiene el estado completo del folio: progreso por sección, ubicaciones, flag de calculabilidad y resultado financiero.",
+                      "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/state",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "state"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/state",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "state"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "calculate",
+                  "item": [
+                    {
+                      "name": "POST /v1/quotes/{folio}/calculate — Ejecuta el motor de cálculo de primas sobre el folio.",
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"version\": 4032\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio/calculate",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio",
+                            "calculate"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "OK",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: basic",
+                                "key": "Authorization",
+                                "value": "Basic <credentials>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"version\": 4032\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/quotes/:folio/calculate",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "quotes",
+                                ":folio",
+                                "calculate"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "folio",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": null
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "GET /v1/quotes/{folio} — Obtiene el resumen de una cotización.",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/quotes/:folio",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "quotes",
+                        ":folio"
+                      ],
+                      "variable": [
+                        {
+                          "key": "folio",
+                          "value": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "OK",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: basic",
+                            "key": "Authorization",
+                            "value": "Basic <credentials>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/quotes/:folio",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "quotes",
+                            ":folio"
+                          ],
+                          "variable": [
+                            {
+                              "key": "folio",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001"
+    }
+  ]
+}

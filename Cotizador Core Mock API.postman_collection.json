@@ -1,0 +1,978 @@
+{
+  "info": {
+    "_postman_id": "b280d3d0-4d3f-485a-bb8e-f2d3bbaecbac",
+    "name": "Cotizador Core Mock API",
+    "description": "Servicio mock que simula `cotizador-core-ohs`. Expone catálogos de suscriptores, agentes, giros comerciales, códigos postales, tarifas y parámetros de cálculo. Los datos son fixtures JSON estáticos; el folio es secuencial en memoria.\n\nContact Support:\n Name: Equipo Cotizador\n Email: cotizador@empresa.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21620602",
+    "_collection_link": "https://go.postman.co/collection/21620602-b280d3d0-4d3f-485a-bb8e-f2d3bbaecbac?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "subscribers",
+          "item": [
+            {
+              "name": "Obtiene el catálogo completo de suscriptores activos",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/subscribers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "subscribers"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Lista de suscriptores",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscribers",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscribers"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"code\": \"SUB-001\",\n      \"name\": \"María González López\",\n      \"office\": \"CDMX Central\",\n      \"active\": true\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "agents",
+          "item": [
+            {
+              "name": "Lista todos los agentes o filtra por código",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/agents?code=AGT-001",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "agents"
+                  ],
+                  "query": [
+                    {
+                      "description": "Filtra por código de agente (ej: AGT-001)",
+                      "key": "code",
+                      "value": "AGT-001"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Agente encontrado (con ?code) o lista completa",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/agents?code=AGT-001",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "agents"
+                      ],
+                      "query": [
+                        {
+                          "description": "Filtra por código de agente (ej: AGT-001)",
+                          "key": "code",
+                          "value": "AGT-001"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"code\": \"AGT-001\",\n    \"name\": \"Juan Pérez Torres\",\n    \"region\": \"Centro\",\n    \"active\": true\n  }\n}"
+                },
+                {
+                  "name": "Agente no encontrado",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/agents?code=AGT-001",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "agents"
+                      ],
+                      "query": [
+                        {
+                          "description": "Filtra por código de agente (ej: AGT-001)",
+                          "key": "code",
+                          "value": "AGT-001"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"type\": \"agentNotFound\",\n  \"message\": \"Agente no encontrado\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "business-lines",
+          "item": [
+            {
+              "name": "Obtiene el catálogo de giros comerciales con clave de incendio",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/business-lines",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "business-lines"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Lista de giros comerciales",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/business-lines",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "business-lines"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"code\": \"BL-001\",\n      \"description\": \"Bodega de almacenamiento\",\n      \"fireKey\": \"B-03\",\n      \"riskLevel\": \"medium\"\n    },\n    {\n      \"code\": \"BL-001\",\n      \"description\": \"Bodega de almacenamiento\",\n      \"fireKey\": \"B-03\",\n      \"riskLevel\": \"medium\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "zip-codes",
+          "item": [
+            {
+              "name": "{zipCode}",
+              "item": [
+                {
+                  "name": "Resuelve datos geográficos (estado, municipio, zona CAT) por código postal",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/zip-codes/:zipCode",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "zip-codes",
+                        ":zipCode"
+                      ],
+                      "variable": [
+                        {
+                          "key": "zipCode",
+                          "value": "06600",
+                          "description": "Código postal de 5 dígitos"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Datos geográficos del código postal",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/zip-codes/:zipCode",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "zip-codes",
+                            ":zipCode"
+                          ],
+                          "variable": [
+                            {
+                              "key": "zipCode",
+                              "value": "06600",
+                              "description": "Código postal de 5 dígitos"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": {\n    \"zipCode\": \"06600\",\n    \"state\": \"Ciudad de México\",\n    \"municipality\": \"Cuauhtémoc\",\n    \"neighborhood\": \"Doctores\",\n    \"city\": \"Ciudad de México\",\n    \"catZone\": \"A\",\n    \"technicalLevel\": 2\n  }\n}"
+                    },
+                    {
+                      "name": "Código postal no encontrado",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/zip-codes/:zipCode",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "zip-codes",
+                            ":zipCode"
+                          ],
+                          "variable": [
+                            {
+                              "key": "zipCode",
+                              "value": "06600",
+                              "description": "Código postal de 5 dígitos"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"type\": \"agentNotFound\",\n  \"message\": \"Agente no encontrado\"\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "validate",
+              "item": [
+                {
+                  "name": "Valida si un código postal existe en el catálogo",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"zipCode\": \"06600\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/zip-codes/validate",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "zip-codes",
+                        "validate"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Resultado de la validación",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"zipCode\": \"06600\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/zip-codes/validate",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "zip-codes",
+                            "validate"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": {\n    \"valid\": true,\n    \"zipCode\": \"06600\"\n  }\n}"
+                    },
+                    {
+                      "name": "El campo zipCode es obligatorio",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"zipCode\": \"06600\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/zip-codes/validate",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "zip-codes",
+                            "validate"
+                          ]
+                        }
+                      },
+                      "status": "Bad Request",
+                      "code": 400,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"type\": \"agentNotFound\",\n  \"message\": \"Agente no encontrado\"\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "folios",
+          "item": [
+            {
+              "name": "next",
+              "item": [
+                {
+                  "name": "Genera el siguiente número de folio secuencial (DAN-YYYY-NNNNN)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/folios/next",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "folios",
+                        "next"
+                      ]
+                    },
+                    "description": "El contador es en memoria — se reinicia al reiniciar el servicio. Cada llamada incrementa el contador en 1."
+                  },
+                  "response": [
+                    {
+                      "name": "Nuevo número de folio",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/folios/next",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "folios",
+                            "next"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": {\n    \"folioNumber\": \"DAN-2026-00001\"\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "catalogs",
+          "item": [
+            {
+              "name": "risk-classification",
+              "item": [
+                {
+                  "name": "Obtiene el catálogo de clasificaciones de riesgo",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/catalogs/risk-classification",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "catalogs",
+                        "risk-classification"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Lista de clasificaciones de riesgo con factor multiplicador",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/catalogs/risk-classification",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "catalogs",
+                            "risk-classification"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": [\n    {\n      \"code\": \"standard\",\n      \"description\": \"Riesgo estándar\",\n      \"factor\": 1\n    },\n    {\n      \"code\": \"standard\",\n      \"description\": \"Riesgo estándar\",\n      \"factor\": 1\n    }\n  ]\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "guarantees",
+              "item": [
+                {
+                  "name": "Obtiene el catálogo de garantías tarifables (14 garantías del dominio)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/catalogs/guarantees",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "catalogs",
+                        "guarantees"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Lista de garantías con categoría e indicador de suma asegurada",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/catalogs/guarantees",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "catalogs",
+                            "guarantees"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": [\n    {\n      \"key\": \"building_fire\",\n      \"name\": \"Incendio Edificios\",\n      \"description\": \"Cobertura base sobre la construcción contra incendio\",\n      \"category\": \"fire\",\n      \"requiresInsuredAmount\": true\n    },\n    {\n      \"key\": \"building_fire\",\n      \"name\": \"Incendio Edificios\",\n      \"description\": \"Cobertura base sobre la construcción contra incendio\",\n      \"category\": \"fire\",\n      \"requiresInsuredAmount\": true\n    }\n  ]\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "tariffs",
+          "item": [
+            {
+              "name": "calculation-parameters",
+              "item": [
+                {
+                  "name": "Obtiene los parámetros de cálculo (gastos, comisión, IVA, etc.)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/tariffs/calculation-parameters",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "tariffs",
+                        "calculation-parameters"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Parámetros de cálculo vigentes",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/tariffs/calculation-parameters",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "tariffs",
+                            "calculation-parameters"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": {\n    \"expeditionExpenses\": 0.25,\n    \"agentCommission\": 0.15,\n    \"issuingRights\": 0.05,\n    \"iva\": 0.16,\n    \"surcharges\": 0.02,\n    \"effectiveDate\": \"2025-01-01\"\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "{type}",
+              "item": [
+                {
+                  "name": "Obtiene las tarifas por tipo de riesgo",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/tariffs/:type",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "tariffs",
+                        ":type"
+                      ],
+                      "variable": [
+                        {
+                          "key": "type",
+                          "value": "fire",
+                          "description": "Tipo de tarifa"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Lista de tarifas para el tipo solicitado",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/tariffs/:type",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "tariffs",
+                            ":type"
+                          ],
+                          "variable": [
+                            {
+                              "key": "type",
+                              "value": "fire",
+                              "description": "Tipo de tarifa"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": [\n    {\n      \"fireKey\": \"B-03\",\n      \"baseRate\": 0.0032,\n      \"description\": \"Bodega — riesgo medio\"\n    },\n    {\n      \"fireKey\": \"B-03\",\n      \"baseRate\": 0.0032,\n      \"description\": \"Bodega — riesgo medio\"\n    }\n  ]\n}"
+                    },
+                    {
+                      "name": "Tipo de tarifa no encontrado",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/tariffs/:type",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "tariffs",
+                            ":type"
+                          ],
+                          "variable": [
+                            {
+                              "key": "type",
+                              "value": "fire",
+                              "description": "Tipo de tarifa"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"type\": \"agentNotFound\",\n  \"message\": \"Agente no encontrado\"\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "health",
+      "item": [
+        {
+          "name": "Verifica que el servicio está en ejecución",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Servicio saludable",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"status\": \"ok\",\n  \"service\": \"cotizador-core-mock\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    }
+  ]
+}
