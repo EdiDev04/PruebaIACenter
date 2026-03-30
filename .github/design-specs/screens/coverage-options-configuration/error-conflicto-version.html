@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configurar Vista - Cotizador de Daños</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {tertiary: "#006e2e", "surface-variant": "#d5e3ff", "on-primary-fixed": "#ffffff", "on-error": "#fff7f7", "on-error-container": "#6e0523", "primary-container": "#4878fd", "tertiary-fixed-dim": "#73f08c", outline: "#6c7b96", "surface-container-highest": "#d5e3ff", "primary-fixed-dim": "#386bef", "on-tertiary-fixed-variant": "#006c2d", "surface-container-low": "#f0f3ff", "secondary-fixed": "#ffdcc3", primary: "#1554d9", "on-primary-container": "#000000", error: "#a8364b", "on-tertiary-fixed": "#004c1d", "on-surface": "#24334a", background: "#f9f9ff", "secondary-fixed-dim": "#ffcaa1", secondary: "#914d00", "on-tertiary-container": "#006127", "secondary-container": "#ffdcc3", "surface-bright": "#f9f9ff", "on-secondary-fixed-variant": "#8c4a00", "on-secondary-fixed": "#633300", "error-container": "#f97386", "surface-container-high": "#dee8ff", "surface-tint": "#1554d9", "on-secondary-container": "#7e4200", "surface-dim": "#cbdbf9", "outline-variant": "#a3b3cf", "on-tertiary": "#e9ffe6", "inverse-surface": "#070e19", "primary-fixed": "#4878fd", "tertiary-container": "#82ff99", "surface-container-lowest": "#ffffff", surface: "#f9f9ff", "on-primary": "#faf8ff", "surface-container": "#e7eeff", "on-background": "#24334a", "inverse-primary": "#638aff", "tertiary-fixed": "#82ff99", "on-secondary": "#fff7f4", "on-surface-variant": "#506079", "inverse-on-surface": "#969dac", "on-primary-fixed-variant": "#fefcff", "tertiary-dim": "#006127", "primary-dim": "#0047c6", "error-dim": "#6b0221", "secondary-dim": "#804300"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-200 flex justify-end min-h-screen">
+<!-- Right Side Panel (SideNavBar Container) -->
+<aside class="w-[360px] h-screen bg-white flex flex-col shadow-2xl z-50 relative border-l border-slate-100">
+<!-- Header Section -->
+<header class="flex items-center justify-between px-6 py-5 border-b border-slate-50">
+<div class="flex items-center gap-3">
+<h1 class="text-xl font-bold text-on-surface tracking-tight">Configurar vista</h1>
+<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold tracking-widest uppercase rounded">PERSONALIZADA</span>
+</div>
+<button class="text-slate-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+</header>
+<!-- Conflict Alert (The Primary Element) -->
+<section class="mx-4 mt-4 mb-2 p-4 bg-[#FFF8E1] border-l-4 border-[#F9A825] flex flex-col gap-3">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-[#E65100] mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
+<p class="text-sm font-medium text-[#E65100] leading-snug">
+                    El folio fue modificado por otro proceso. Recargue para continuar.
+                </p>
+</div>
+<div class="flex justify-end">
+<button class="px-4 py-1.5 border border-[#E65100] text-[#E65100] text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#E65100] hover:text-white transition-all">
+                    Recargar
+                </button>
+</div>
+</section>
+<!-- Scrollable Content (Disabled State) -->
+<div class="flex-1 overflow-y-auto px-6 py-4 opacity-50 pointer-events-none cursor-not-allowed select-none">
+<!-- Segmented Control (View Type) -->
+<div class="mb-8">
+<label class="block text-[11px] font-bold text-on-surface-variant tracking-widest uppercase mb-3">TIPO DE VISTA</label>
+<div class="flex p-1 bg-surface-dim rounded-xl w-full">
+<button class="flex-1 flex items-center justify-center gap-2 py-2 bg-white shadow-sm rounded-lg text-primary text-sm font-semibold">
+<span class="material-symbols-outlined text-lg">view_list</span>
+                        Lista
+                    </button>
+<button class="flex-1 flex items-center justify-center gap-2 py-2 text-on-surface-variant text-sm font-medium">
+<span class="material-symbols-outlined text-lg">grid_view</span>
+                        Grilla
+                    </button>
+</div>
+</div>
+<!-- Settings Groups -->
+<div class="space-y-8">
+<!-- Group 1: Identificación -->
+<div>
+<h3 class="text-xs font-extrabold text-on-surface tracking-widest uppercase mb-4 flex items-center gap-2">
+<span class="w-1 h-4 bg-primary rounded-full"></span>
+                        IDENTIFICACIÓN
+                    </h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Nombre de ubicación</span>
+</label>
+<label class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">ID de referencia</span>
+</label>
+<label class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Tipo de ocupación</span>
+</label>
+</div>
+</div>
+<!-- Group 2: Ubicación Geográfica -->
+<div>
+<h3 class="text-xs font-extrabold text-on-surface tracking-widest uppercase mb-4 flex items-center gap-2">
+<span class="w-1 h-4 bg-primary rounded-full"></span>
+                        UBICACIÓN GEOGRÁFICA
+                    </h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Dirección completa</span>
+</label>
+<label class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Código Postal</span>
+</label>
+<label class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Coordenadas GPS</span>
+</label>
+<label class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Zona de riesgo sísmico</span>
+</label>
+</div>
+</div>
+<!-- Group 3: Valores Declarados -->
+<div>
+<h3 class="text-xs font-extrabold text-on-surface tracking-widest uppercase mb-4 flex items-center gap-2">
+<span class="w-1 h-4 bg-primary rounded-full"></span>
+                        VALORES DECLARADOS
+                    </h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Valor de reposición</span>
+</label>
+<label class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20" disabled="" type="checkbox"/>
+<span class="text-sm text-on-surface font-medium">Límite de responsabilidad</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Disabled) -->
+<footer class="p-6 bg-slate-50 border-t border-slate-100 flex flex-col gap-3 cursor-not-allowed">
+<button class="w-full py-2.5 text-slate-400 text-sm font-semibold transition-colors flex items-center justify-center gap-2" disabled="">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+                Restaurar predeterminados
+            </button>
+<button class="w-full py-3 bg-slate-300 text-white text-sm font-bold uppercase tracking-widest rounded-lg opacity-60 cursor-not-allowed shadow-sm" disabled="">
+                Guardar configuración
+            </button>
+</footer>
+<!-- Hidden SideNavBar Branding (Reference from JSON) -->
+<div class="absolute bottom-4 left-4 opacity-10 pointer-events-none">
+<span class="text-[10px] font-manrope font-extrabold text-blue-900 uppercase">Cotizador de Daños v2.4.0</span>
+</div>
+</aside>
+<!-- Overlay Background -->
+<div class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 pointer-events-none"></div>
+</body></html>

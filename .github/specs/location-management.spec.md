@@ -1,6 +1,6 @@
 ---
 id: SPEC-006
-status: DRAFT
+status: IMPLEMENTED
 feature: location-management
 feature_type: full-stack
 requires_design_spec: true
@@ -19,7 +19,7 @@ estimated-complexity: XL
 
 # Spec: Gestión de Ubicaciones de Riesgo
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `IN_PROGRESS` — Aprobado el 2026-03-29. Implementación en curso.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---

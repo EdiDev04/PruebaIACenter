@@ -52,4 +52,18 @@ export const httpClient = {
     if (!res.ok) throw await res.json();
     return res.json() as Promise<T>;
   },
+
+  patch: async <T>(url: string, body: unknown): Promise<T> => {
+    const res = await fetch(`${getBaseUrl()}${url}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: getAuthHeader(),
+        'Content-Type': 'application/json',
+        'Correlation-Id': crypto.randomUUID(),
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw await res.json();
+    return res.json() as Promise<T>;
+  },
 };

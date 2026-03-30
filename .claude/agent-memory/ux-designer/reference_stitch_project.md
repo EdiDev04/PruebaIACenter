@@ -10,4 +10,4 @@ Stitch project for Cotizador de Seguros de Danos:
 - Design System Asset ID: 4588898471681033353
 - Config file: .github/design-specs/.stitch-config.json
 
-Existing screens (as of 2026-03-29): folio-creation (2 screens), general-info (3 screens).
+Existing screens (as of 2026-03-29): folio-creation (2), general-info (3), layout-config (3), location-management (4). Coverage-options (3) pending generation.

@@ -1,8 +1,10 @@
 namespace Cotizador.Domain.ValueObjects;
 
-/// <summary>
-/// Placeholder — detailed structure defined in SPEC-005 (location-layout-configuration).
-/// </summary>
 public class LayoutConfiguration
 {
+    public string DisplayMode { get; init; } = "grid";
+    public List<string> VisibleColumns { get; init; } = new()
+    {
+        "index", "locationName", "zipCode", "businessLine", "validationStatus"
+    };
 }

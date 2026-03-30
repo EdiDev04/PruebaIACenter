@@ -1,12 +1,7 @@
 using Cotizador.API.Auth;
 using Cotizador.API.Middleware;
-using Cotizador.Application.Interfaces;
-using Cotizador.Application.DTOs;
-using Cotizador.Application.Settings;
-using Cotizador.Application.UseCases;
-using Cotizador.Application.Validators;
+using Cotizador.Application;
 using Cotizador.Infrastructure;
-using FluentValidation;
 using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -26,25 +21,8 @@ builder.Services.AddAuthorization();
 // Infrastructure (MongoDB + CoreOhsClient)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// BusinessTypes configuration
-builder.Services.Configure<BusinessTypeSettings>(
-    builder.Configuration.GetSection(BusinessTypeSettings.SectionName));
-
-// Use Cases — SPEC-003
-builder.Services.AddScoped<ICreateFolioUseCase, CreateFolioUseCase>();
-builder.Services.AddScoped<IGetQuoteSummaryUseCase, GetQuoteSummaryUseCase>();
-
-// Use Cases — SPEC-004
-builder.Services.AddScoped<IGetGeneralInfoUseCase, GetGeneralInfoUseCase>();
-builder.Services.AddScoped<IUpdateGeneralInfoUseCase, UpdateGeneralInfoUseCase>();
-
-// Use Cases — Proxy catálogos (SPEC-004)
-builder.Services.AddScoped<IGetSubscribersUseCase, GetSubscribersUseCase>();
-builder.Services.AddScoped<IGetAgentByCodeUseCase, GetAgentByCodeUseCase>();
-builder.Services.AddScoped<IGetRiskClassificationsUseCase, GetRiskClassificationsUseCase>();
-
-// FluentValidation
-builder.Services.AddScoped<IValidator<UpdateGeneralInfoRequest>, UpdateGeneralInfoRequestValidator>();
+// Application (Use Cases + Validators + Settings)
+builder.Services.AddApplication(builder.Configuration);
 
 // Controllers
 builder.Services.AddControllers();

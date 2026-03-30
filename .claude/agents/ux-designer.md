@@ -251,12 +251,23 @@ Para cada prompt de la Sección 6 del design spec (en lotes de 2):
    - prompt: "<prompt de la Sección 6>"
    - modelId: "GEMINI_3_FLASH"
 
-3. [CONFIRMAR INMEDIATAMENTE] Llama `list_screens` después de cada generación
-   - Si la pantalla aparece → extraer screenId y registrar en config
-   - Si NO aparece → y solo entonces → reintentar UNA vez
-   - Si tras el reintento tampoco aparece → marcar status: "pending" y continuar
+3. [ESPERAR — OBLIGATORIO] Stitch procesa de forma asíncrona. Usar siempre esta
+   estrategia de espera escalonada entre la generación y la verificación:
 
-4. [REGISTRAR] Actualiza `.stitch-config.json` con el screenId confirmado:
+   Intento 1 → sleep 30s → list_screens
+   Intento 2 → sleep 45s → list_screens   (si no apareció en intento 1)
+   Intento 3 → sleep 60s → list_screens   (si no apareció en intento 2)
+
+   NUNCA llamar list_screens inmediatamente después de generate_screen_from_text.
+   NUNCA reintentar generate_screen_from_text si la pantalla no aparece en los
+   primeros list_screens — puede ser que aún esté procesando.
+
+4. [CONFIRMAR] Tras la espera, llama `list_screens`:
+   - Si la pantalla aparece → extraer screenId y registrar en config
+   - Si NO aparece tras los 3 intentos → marcar status: "pending" y continuar
+     sin regenerar (la pantalla puede aparecer después por eventual consistency)
+
+5. [REGISTRAR] Actualiza `.stitch-config.json` con el screenId confirmado:
    {
      "screens": {
        "<nombre-pantalla>": {

@@ -23,4 +23,9 @@ public static class GuaranteeKeys
         DebrisRemoval, ExtraordinaryExpenses, RentLoss, BusinessInterruption,
         ElectronicEquipment, Theft, CashAndSecurities, Glass, IlluminatedSigns
     };
+
+    public static readonly string[] NotRequiringInsuredAmount = new[]
+    {
+        Glass, IlluminatedSigns
+    };
 }

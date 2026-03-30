@@ -1,6 +1,6 @@
 ---
 id: SPEC-007
-status: DRAFT
+status: APPROVED
 feature: coverage-options-configuration
 feature_type: full-stack
 requires_design_spec: true
@@ -19,7 +19,7 @@ estimated-complexity: S
 
 # Spec: Configuración de Opciones de Cobertura
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `APPROVED` — listo para implementación.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---

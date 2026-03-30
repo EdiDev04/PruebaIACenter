@@ -1,0 +1,52 @@
+.banner {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #92400e;
+}
+
+.bannerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.locationName {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.alerts {
+  margin: 0;
+  padding-left: 1rem;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.alert {
+  font-size: 0.8125rem;
+  color: #92400e;
+}

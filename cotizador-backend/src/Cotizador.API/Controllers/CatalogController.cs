@@ -12,19 +12,26 @@ namespace Cotizador.API.Controllers;
 public class CatalogController : ControllerBase
 {
     private static readonly Regex AgentCodeRegex = new(@"^AGT-\d{3}$", RegexOptions.Compiled);
+    private static readonly Regex ZipCodeRegex = new(@"^\d{5}$", RegexOptions.Compiled);
 
     private readonly IGetSubscribersUseCase _getSubscribersUseCase;
     private readonly IGetAgentByCodeUseCase _getAgentByCodeUseCase;
     private readonly IGetRiskClassificationsUseCase _getRiskClassificationsUseCase;
+    private readonly IGetZipCodeUseCase _getZipCodeUseCase;
+    private readonly IGetBusinessLinesUseCase _getBusinessLinesUseCase;
 
     public CatalogController(
         IGetSubscribersUseCase getSubscribersUseCase,
         IGetAgentByCodeUseCase getAgentByCodeUseCase,
-        IGetRiskClassificationsUseCase getRiskClassificationsUseCase)
+        IGetRiskClassificationsUseCase getRiskClassificationsUseCase,
+        IGetZipCodeUseCase getZipCodeUseCase,
+        IGetBusinessLinesUseCase getBusinessLinesUseCase)
     {
         _getSubscribersUseCase = getSubscribersUseCase;
         _getAgentByCodeUseCase = getAgentByCodeUseCase;
         _getRiskClassificationsUseCase = getRiskClassificationsUseCase;
+        _getZipCodeUseCase = getZipCodeUseCase;
+        _getBusinessLinesUseCase = getBusinessLinesUseCase;
     }
 
     /// <summary>GET /v1/subscribers — Obtiene el catálogo de suscriptores desde core-ohs.</summary>
@@ -70,5 +77,42 @@ public class CatalogController : ControllerBase
     {
         List<RiskClassificationDto> classifications = await _getRiskClassificationsUseCase.ExecuteAsync(ct);
         return Ok(new { data = classifications });
+    }
+
+    /// <summary>GET /v1/zip-codes/{zipCode} — Proxy a core-ohs: resuelve datos geográficos por código postal.</summary>
+    [HttpGet("zip-codes/{zipCode}")]
+    public async Task<IActionResult> GetZipCodeAsync(string zipCode, CancellationToken ct)
+    {
+        if (!ZipCodeRegex.IsMatch(zipCode))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "El código postal debe ser de 5 dígitos numéricos",
+                field = "zipCode"
+            });
+        }
+
+        var dto = await _getZipCodeUseCase.ExecuteAsync(zipCode, ct);
+
+        if (dto is null)
+        {
+            return NotFound(new
+            {
+                type = "zipCodeNotFound",
+                message = "Código postal no encontrado",
+                field = (string?)null
+            });
+        }
+
+        return Ok(new { data = dto });
+    }
+
+    /// <summary>GET /v1/business-lines — Proxy a core-ohs: obtiene el catálogo de giros comerciales.</summary>
+    [HttpGet("business-lines")]
+    public async Task<IActionResult> GetBusinessLinesAsync(CancellationToken ct)
+    {
+        List<BusinessLineDto> businessLines = await _getBusinessLinesUseCase.ExecuteAsync(ct);
+        return Ok(new { data = businessLines });
     }
 }

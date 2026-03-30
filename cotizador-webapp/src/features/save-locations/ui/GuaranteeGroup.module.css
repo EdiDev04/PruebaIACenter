@@ -1,0 +1,137 @@
+.group {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+  border-left: 3px solid transparent;
+  transition: background 0.15s;
+}
+
+.header:hover {
+  background: #f9fafb;
+}
+
+.headerOpen {
+  border-left-color: #2563eb;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.counter {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.chevron {
+  transition: transform 0.2s;
+  color: #6b7280;
+  font-size: 1.2rem;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.items {
+  border-top: 1px solid #f3f4f6;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fff;
+  transition: background 0.1s;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.itemSelected {
+  background-color: #f0f4ff;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: #2563eb;
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recommendedBadge {
+  background-color: #dcfce7;
+  color: #15803d;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.amountWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.currencyPrefix {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.amountInput {
+  width: 120px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.amountInput:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.amountError {
+  border-color: #d97706;
+}
+
+.amountMsg {
+  font-size: 0.7rem;
+  color: #d97706;
+}
