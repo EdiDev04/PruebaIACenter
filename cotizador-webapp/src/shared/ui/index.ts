@@ -11,3 +11,5 @@ export type { SelectOption } from './Select';
 export { ReadOnlyField } from './ReadOnlyField';
 export { Modal } from './Modal';
 export { WizardProgressBar } from './WizardProgressBar';
+export { DisplayModeToggle } from './DisplayModeToggle';
+export { ColumnGroupCheckbox } from './ColumnGroupCheckbox';

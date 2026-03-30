@@ -44,7 +44,7 @@ cotizador-webapp/src/pages/             (rutas y componentes de página)
 
 Los tres servicios deben estar levantados:
 - `cotizador-webapp` en `http://localhost:5173`
-- `cotizador-backend` en `http://localhost:5000`
+- `cotizador-backend` en `http://localhost:5001`
 - `cotizador-core-mock` en `http://localhost:3001`
 
 ## Estructura a generar

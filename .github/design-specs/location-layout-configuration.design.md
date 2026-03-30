@@ -2,7 +2,7 @@
 
 > **SPEC:** SPEC-005
 > **Feature:** location-layout-configuration
-> **Status:** DRAFT
+> **Status:** APPROVED
 > **Creado:** 2026-03-29
 > **Autor:** ux-designer
 

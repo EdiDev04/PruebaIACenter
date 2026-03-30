@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary-fixed-variant": "#006c2d", "tertiary-container": "#82ff99", "inverse-surface": "#070e19", "primary-fixed": "#4878fd", "error-container": "#f97386", "secondary-container": "#ffdcc3", "surface-container-lowest": "#ffffff", "on-secondary-container": "#7e4200", "on-secondary-fixed": "#633300", primary: "#1554d9", "surface-bright": "#f9f9ff", "tertiary-fixed-dim": "#73f08c", "on-error-container": "#6e0523", "on-surface": "#24334a", "on-primary-fixed-variant": "#fefcff", secondary: "#914d00", outline: "#6c7b96", "on-primary-container": "#000000", tertiary: "#006e2e", "primary-container": "#4878fd", background: "#f9f9ff", "on-primary-fixed": "#ffffff", "on-tertiary-container": "#006127", "surface-container-highest": "#d5e3ff", "surface-container-low": "#f0f3ff", error: "#a8364b", "inverse-primary": "#638aff", "surface-variant": "#d5e3ff", "surface-container-high": "#dee8ff", "secondary-fixed-dim": "#ffcaa1", "secondary-fixed": "#ffdcc3", "tertiary-fixed": "#82ff99", "on-primary": "#faf8ff", "on-surface-variant": "#506079", "inverse-on-surface": "#969dac", "surface-tint": "#1554d9", "primary-fixed-dim": "#386bef", "on-secondary-fixed-variant": "#8c4a00", "surface-container": "#e7eeff", "surface-dim": "#cbdbf9", "on-secondary": "#fff7f4", "on-error": "#fff7f7", "on-tertiary-fixed": "#004c1d", "on-tertiary": "#e9ffe6", "on-background": "#24334a", "outline-variant": "#a3b3cf", surface: "#f9f9ff", "error-dim": "#6b0221", "primary-dim": "#0047c6", "secondary-dim": "#804300", "tertiary-dim": "#006127"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-[#f8f9ff] dark:bg-slate-950 shadow-sm flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#1A56DB] dark:text-blue-400">arrow_back</span>
+<h1 class="text-2xl font-bold font-headline text-[#121c28] dark:text-slate-100">Resumen de ubicaciones</h1>
+</div>
+<span class="text-sm font-medium font-inter text-[#434654] dark:text-slate-400">Paso 2 de 4</span>
+</header>
+<main class="mt-20 px-6">
+<!-- Metrics Cards Section -->
+<section class="grid grid-cols-2 gap-3 mb-8">
+<div class="bg-secondary-container p-4 rounded-xl flex flex-col justify-between min-h-[110px]">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="text-lg font-bold font-headline leading-tight text-on-secondary-container">3 Calculables</p>
+<p class="text-[10px] font-semibold font-label uppercase tracking-tighter text-on-secondary-container/80">Listas para cotizar</p>
+</div>
+</div>
+<div class="bg-tertiary-fixed p-4 rounded-xl flex flex-col justify-between min-h-[110px]">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" style="font-variation-settings: 'FILL' 1;">error</span>
+<div>
+<p class="text-lg font-bold font-headline leading-tight text-on-tertiary-fixed-variant">1 Pendiente</p>
+<p class="text-[10px] font-semibold font-label uppercase tracking-tighter text-on-tertiary-fixed-variant/80">Requiere datos</p>
+</div>
+</div>
+</section>
+<!-- Info Banner -->
+<section class="bg-surface-container-low p-4 rounded-xl mb-8 flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+<p class="text-sm font-medium leading-relaxed text-on-surface-variant">
+                Las ubicaciones con datos pendientes no se incluirán en el cálculo de tarifa. Puedes continuar y completarlas después.
+            </p>
+</section>
+<!-- Locations List -->
+<section class="space-y-4">
+<!-- Ubicación 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(18,28,40,0.04)] flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-xs font-semibold text-outline uppercase tracking-wider">Ubicación 1</p>
+<h3 class="text-base font-bold font-headline">Bodega Central CDMX</h3>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary-container/30 rounded-full mt-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[11px] font-bold text-on-secondary-container uppercase tracking-wide">Calculable</span>
+</div>
+</div>
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Ubicación 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(18,28,40,0.04)] flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-xs font-semibold text-outline uppercase tracking-wider">Ubicación 2</p>
+<h3 class="text-base font-bold font-headline">Sucursal Del Valle</h3>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary-container/30 rounded-full mt-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[11px] font-bold text-on-secondary-container uppercase tracking-wide">Calculable</span>
+</div>
+</div>
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Ubicación 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(18,28,40,0.04)] flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-xs font-semibold text-outline uppercase tracking-wider">Ubicación 3</p>
+<h3 class="text-base font-bold font-headline">Oficinas Corporativas Polanco</h3>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary-container/30 rounded-full mt-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-[11px] font-bold text-on-secondary-container uppercase tracking-wide">Calculable</span>
+</div>
+</div>
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Ubicación 4 (Pending) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_10px_30px_rgba(18,28,40,0.08)] border-l-[3px] border-tertiary flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-xs font-semibold text-on-tertiary-fixed-variant uppercase tracking-wider">Ubicación 4</p>
+<h3 class="text-base font-bold font-headline">Almacén Norte Ecatepec</h3>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-tertiary-fixed/40 rounded-full mt-2">
+<span class="material-symbols-outlined text-[14px] text-tertiary">contrast</span>
+<span class="text-[11px] font-bold text-on-tertiary-fixed-variant uppercase tracking-wide">Datos pendientes</span>
+</div>
+</div>
+<button class="p-2 text-outline-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="bg-tertiary-fixed/10 p-3 rounded-lg">
+<ul class="space-y-1">
+<li class="text-xs font-medium text-on-tertiary-fixed-variant flex items-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span>
+                            Código postal requerido
+                        </li>
+<li class="text-xs font-medium text-on-tertiary-fixed-variant flex items-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span>
+                            Giro comercial requerido
+                        </li>
+</ul>
+<button class="mt-3 text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">
+                        Completar datos <span class="material-symbols-outlined text-sm">east</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Decorative Map Background Preview -->
+<section class="mt-8 rounded-2xl overflow-hidden relative h-32 w-full">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="Modern minimalist digital map of Mexico City showing urban blocks in soft blue and grey tones" data-location="Mexico City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdtieWYTMDj1aQvXzg4295rSVq7AR7TE5lio3outIJ9nCVkTwb7aoxFQkXNv-HkRGKcNoUWIEXMfngaquyuvyWKg3uxZnm5Qyf5Lg6jcLBEIsXn_uiktBQOiuYqou5ZWyDEIVnM4dvQdqiespu1NMxDCONHtxdF0oO6wipRtEm3Z-T_um2WD3N5dMPRkn5KAwYEEqymS7Ik0ncVhktxT880gV8CidlrRd7lT247wBbd0rh5IK08wPXei54zzg0-_FNk2nfcS9MoI0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<span class="px-3 py-1 bg-white/80 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-on-surface">Visualización de red</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-[#c3c5d7]/15">
+<button class="text-[#434654] dark:text-slate-400 flex items-center gap-2 px-4 py-2 hover:bg-[#eef4ff] rounded-xl transition-all">
+<span class="material-symbols-outlined" data-icon="west">west</span>
+<span class="text-xs font-semibold font-inter uppercase tracking-wider">Volver a ubicaciones</span>
+</button>
+<button class="bg-gradient-to-br from-[#003fb1] to-[#1a56db] text-white rounded-xl px-6 py-3 shadow-lg flex items-center gap-2 active:scale-[0.98] transition-all hover:brightness-110">
+<span class="text-xs font-semibold font-inter uppercase tracking-wider">Continuar con 3 ubicaciones</span>
+<span class="material-symbols-outlined" data-icon="east">east</span>
+</button>
+</nav>
+</body></html>

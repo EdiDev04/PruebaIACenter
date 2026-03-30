@@ -1,2 +1,3 @@
 - [SPEC-005 Design Status](project_spec005_status.md) -- Layout config design spec created, pending Stitch generation
+- [SPEC-007 Coverage Options Design](project_spec007_status.md) -- Coverage options design spec created, 3 screens pending Stitch generation
 - [Stitch Project Config](reference_stitch_project.md) -- Project ID and design system references for Stitch MCP

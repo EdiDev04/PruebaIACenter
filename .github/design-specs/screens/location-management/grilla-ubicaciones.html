@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ubicaciones de Riesgo - The Sovereign Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"tertiary-fixed": "#82ff99", "surface-variant": "#d5e3ff", "tertiary-container": "#82ff99", primary: "#1554d9", "error-container": "#f97386", "on-tertiary-container": "#006127", "on-primary-container": "#000000", secondary: "#914d00", "surface-container-high": "#dee8ff", "on-secondary-container": "#7e4200", "on-surface-variant": "#506079", "inverse-primary": "#638aff", error: "#a8364b", "on-secondary": "#fff7f4", "on-error-container": "#6e0523", surface: "#f9f9ff", "on-tertiary": "#e9ffe6", "on-background": "#24334a", "primary-fixed-dim": "#386bef", "inverse-surface": "#070e19", "inverse-on-surface": "#969dac", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#004c1d", "secondary-container": "#ffdcc3", "surface-container": "#e7eeff", "on-tertiary-fixed-variant": "#006c2d", "surface-tint": "#1554d9", "surface-container-low": "#f0f3ff", outline: "#6c7b96", "on-error": "#fff7f7", "secondary-fixed": "#ffdcc3", background: "#f9f9ff", "on-surface": "#24334a", "on-secondary-fixed": "#633300", "primary-container": "#4878fd", "outline-variant": "#a3b3cf", tertiary: "#006e2e", "on-primary-fixed-variant": "#fefcff", "tertiary-fixed-dim": "#73f08c", "surface-dim": "#cbdbf9", "on-secondary-fixed-variant": "#8c4a00", "primary-fixed": "#4878fd", "on-primary": "#faf8ff", "surface-container-highest": "#d5e3ff", "surface-bright": "#f9f9ff", "secondary-fixed-dim": "#ffcaa1", "on-primary-fixed": "#ffffff", "error-dim": "#6b0221", "primary-dim": "#0047c6", "secondary-dim": "#804300", "tertiary-dim": "#006127"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .bg-gradient-sovereign {
+            background: linear-gradient(135deg, #003fb1 0%, #1a56db 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm flex items-center justify-between px-6 h-16 max-w-full mx-auto">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="account_balance">account_balance</span>
+<span class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">The Sovereign Ledger</span>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8">
+<span class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 cursor-pointer transition-colors duration-200">Dashboard</span>
+<span class="text-blue-700 dark:text-blue-400 font-bold border-b-2 border-blue-700 cursor-pointer">Underwriting</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 cursor-pointer transition-colors duration-200">Portfolio</span>
+</nav>
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100 cursor-pointer active:opacity-70" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<div class="flex flex-1 pt-16 pb-24">
+<!-- NavigationDrawer Shell (Left Sidebar) -->
+<aside class="hidden lg:flex h-[calc(100vh-4rem)] w-64 flex-col pt-8 bg-slate-50 dark:bg-slate-900 tonal-shift sticky top-16">
+<div class="px-6 mb-8">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Underwriting Progress</h2>
+</div>
+<nav class="flex flex-col gap-1 px-2">
+<div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 opacity-60 hover:bg-slate-200 transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="text-sm font-medium tracking-wide uppercase">General Data</span>
+</div>
+<div class="flex items-center gap-3 bg-white dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-l-4 border-blue-700 rounded-r-lg px-4 py-3 shadow-sm cursor-pointer">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="text-sm font-medium tracking-wide uppercase">Locations</span>
+</div>
+<div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 opacity-60 hover:bg-slate-200 transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+<span class="text-sm font-medium tracking-wide uppercase">Coverages</span>
+</div>
+<div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 opacity-60 hover:bg-slate-200 transition-all rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium tracking-wide uppercase">Results</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-8 py-10 max-w-6xl mx-auto w-full">
+<!-- Breadcrumb -->
+<nav class="mb-6 flex items-center gap-2 text-on-surface-variant text-sm font-medium">
+<span class="hover:underline cursor-pointer">DAN-2026-00001</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+<span class="hover:underline cursor-pointer">Paso 1</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-semibold">Paso 2</span>
+</nav>
+<!-- Wizard Header -->
+<div class="mb-10">
+<div class="flex items-center justify-between mb-8">
+<div class="flex-1 flex items-center gap-0">
+<!-- Step 1 Done -->
+<div class="flex items-center group">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+<span class="material-symbols-outlined text-lg" data-icon="check">check</span>
+</div>
+<div class="h-1 w-16 bg-primary"></div>
+</div>
+<!-- Step 2 Active -->
+<div class="flex items-center group">
+<div class="w-10 h-10 rounded-full border-2 border-primary bg-white text-primary flex items-center justify-center font-bold shadow-md">2</div>
+<div class="h-1 w-16 bg-surface-container-highest"></div>
+</div>
+<!-- Step 3 Pending -->
+<div class="flex items-center group">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-sm">3</div>
+<div class="h-1 w-16 bg-surface-container-highest"></div>
+</div>
+<!-- Step 4 Pending -->
+<div class="flex items-center group">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-sm">4</div>
+</div>
+</div>
+</div>
+<div class="flex items-end justify-between gap-4">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight text-on-background">Ubicaciones de riesgo</h1>
+<p class="text-on-surface-variant mt-2 font-medium">3 ubicaciones — <span class="text-primary">2 calculables</span>, <span class="text-tertiary">1 pendiente</span></p>
+</div>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-surface-container-high text-on-secondary-fixed-variant font-semibold rounded-lg hover:bg-surface-container-highest transition-colors active:scale-95">
+                        Configurar vista
+                        <span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+<!-- Alert Banner -->
+<div class="mb-8 p-5 bg-tertiary-fixed/30 rounded-xl flex items-start gap-4 shadow-sm border-l-4 border-tertiary">
+<span class="material-symbols-outlined text-tertiary-container mt-0.5" data-icon="warning">warning</span>
+<div class="text-sm leading-relaxed">
+<p class="font-bold text-tertiary-container text-base mb-1">1 ubicación con datos pendientes</p>
+<p class="text-on-tertiary-fixed-variant">Completa los datos para incluirla en la cotización. <br/>
+<span class="font-bold inline-flex items-center mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary mr-2"></span> 
+                            Almacén Norte: Código postal requerido, Giro comercial requerido
+                        </span>
+</p>
+</div>
+</div>
+<!-- Table Container -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(18,28,42,0.04)] overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant">
+<th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">#</th>
+<th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Nombre</th>
+<th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">C.P.</th>
+<th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Giro</th>
+<th class="px-6 py-4 font-bold text-xs uppercase tracking-widest">Estado</th>
+<th class="px-6 py-4 w-10"></th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-5 font-mono text-sm text-on-surface-variant">01</td>
+<td class="px-6 py-5 font-semibold text-on-surface">Bodega Central CDMX</td>
+<td class="px-6 py-5 font-medium text-on-surface-variant">06600</td>
+<td class="px-6 py-5 text-on-surface">Storage warehouse</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-tighter">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
+                                    Calculable
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-outline cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container-low/30 hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-5 font-mono text-sm text-on-surface-variant">02</td>
+<td class="px-6 py-5 font-semibold text-on-surface">Sucursal Del Valle</td>
+<td class="px-6 py-5 font-medium text-on-surface-variant">03100</td>
+<td class="px-6 py-5 text-on-surface">Retail store</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-tighter">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
+                                    Calculable
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-outline cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" data-icon="more_vert">more_vert</span>
+</td>
+</tr>
+<!-- Row 3 - Pending & Context Menu Open -->
+<tr class="bg-tertiary-fixed/5 hover:bg-tertiary-fixed/10 transition-colors relative">
+<td class="px-6 py-5 font-mono text-sm text-on-surface-variant">03</td>
+<td class="px-6 py-5 font-semibold text-on-surface">Almacén Norte</td>
+<td class="px-6 py-5 text-on-surface-variant font-bold">—</td>
+<td class="px-6 py-5 text-on-surface-variant font-bold">—</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-tighter">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2"></span>
+                                    Datos pendientes
+                                </span>
+</td>
+<td class="px-6 py-5 text-right relative">
+<button class="material-symbols-outlined text-blue-700 font-bold" data-icon="more_vert">more_vert</button>
+<!-- Context Menu (Simulated Open State) -->
+<div class="absolute right-6 top-14 w-40 bg-white shadow-xl rounded-lg border border-outline-variant z-20 py-2">
+<button class="w-full text-left px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+                                        Editar
+                                    </button>
+<button class="w-full text-left px-4 py-2 text-sm font-semibold text-error hover:bg-error-container/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                                        Eliminar
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Floating Action Button Contextual Mock -->
+<div class="mt-8 flex items-center justify-between">
+<button class="flex items-center gap-3 px-6 py-3 border-2 border-dashed border-outline-variant text-on-surface-variant font-bold rounded-xl hover:bg-surface-container-low hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="add_location_alt">add_location_alt</span>
+                    + Agregar ubicación
+                </button>
+</div>
+</main>
+</div>
+<!-- BottomNavBar Shell -->
+<footer class="fixed bottom-0 left-0 w-full px-6 py-4 flex justify-between items-center bg-white/95 dark:bg-slate-900/95 shadow-[0_-4px_20px_rgba(18,28,42,0.06)] z-50">
+<button class="flex flex-row items-center justify-center text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-lg px-8 py-3 gap-2 font-bold uppercase tracking-widest text-xs hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+            Back
+        </button>
+<button class="flex flex-row-reverse items-center justify-center bg-gradient-sovereign text-white rounded-lg px-8 py-3 gap-2 font-bold uppercase tracking-widest text-xs hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-blue-700/20">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+            Continue → (2 ubicaciones calculables)
+        </button>
+</footer>
+<!-- Visual Polish: Decorative Element -->
+<div class="fixed top-0 right-0 w-1/3 h-screen bg-blue-50/30 -z-10 pointer-events-none" style="clip-path: polygon(100% 0, 0 0, 100% 100%);"></div>
+</body></html>

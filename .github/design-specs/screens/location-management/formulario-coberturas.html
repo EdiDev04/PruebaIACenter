@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"primary-container": "#4878fd", "secondary-container": "#ffdcc3", "on-secondary": "#fff7f4", "on-tertiary-fixed-variant": "#006c2d", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#969dac", "on-surface": "#24334a", outline: "#6c7b96", "surface-container-highest": "#d5e3ff", primary: "#1554d9", "on-error": "#fff7f7", "surface-variant": "#d5e3ff", "tertiary-fixed": "#82ff99", tertiary: "#006e2e", secondary: "#914d00", "on-tertiary-fixed": "#004c1d", "tertiary-fixed-dim": "#73f08c", "surface-dim": "#cbdbf9", "surface-tint": "#1554d9", "on-background": "#24334a", "on-tertiary": "#e9ffe6", "surface-container-low": "#f0f3ff", "on-secondary-fixed": "#633300", "on-error-container": "#6e0523", "on-secondary-fixed-variant": "#8c4a00", "surface-bright": "#f9f9ff", error: "#a8364b", "primary-fixed": "#4878fd", "on-primary-container": "#000000", "inverse-surface": "#070e19", "tertiary-container": "#82ff99", "on-primary-fixed": "#ffffff", "on-primary-fixed-variant": "#fefcff", background: "#f9f9ff", surface: "#f9f9ff", "on-surface-variant": "#506079", "surface-container-high": "#dee8ff", "surface-container": "#e7eeff", "secondary-fixed-dim": "#ffcaa1", "on-secondary-container": "#7e4200", "outline-variant": "#a3b3cf", "primary-fixed-dim": "#386bef", "secondary-fixed": "#ffdcc3", "inverse-primary": "#638aff", "error-container": "#f97386", "on-primary": "#faf8ff", "on-tertiary-container": "#006127", "error-dim": "#6b0221", "primary-dim": "#0047c6", "tertiary-dim": "#006127", "secondary-dim": "#804300"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .filled-icon {
+        font-variation-settings: 'FILL' 1;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c3c5d7;
+        border-radius: 10px;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0b1c30]/40 min-h-screen flex justify-end overflow-hidden">
+<!-- Backdrop for Underwriting Progress Flow -->
+<div class="fixed inset-0 bg-[#0b1c30]/60 backdrop-blur-[4px] z-0"></div>
+<!-- Navigation Drawer (Shell) -->
+<aside class="fixed right-0 top-0 h-full w-[520px] bg-[#f8f9ff] shadow-[-10px_0_30px_rgba(11,28,48,0.1)] rounded-l-xl z-50 flex flex-col overflow-hidden">
+<!-- TopAppBar Context -->
+<header class="flex items-center justify-between px-6 h-16 w-full border-b border-[#c3c5d7]/15 bg-[#ffffff]">
+<h1 class="font-['Manrope'] font-bold tracking-tight text-on-surface text-lg">Nueva ubicación — Bodega Central CDMX</h1>
+<button class="p-2 hover:bg-[#f8f9ff] rounded-full transition-colors active:scale-95 duration-200 text-on-surface">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</header>
+<!-- Progress Indicator (NavigationDrawer Logic) -->
+<nav class="bg-[#eff4ff] px-6 py-4 flex items-center gap-6 border-b border-[#c3c5d7]/10">
+<div class="flex items-center gap-2 text-[#006f4d] font-semibold text-sm">
+<span class="material-symbols-outlined text-base filled-icon" data-icon="check_circle">check_circle</span>
+<span>Datos del inmueble</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<div class="flex items-center gap-2 text-[#1A56DB] font-bold text-sm">
+<span class="material-symbols-outlined text-base filled-icon" data-icon="radio_button_checked">radio_button_checked</span>
+<span>Coberturas</span>
+</div>
+</nav>
+<!-- Main Content Area (Scrollable) -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32">
+<!-- Summary Card (Read-only) -->
+<section class="bg-surface-container-low p-4 rounded-lg border-l-4 border-primary/20">
+<p class="text-on-surface-variant font-medium text-xs uppercase tracking-widest mb-1 opacity-70">Ubicación Seleccionada</p>
+<p class="text-on-surface font-semibold text-sm leading-relaxed">
+                    Av. Industria 340, CP 06600 — Zona A — Tipo 1 Macizo — Nivel 2
+                </p>
+</section>
+<!-- SECTION 1: Giro Comercial -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<label class="font-['Inter'] text-sm font-semibold text-on-surface flex items-center gap-1.5 uppercase tracking-wider">
+                        Giro Comercial
+                        <span class="material-symbols-outlined text-outline text-base cursor-help" data-icon="help">help</span>
+</label>
+</div>
+<div class="relative">
+<div class="flex items-center w-full bg-white border border-outline-variant rounded-lg px-4 py-3 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-outline mr-3" data-icon="search">search</span>
+<div class="flex flex-1 items-center gap-2">
+<span class="text-on-surface font-medium">Storage warehouse (B-03)</span>
+<span class="bg-surface-container px-2 py-0.5 rounded text-[10px] font-bold text-secondary tracking-wider">B-03</span>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="expand_more">expand_more</span>
+</div>
+<p class="mt-2 text-on-surface-variant text-xs italic">El fireKey determina la tarifa de incendio</p>
+</div>
+</section>
+<!-- SECTION 2: Coberturas -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-['Manrope'] font-bold text-on-surface text-base">Coberturas</h2>
+<span class="text-xs font-bold text-primary bg-primary-fixed/30 px-3 py-1 rounded-full uppercase tracking-tighter">2 de 14 seleccionadas</span>
+</div>
+<div class="space-y-2">
+<!-- Accordion 1: Expanded -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden ring-1 ring-primary/5">
+<button class="w-full px-5 py-4 flex items-center justify-between hover:bg-surface-container-high/50 transition-colors">
+<span class="font-['Inter'] font-bold text-on-surface text-sm uppercase tracking-wider">Coberturas Base</span>
+<span class="material-symbols-outlined text-primary" data-icon="expand_less">expand_less</span>
+</button>
+<div class="px-5 pb-5 space-y-6">
+<!-- Coverage Item 1 -->
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant rounded-md focus:ring-primary/20" type="checkbox"/>
+<div class="space-y-1">
+<span class="text-sm font-bold text-on-surface">Incendio de edificio</span>
+<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-container text-on-tertiary-container uppercase tracking-tight">Recomendado</span>
+</div>
+</div>
+</div>
+<div class="pl-8">
+<div class="relative max-w-[280px]">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline font-medium text-xs">MXN $</span>
+<input class="w-full bg-white border-outline-variant rounded-lg pl-16 pr-4 py-2 font-['Manrope'] font-bold text-on-surface focus:ring-2 focus:ring-primary-fixed" type="text" value="5,000,000"/>
+</div>
+<p class="flex items-center gap-1 mt-1.5 text-[11px] font-semibold text-tertiary-container">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+                                        Suma asegurada válida
+                                    </p>
+</div>
+</div>
+<hr class="border-outline-variant/20"/>
+<!-- Coverage Item 2 -->
+<div class="space-y-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant rounded-md focus:ring-primary/20" type="checkbox"/>
+<div class="space-y-1">
+<span class="text-sm font-bold text-on-surface">Incendio de contenido</span>
+<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-tertiary-container text-on-tertiary-container uppercase tracking-tight">Recomendado</span>
+</div>
+</div>
+</div>
+<div class="pl-8">
+<div class="relative max-w-[280px]">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-outline font-medium text-xs">MXN $</span>
+<input class="w-full bg-white border-outline-variant rounded-lg pl-16 pr-4 py-2 font-['Manrope'] font-bold text-on-surface focus:ring-2 focus:ring-primary-fixed" type="text" value="2,000,000"/>
+</div>
+</div>
+</div>
+<hr class="border-outline-variant/20"/>
+<!-- Coverage Item 3 -->
+<div class="flex items-center gap-3 opacity-60">
+<input class="w-5 h-5 text-primary border-outline-variant rounded-md focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface">Cristales</span>
+</div>
+<!-- Coverage Item 4 -->
+<div class="flex items-center gap-3 opacity-60">
+<input class="w-5 h-5 text-primary border-outline-variant rounded-md focus:ring-primary/20" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface">Anuncios luminosos</span>
+</div>
+</div>
+</div>
+<!-- Accordion 2: Collapsed -->
+<div class="border border-outline-variant/20 rounded-xl overflow-hidden hover:border-primary/30 transition-colors">
+<button class="w-full px-5 py-4 flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<span class="font-['Inter'] font-semibold text-on-surface-variant text-sm uppercase tracking-wider group-hover:text-primary transition-colors">Catástrofes Naturales</span>
+<span class="text-[10px] font-bold bg-surface-container text-on-secondary-container px-2 py-0.5 rounded-full">0</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- Accordion 3: Collapsed -->
+<div class="border border-outline-variant/20 rounded-xl overflow-hidden hover:border-primary/30 transition-colors">
+<button class="w-full px-5 py-4 flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<span class="font-['Inter'] font-semibold text-on-surface-variant text-sm uppercase tracking-wider group-hover:text-primary transition-colors">Complementarias</span>
+<span class="text-[10px] font-bold bg-surface-container text-on-secondary-container px-2 py-0.5 rounded-full">0</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<!-- Accordion 4: Collapsed -->
+<div class="border border-outline-variant/20 rounded-xl overflow-hidden hover:border-primary/30 transition-colors">
+<button class="w-full px-5 py-4 flex items-center justify-between group">
+<div class="flex items-center gap-3">
+<span class="font-['Inter'] font-semibold text-on-surface-variant text-sm uppercase tracking-wider group-hover:text-primary transition-colors">Especiales</span>
+<span class="text-[10px] font-bold bg-surface-container text-on-secondary-container px-2 py-0.5 rounded-full">0</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Shell -->
+<footer class="absolute bottom-0 right-0 w-[520px] bg-white border-t border-[#c3c5d7]/20 p-6 flex justify-end gap-4 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+<button class="flex items-center gap-2 px-6 py-2.5 text-primary font-bold uppercase tracking-widest text-[11px] border border-primary/20 rounded-lg hover:bg-primary/5 transition-all active:translate-y-0.5">
+<span class="material-symbols-outlined text-base" data-icon="arrow_back">arrow_back</span>
+                Volver
+            </button>
+<button class="px-8 py-2.5 bg-primary text-white font-bold uppercase tracking-widest text-[11px] rounded-lg shadow-lg shadow-primary/20 hover:opacity-95 transition-all active:translate-y-0.5">
+                Guardar ubicación
+            </button>
+</footer>
+</aside>
+<!-- Main Content Background (Mocked for context) -->
+<main class="w-full h-full flex items-center justify-center pointer-events-none p-12 pr-[560px]">
+<div class="w-full max-w-4xl grid grid-cols-2 gap-8 opacity-40">
+<div class="h-48 bg-white/20 rounded-2xl border-2 border-dashed border-white/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/50 text-4xl" data-icon="location_on">location_on</span>
+</div>
+<div class="h-48 bg-white/20 rounded-2xl border-2 border-dashed border-white/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/50 text-4xl" data-icon="shield">shield</span>
+</div>
+<div class="h-96 col-span-2 bg-white/20 rounded-2xl border-2 border-dashed border-white/30 flex items-center justify-center overflow-hidden">
+<img alt="Mexican business district" class="w-full h-full object-cover grayscale brightness-50 contrast-125" data-alt="Wide aerial perspective of Mexico City financial district with tall glass skyscrapers and heavy traffic in bright daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfANMI8RmKeB_HXnjhYh27TAcs_j2G0GGvng0mxyEZHsQqM7HBEZILa29aF4QJgsmwjnQ8mMwlifFLLqCLybkNqs9GBCNVBLh-TQmaBzLasaK1BY9J6vdBAHdpf_yTmPtcImJpsv7oCgUE6kOcnKPeQqItE9rKLd5Cz_I_5mi6PZrIgSgsi1Va8KM6Z9CtUrAl3TGyZq13Au_GWN6Zz9TcAYv6feMYcIFQWPcksEsUEkxAvNbkiT5asw1XpLOqSIZUl27aozAu8lA"/>
+</div>
+</div>
+</main>
+</body></html>

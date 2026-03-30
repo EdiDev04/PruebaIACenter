@@ -1,0 +1,36 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.calculable {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.incomplete {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotCalculable {
+  background-color: #16a34a;
+}
+
+.dotIncomplete {
+  background-color: #d97706;
+}

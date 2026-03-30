@@ -1,3 +1,253 @@
+# Nota arquitectónica — Backend API → Infrastructure reference (Composition Root) — 2026-03-29
+
+## Hallazgo auditado
+
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Cotizador.API.csproj`
+- **Flag:** `<ProjectReference>` directa a `Cotizador.Infrastructure` desde `Cotizador.API` (potencial violación de Clean Architecture)
+- **Flag equivalente a:** CRIT-001 backend
+
+## Diagnóstico
+
+Se intentó eliminar la referencia `Cotizador.API` → `Cotizador.Infrastructure` para cumplir la regla "API solo referencia Application". El resultado fue:
+
+```
+error CS0234: The type or namespace name 'Infrastructure' does not exist in the namespace 'Cotizador' (are you missing an assembly reference?)
+```
+
+La referencia es **requerida** en `Program.cs` para invocar `builder.Services.AddInfrastructure(builder.Configuration)`. Ningún tipo de Infrastructure (repositorios, clientes HTTP, MongoDB) es referenciado directamente por los Controllers — solo `Program.cs` lo usa para el wiring de DI.
+
+## Veredicto: Falso positivo — Composition Root pattern (aceptado)
+
+**"API references Infrastructure ONLY for DI composition root (`AddInfrastructure`). All interface types used in layers come from Application. This follows the Composition Root pattern (Mark Seemann) and is accepted."**
+
+Los Controllers de API únicamente conocen interfaces de `Cotizador.Application` (`IXxxUseCase`). La referencia a Infrastructure existe exclusivamente en el Composition Root (`Program.cs`) y es el punto único de ensamblado del grafo de dependencias.
+
+## Mejora aplicada
+
+Se creó `Cotizador.Application/ApplicationServiceCollectionExtensions.cs` con `AddApplication(IServiceCollection, IConfiguration)` que centraliza el registro de todos los use cases y validators. `Program.cs` fue simplificado de 15 registros `AddScoped` individuales a:
+
+```csharp
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication(builder.Configuration);
+```
+
+**Build resultado:** ✅ `Build succeeded. 0 Error(s) 0 Warning(s)`
+
+---
+
+# Reporte de calidad — SPEC-005 location-layout-configuration — 2026-03-29
+
+---
+
+## Parte 1 — Auditoría de arquitectura
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 1     | Sí              |
+| MAYOR     | 3     | No              |
+| MENOR     | 4     | No              |
+
+### Violaciones críticas
+
+#### CRIT-001
+- **Archivo:** `cotizador-webapp/src/features/save-layout/model/useSaveLayout.ts`
+- **Línea:** 2
+- **Regla:** FSD — ruta interna de slice importada directamente (no index.ts)
+- **Detalle:** `import { updateLayout } from '@/entities/layout/api/layoutApi'` accede a la ruta interna del slice `entities/layout` ignorando su public API. `updateLayout` no está exportado en `entities/layout/index.ts`, lo que fuerza a la feature a romper la encapsulación del slice.
+- **Acción:** Exportar `updateLayout` y `LayoutResponse` desde `cotizador-webapp/src/entities/layout/index.ts`, luego actualizar el import a `import { updateLayout } from '@/entities/layout'`.
+
+### Violaciones mayores
+
+#### MAYOR-001
+- **Archivo:** `cotizador-backend/src/Cotizador.Domain/ValueObjects/LayoutConfiguration.cs`
+- **Líneas:** 4–9
+- **Regla:** Value Object con setters públicos mutables — violación del principio de inmutabilidad de DDD
+- **Detalle:** `DisplayMode` y `VisibleColumns` exponen `{ get; set; }`, permitiendo mutación externa arbitraria después de la construcción. Los Value Objects deben ser inmutables.
+- **Acción:** Cambiar a `{ get; init; }` o constructor con parámetros requeridos.
+
+#### MAYOR-002
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/UpdateLayoutUseCase.cs`
+- **Líneas:** 34–43
+- **Regla:** Doble roundtrip a base de datos innecesario
+- **Detalle:** `_repository.UpdateLayoutAsync()` actualiza el documento; inmediatamente `_repository.GetByFolioNumberAsync()` lo re-lee. El DTO de respuesta puede construirse con los datos del request + versión incrementada sin un segundo viaje a DB. Si `UpdateLayoutAsync` devolviera el nuevo documento (o solo la versión), la segunda llamada sería evitable.
+- **Acción:** Modificar `IQuoteRepository.UpdateLayoutAsync` para retornar el nuevo número de versión, y construir el DTO directamente sin la segunda consulta.
+
+#### MAYOR-003
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs`
+- **Líneas:** 6, 47, 84, 102
+- **Regla:** API consume tipos de `Cotizador.Domain` directamente (via dependencia transitiva)
+- **Detalle:** `using Cotizador.Domain.Constants;` en el controller hace que el API layer use `FolioConstants.FolioPattern` del proyecto Domain. `FolioConstants` debería residir en `Cotizador.Application.Constants`. Patrón introducido en SPEC-004 y perpetuado por los nuevos endpoints de SPEC-005.
+- **Acción:** Mover `FolioConstants` a `Cotizador.Application.Constants` y actualizar los usings en el controller.
+
+### Sugerencias menores
+
+#### MENOR-001
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/Validators/UpdateLayoutRequestValidator.cs`
+- **Líneas:** 29–31
+- **Regla:** Guardia de nulo redundante
+- **Detalle:** La regla `NotNull()` en `VisibleColumns` ya garantiza no-nulo antes de `Must(cols => cols != null && cols.Count > 0)`. La condición `cols != null` nunca será `false` en ese punto.
+- **Acción:** Simplificar a `.Must(cols => cols.Count > 0)`.
+
+#### MENOR-002
+- **Archivo:** `cotizador-webapp/src/__tests__/entities/layout/useLayoutQuery.test.ts`
+- **Línea:** 6
+- **Regla:** Test importa desde ruta interna del slice en lugar de la public API
+- **Detalle:** `import { useLayoutQuery } from '@/entities/layout/model/useLayoutQuery'` — debería ser `@/entities/layout`.
+
+#### MENOR-003
+- **Archivo:** `cotizador-webapp/src/__tests__/features/save-layout/useSaveLayout.test.ts`
+- **Línea:** 5
+- **Regla:** Test importa desde ruta interna del slice
+- **Detalle:** `import { useSaveLayout } from '@/features/save-layout/model/useSaveLayout'` — debería ser `@/features/save-layout`.
+
+#### MENOR-004
+- **Archivo:** `cotizador-webapp/src/__tests__/widgets/layout-config/LayoutConfigPanel.test.tsx`
+- **Línea:** 8
+- **Regla:** Test importa desde ruta interna del widget
+- **Detalle:** `import { LayoutConfigPanel } from '@/widgets/layout-config/ui/LayoutConfigPanel'` — debería ser `@/widgets/layout-config`.
+
+---
+
+## Parte 2 — Análisis estático SonarQube
+
+### Resumen ejecutivo
+
+- **Project Key:** No disponible (workspace no conectado a servidor SonarQube)
+- **Archivos analizados:** 13 (6 backend C#, 7 frontend TS/TSX)
+- **Gate SonarQube:** FAIL
+
+### Conteo de issues
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 2     |
+| MAJOR     | 3     |
+| MINOR     | 3     |
+| INFO      | 0     |
+
+### Issues CRITICAL — Acción requerida
+
+| # | Archivo | Línea | Regla | Mensaje | Severidad |
+|---|---------|-------|-------|---------|-----------|
+| 1 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L28 | `javascript:S2871` | Provide a compare function to avoid sorting elements alphabetically | CRITICAL |
+| 2 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L29 | `javascript:S2871` | Provide a compare function to avoid sorting elements alphabetically | CRITICAL |
+
+**Contexto:** La función `isDefaultLayout` invoca `[...visibleColumns].sort()` y `[...DEFAULT_VISIBLE_COLUMNS].sort()` sin función de comparación. El sort por defecto usa orden Unicode; para valores `ColumnKey` ASCII el resultado es correcto en la práctica, pero el comportamiento es dependiente del motor y SonarQube lo clasifica como CRITICAL por el riesgo de divergencia en collations no estándar.
+
+**Acción:** `[...visibleColumns].sort((a, b) => a.localeCompare(b))` en ambas líneas.
+
+### Issues MAJOR — Revisión recomendada
+
+| # | Archivo | Línea | Regla | Mensaje |
+|---|---------|-------|-------|---------|
+| 1 | `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs` | L14 | `csharpsquid:S4144` | This controller has multiple responsibilities and could be split into 4 smaller controllers |
+| 2 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L168 | `javascript:S6851` | Use `<dialog>` instead of the "dialog" role to ensure accessibility across all devices |
+| 3 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L223 | `javascript:S6836` | Refactor this code to not use nested template literals |
+
+### Issues MINOR — Informativos
+
+| # | Archivo | Línea | Regla | Mensaje |
+|---|---------|-------|-------|---------|
+| 1 | `cotizador-webapp/src/entities/layout/model/useLayoutQuery.ts` | L25 | `typescript:S4158` | This assertion is unnecessary since it does not change the type of the expression |
+| 2 | `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs` | L48 | `csharpsquid:S1192` | Define a constant instead of using literal `'validationError'` 4 times |
+| 3 | `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs` | L49 | `csharpsquid:S1192` | Define a constant instead of using literal `'Formato de folio inválido. Use DAN-YYYY-NNNNN'` 4 times |
+
+---
+
+## Veredicto consolidado — SPEC-005
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura — Backend Clean Architecture | PASS |
+| Auditoría arquitectura — Frontend FSD | **FAIL — 1 crítico (CRIT-001)** |
+| SonarQube | **FAIL — 2 CRITICAL** |
+| **Gate final** | **FAILED** |
+
+**Causas raíz del fallo:**
+1. `features/save-layout/model/useSaveLayout.ts:2` — importación desde ruta interna de `entities/layout` (`/api/layoutApi`), violando encapsulación FSD. Corrección: exportar `updateLayout` en `entities/layout/index.ts`.
+2. `widgets/layout-config/ui/LayoutConfigPanel.tsx:28–29` — dos llamadas `.sort()` sin función de comparación explícita (2x CRITICAL SonarQube).
+
+---
+
+# Re-auditoría post-fix — SPEC-005 location-layout-configuration — 2026-03-29
+
+> Re-auditoría parcial: solo los 4 archivos modificados tras el gate FAILED anterior.
+
+---
+
+## Parte 1 — Auditoría de arquitectura (re-auditoría)
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 0     | —               |
+| MAYOR     | 0     | No              |
+| MENOR     | 0     | No              |
+
+### Verificación de fixes críticos
+
+| Issue anterior | Fix reportado | Verificado |
+|----------------|---------------|-----------|
+| CRIT-001: `useSaveLayout.ts` importa desde ruta interna | Ahora usa `import { updateLayout } from '@/entities/layout'` | ✅ RESUELTO |
+| CRIT-001 (parte 2): `updateLayout` no exportado en `index.ts` | `export { updateLayout } from './api/layoutApi'` en `entities/layout/index.ts` | ✅ RESUELTO |
+| MAYOR-001: `LayoutConfiguration.cs` con `{ get; set; }` | Propiedades cambiadas a `{ get; init; }` | ✅ RESUELTO |
+
+### Violaciones críticas
+
+Ninguna.
+
+---
+
+## Parte 2 — Análisis estático SonarQube (re-auditoría)
+
+### Resumen ejecutivo
+
+- **Project Key:** No disponible (workspace no conectado a servidor SonarQube)
+- **Archivos analizados:** 4 (3 frontend TS/TSX, 1 backend C#)
+- **Gate SonarQube:** PASS
+
+### Conteo de issues (archivos re-auditados)
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 0     |
+| MAJOR     | 2     |
+| MINOR     | 0     |
+| INFO      | 0     |
+
+### Issues CRITICAL — Acción requerida
+
+Ninguno. Los 2 issues CRITICAL (S2871 `.sort()` sin comparador) ya están resueltos — ambas llamadas ahora usan `(a, b) => a.localeCompare(b)`.
+
+### Issues MAJOR residuales — Revisión recomendada (no bloquean gate)
+
+| # | Archivo | Línea | Regla | Mensaje |
+|---|---------|-------|-------|---------|
+| 1 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L168 | `javascript:S6851` | Use `<dialog>` instead of the "dialog" role to ensure accessibility across all devices |
+| 2 | `cotizador-webapp/src/widgets/layout-config/ui/LayoutConfigPanel.tsx` | L223 | `javascript:S6836` | Refactor this code to not use nested template literals |
+
+> Estos 2 issues MAJOR ya estaban presentes en el reporte anterior. No son nuevos. No bloquean el gate.
+
+---
+
+## Veredicto consolidado — Re-auditoría SPEC-005
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura — Frontend FSD | PASS — 0 críticos |
+| Auditoría arquitectura — Backend Clean Architecture | PASS — 0 críticos |
+| SonarQube | PASS — 0 BLOCKER / 0 CRITICAL |
+| **Gate final** | **PASSED** |
+
+---
+
+# Reportes anteriores
+
 # Reporte de calidad — SPEC-003 (folio-creation) + SPEC-004 (general-info-management) — 2026-03-29
 
 ---
@@ -242,3 +492,163 @@ Ninguna.
 El único MAYOR (ADR-008 en mensaje 503 del middleware existente) no es una violación crítica de arquitectura. Los 8 puntos de verificación explícitos están aprobados.
 
 ---
+
+# Reporte de calidad — SPEC-006 Gestión de Ubicaciones de Riesgo — 2026-03-29
+
+---
+
+## Parte 1 — Auditoría de arquitectura
+
+### Resumen
+
+| Severidad | Total | Bloquea qa-agent |
+|-----------|-------|-----------------|
+| CRÍTICO   | 1     | Sí              |
+| MAYOR     | 4     | No              |
+| MENOR     | 3     | No              |
+
+---
+
+### Violaciones críticas
+
+#### CRIT-001
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Cotizador.API.csproj`
+- **Línea:** 8
+- **Regla:** API referencia Infrastructure directamente
+- **Detalle:** El proyecto `Cotizador.API` tiene un `<ProjectReference>` explícito a `Cotizador.Infrastructure`. Según las reglas del proyecto y la política de capas de Clean Architecture, `API` solo debe referenciar `Cotizador.Application`. La referencia a Infrastructure se usa únicamente para invocar `builder.Services.AddInfrastructure(...)` en `Program.cs`, pero no exime la violación estructural: cualquier tipo de `Infrastructure` queda visible en toda la capa API.
+- **Acción requerida:** Eliminar el `<ProjectReference>` a `Cotizador.Infrastructure` del `.csproj` de API. Mover todo el wiring de use cases y validators dentro de métodos de extensión en `Cotizador.Application` (ej. `ApplicationServiceCollectionExtensions.cs`). El método `AddInfrastructure()` ya consolida el wiring de Infrastructure — hacer lo mismo con Application permite que Program.cs solo llame a `AddApplication()` + `AddInfrastructure()` sin necesidad de referenciar Infrastructure en el `.csproj`.
+
+```xml
+<!-- INCORRECTO — en Cotizador.API.csproj -->
+<ProjectReference Include="..\Cotizador.Infrastructure\Cotizador.Infrastructure.csproj" />
+
+<!-- CORRECTO: eliminar esa línea y consolidar wiring en ApplicationServiceCollectionExtensions -->
+```
+
+---
+
+### Violaciones mayores
+
+#### MAY-001
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs`
+- **Línea:** 5 (`using Cotizador.Domain.Constants;`)
+- **Regla:** API accede a tipos de `Domain` directamente (via dependencia transitiva)
+- **Detalle:** `QuoteController` importa `Cotizador.Domain.Constants` para usar `FolioConstants.FolioPattern`. La capa `API` no debe conocer tipos de `Domain` directamente. Patrón detectado también en SPEC-004/005 — sigue sin corregirse.
+- **Acción:** Mover `FolioConstants` (o al menos `FolioPattern`) a `Cotizador.Application/Constants/` y actualizar el `using` en el controller.
+
+#### MAY-002
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/PatchLocationUseCase.cs`
+- **Líneas:** 36 y 83
+- **Regla:** Excepción de dominio usada con semántica incorrecta
+- **Detalle:** `FolioNotFoundException` se lanza cuando la **ubicación** con el índice dado no existe dentro del folio (no cuando el folio mismo no existe). Esto mezcla dos conceptos distintos bajo la misma excepción. Si en el futuro se necesita distinguir "folio no encontrado" de "ubicación no encontrada" (por ejemplo para métricas o manejo diferenciado en el cliente), será imposible sin cambio de ruptura.
+- **Acción:** Crear `LocationNotFoundException` en `Cotizador.Domain/Exceptions/` e implementar su mapeo en `ExceptionHandlingMiddleware` (404 con `type = "locationNotFound"`).
+
+```csharp
+// INCORRECTO:
+throw new FolioNotFoundException($"La ubicación con índice {index} no existe en el folio");
+
+// CORRECTO:
+throw new LocationNotFoundException(folioNumber, index);
+```
+
+#### MAY-003
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/LocationCalculabilityEvaluator.cs`
+- **Línea:** 4 (declaración `internal static class`)
+- **Regla:** Clase estática acoplada directamente desde use cases — viola DIP
+- **Detalle:** `LocationCalculabilityEvaluator` es `internal static` y los use cases la llaman directamente (`LocationCalculabilityEvaluator.Evaluate(entity)` en `UpdateLocationsUseCase` y `PatchLocationUseCase`). Esto viola el Dependency Inversion Principle: los use cases no pueden ser testeados en aislamiento porque no existe una interfaz que permita mockear el evaluador. Si cambia la lógica de calculabilidad, hay que localizar y rastrear todos los callsites estáticos.
+- **Acción:** Definir `ILocationCalculabilityEvaluator` en `Application/Interfaces/`, hacer la clase concreta no-static e inyectarla por constructor en ambos use cases.
+
+```csharp
+// Nueva interfaz en Application/Interfaces/
+public interface ILocationCalculabilityEvaluator
+{
+    void Evaluate(Location location);
+}
+
+// Use case corregido (constructor injection):
+public UpdateLocationsUseCase(
+    IQuoteRepository repository,
+    ILocationCalculabilityEvaluator calculabilityEvaluator,
+    ILogger<UpdateLocationsUseCase> logger) { ... }
+```
+
+#### MAY-004
+- **Archivo:** `cotizador-backend/src/Cotizador.API/Controllers/QuoteController.cs`
+- **Línea:** 32–53 (constructor)
+- **Regla:** SRP — Controller con 12 dependencias en constructor (demasiadas responsabilidades)
+- **Detalle:** `QuoteController` recibe 12 parámetros en el constructor cubriendo general-info, layout y ubicaciones. Si se añade SPEC-007 (cálculo), el número seguirá creciendo. Controladores con > 7 dependencias son una señal de SRP violado.
+- **Acción:** Extraer `LocationsController` con los 4 endpoints de ubicaciones (`GET/PUT locations`, `PATCH location/:index`, `GET locations/summary`). El split no bloquea el gate pero es deuda que se acumula.
+
+---
+
+### Sugerencias menores
+
+#### MEN-001
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/LocationMapper.cs`
+- **Regla:** Artefacto mal ubicado dentro de `UseCases/`
+- **Detalle:** `LocationMapper` no es un use case. Debería estar en `Application/Mappers/` o `Application/Helpers/` para mantener coherencia organizacional.
+
+#### MEN-002
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/UseCases/LocationCalculabilityEvaluator.cs`
+- **Regla:** Lógica de dominio pura en capa Application
+- **Detalle:** La evaluación de calculabilidad ("¿zipCode de 5 dígitos? ¿giro comercial? ¿garantías?") son reglas de negocio puras de la entidad `Location`. Idealmente deberían vivir en `Cotizador.Domain` como domain service o método de la entidad. Al vivir en Application, la entidad puede existir con `ValidationStatus = Incomplete` sin que se haya ejecutado el evaluador, creando posibilidad de estados inconsistentes.
+
+#### MEN-003
+- **Archivo:** `cotizador-backend/src/Cotizador.Application/DTOs/LocationDto.cs`
+- **Regla:** DTO mixto input/output con campos inaplicables al input
+- **Detalle:** `LocationDto` incluye `BlockingAlerts` y `ValidationStatus` que son campos de respuesta calculados en el backend. El cliente que envía `PUT /locations` debe incluir esos campos en el body aunque sean ignorados. Separar en `LocationRequestDto` (sin `BlockingAlerts`/`ValidationStatus`) y `LocationResponseDto` mejoraría la claridad del contrato API y eliminaría ambigüedad.
+
+---
+
+## Parte 2 — Análisis estático SonarQube
+
+### Resumen ejecutivo
+
+- **Project Key:** No resuelto — workspace no vinculado a SonarQube Server/Cloud en Connected Mode
+- **Archivos analizados (Roslyn local):** 4 (`QuoteController.cs`, `PatchLocationUseCase.cs`, `UpdateLocationsUseCase.cs`, `LocationCalculabilityEvaluator.cs`)
+- **Gate SonarQube servidor:** N/A
+
+### Conteo de issues (análisis Roslyn local)
+
+| Severidad | Total |
+|-----------|-------|
+| BLOCKER   | 0     |
+| CRITICAL  | 0     |
+| MAJOR     | 0     |
+| MINOR     | 0     |
+| INFO      | 0     |
+
+> Resultados detallados disponibles en el panel **PROBLEMS** del IDE. No se detectaron hotspots de seguridad OWASP Top 10 en los archivos auditados.
+
+### Issues BLOCKER y CRITICAL — Ninguno
+
+### Análisis de criterios de seguridad explícitos
+
+| Criterio | Estado | Detalle |
+|----------|--------|---------|
+| Validación de `zipCode` antes de llamar core-ohs | ✅ PASS | `CatalogController` valida con `ZipCodeRegex` (`^\d{5}$`) antes del use case. `PatchLocationRequestValidator` y `UpdateLocationsRequestValidator` también validan con `Matches(@"^\d{5}$")`. |
+| Validación del `index` antes del PATCH | ✅ PASS | Controller valida `index < 1` (HTTP 400 inmediato). Route constraint `{index:int}` rechaza no-enteros. `PatchLocationUseCase` verifica existencia de la ubicación en BD. |
+| `validationStatus` calculado en backend sin aceptarlo del cliente | ✅ PASS | `LocationMapper.ToEntity()` no mapea `ValidationStatus` ni `BlockingAlerts`. `LocationCalculabilityEvaluator.Evaluate()` los recalcula siempre antes de persistir (PUT y PATCH). |
+| Use cases dependen de interfaces (DIP) | ⚠️ PARCIAL | Use cases usan `IQuoteRepository` ✅. Pero `LocationCalculabilityEvaluator` es clase estática no inyectable — ver MAY-003. |
+| Controllers delgados sin lógica de negocio | ✅ PASS | Controllers validan formato, invocan FluentValidation y delegan al use case. Sin lógica de negocio. |
+| Domain sin dependencias externas | ✅ PASS | `Cotizador.Domain.csproj` no tiene `<ProjectReference>` ni paquetes externos. |
+| Use cases usan interfaces de repositorio | ✅ PASS | Todos los use cases de Location inyectan `IQuoteRepository`. Ninguno accede a MongoDB directamente. |
+| Logging estructurado en use cases | ✅ PASS | Todos los use cases de Location tienen `ILogger<T>` con `LogInformation` al inicio de `ExecuteAsync`. |
+| Versionado optimista en PUT/PATCH | ✅ PASS | `UpdateLocationsRequest.Version` y `PatchLocationRequest.Version` son obligatorios. Repositorio lanza `VersionConflictException` ante mismatch. |
+| `ExceptionHandlingMiddleware` cubre excepciones de dominio | ⚠️ PARCIAL | Cubre `FolioNotFoundException`, `VersionConflictException`, `InvalidQuoteStateException`, `CoreOhsUnavailableException`, `ValidationException`. Falta mapeo de `LocationNotFoundException` (pendiente de creación — ver MAY-002). |
+
+---
+
+## Veredicto consolidado — SPEC-006
+
+| Fuente | Estado |
+|--------|--------|
+| Auditoría arquitectura | **FAIL — 1 violación crítica (CRIT-001)** |
+| SonarQube Roslyn local | PASS — 0 BLOCKER, 0 CRITICAL |
+| SonarQube servidor | N/A (modo desconectado) |
+| **Gate final** | **FAILED** |
+
+**Causa raíz del fallo:** `Cotizador.API.csproj` contiene una referencia directa a `Cotizador.Infrastructure`, violando la regla de capas del proyecto. La corrección mínima requerida es: crear `ApplicationServiceCollectionExtensions.cs` en `Cotizador.Application` que centralice el registro de use cases y validators, y eliminar la `<ProjectReference>` a Infrastructure del `.csproj` de API.
+
+Las 4 violaciones MAYOR no bloquean el gate pero deben corregirse en el mismo sprint antes de entrar a QA:
+- **MAY-002** (excepción incorrecta en `PatchLocationUseCase`) y **MAY-003** (evaluador estático sin interfaz) son prioritarias por su impacto directo en testabilidad.

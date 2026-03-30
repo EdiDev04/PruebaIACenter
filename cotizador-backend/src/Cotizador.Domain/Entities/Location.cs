@@ -16,7 +16,7 @@ public class Location
     public int Level { get; set; }
     public int ConstructionYear { get; set; }
     public BusinessLine BusinessLine { get; set; } = new();
-    public List<string> Guarantees { get; set; } = new();
+    public List<LocationGuarantee> Guarantees { get; set; } = new();
     public string CatZone { get; set; } = string.Empty;
     public List<string> BlockingAlerts { get; set; } = new();
     public string ValidationStatus { get; set; } = Constants.ValidationStatus.Incomplete;

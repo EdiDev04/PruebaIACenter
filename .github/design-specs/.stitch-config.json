@@ -77,6 +77,73 @@
       "model": "GEMINI_3_FLASH",
       "designSystemApplied": true,
       "status": "approved"
+    },
+    "location-management/grilla-ubicaciones": {
+      "screenName": "projects/3802726589783048530/screens/b94b14a723994bd79adee9186a0bbead",
+      "screenId": "b94b14a723994bd79adee9186a0bbead",
+      "screenIdOriginal": "255c8e11c83f440e9859e2b43e361020",
+      "htmlFile": ".github/design-specs/screens/location-management/grilla-ubicaciones.html",
+      "title": "Gestión de Ubicaciones de Riesgo",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "location-management/formulario-coberturas": {
+      "screenName": "projects/3802726589783048530/screens/e133e04cb52c4035b28242320786a481",
+      "screenId": "e133e04cb52c4035b28242320786a481",
+      "screenIdOriginal": "c46007de005347b7959233aa87b35f25",
+      "htmlFile": ".github/design-specs/screens/location-management/formulario-coberturas.html",
+      "title": "Captura de Ubicación - Coberturas (Step 2)",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "location-management/formulario-datos-inmueble": {
+      "screenName": "projects/3802726589783048530/screens/d8b6b36e5370448ca9ef82a7e7ec4c19",
+      "screenId": "d8b6b36e5370448ca9ef82a7e7ec4c19",
+      "screenIdOriginal": "b4c4d6ae51894a1e9f4c7df7f0f7d827",
+      "htmlFile": ".github/design-specs/screens/location-management/formulario-datos-inmueble.html",
+      "title": "Captura de Ubicación - Datos del Inmueble",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "location-management/resumen-validacion": {
+      "screenName": "projects/3802726589783048530/screens/bd2d6f949d944cf191973f4a8786f23c",
+      "screenId": "bd2d6f949d944cf191973f4a8786f23c",
+      "screenIdOriginal": "70de61d50a95457f871c2c9b46bad72d",
+      "htmlFile": ".github/design-specs/screens/location-management/resumen-validacion.html",
+      "title": "Resumen de Validación de Ubicaciones",
+      "model": "GEMINI_3_FLASH",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "coverage-options/formulario-principal": {
+      "screenName": "projects/3802726589783048530/screens/73875f16439640b4bf4c5e61d98af335",
+      "screenId": "73875f16439640b4bf4c5e61d98af335",
+      "htmlFile": ".github/design-specs/screens/coverage-options-configuration/formulario-principal.html",
+      "title": "Configuración de Coberturas - Paso 3",
+      "model": "GEMINI_3_1_PRO",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "coverage-options/warning-deshabilitacion": {
+      "screenName": "projects/3802726589783048530/screens/0c3fa7467638449aa4cfd216fe4b6b5e",
+      "screenId": "0c3fa7467638449aa4cfd216fe4b6b5e",
+      "htmlFile": ".github/design-specs/screens/coverage-options-configuration/warning-deshabilitacion.html",
+      "title": "Modal Advertencia: Deshabilitar Garantía",
+      "model": "GEMINI_3_1_PRO",
+      "designSystemApplied": true,
+      "status": "approved"
+    },
+    "coverage-options/error-conflicto-version": {
+      "screenName": "projects/3802726589783048530/screens/f20c78e06fe042be93ae8942b5ef0850",
+      "screenId": "f20c78e06fe042be93ae8942b5ef0850",
+      "htmlFile": ".github/design-specs/screens/coverage-options-configuration/error-conflicto-version.html",
+      "title": "Configuración de Coberturas - Conflicto 409",
+      "model": "GEMINI_3_1_PRO",
+      "designSystemApplied": true,
+      "status": "approved"
     }
   }
 }

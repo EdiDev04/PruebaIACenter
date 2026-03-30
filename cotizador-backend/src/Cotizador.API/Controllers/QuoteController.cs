@@ -16,16 +16,43 @@ public class QuoteController : ControllerBase
 
     private readonly IGetGeneralInfoUseCase _getGeneralInfoUseCase;
     private readonly IUpdateGeneralInfoUseCase _updateGeneralInfoUseCase;
-    private readonly IValidator<UpdateGeneralInfoRequest> _validator;
+    private readonly IValidator<UpdateGeneralInfoRequest> _generalInfoValidator;
+    private readonly IGetLayoutUseCase _getLayoutUseCase;
+    private readonly IUpdateLayoutUseCase _updateLayoutUseCase;
+    private readonly IValidator<UpdateLayoutRequest> _layoutValidator;
+    private readonly IGetLocationsUseCase _getLocationsUseCase;
+    private readonly IUpdateLocationsUseCase _updateLocationsUseCase;
+    private readonly IPatchLocationUseCase _patchLocationUseCase;
+    private readonly IGetLocationsSummaryUseCase _getLocationsSummaryUseCase;
+    private readonly IValidator<UpdateLocationsRequest> _updateLocationsValidator;
+    private readonly IValidator<PatchLocationRequest> _patchLocationValidator;
 
     public QuoteController(
         IGetGeneralInfoUseCase getGeneralInfoUseCase,
         IUpdateGeneralInfoUseCase updateGeneralInfoUseCase,
-        IValidator<UpdateGeneralInfoRequest> validator)
+        IValidator<UpdateGeneralInfoRequest> generalInfoValidator,
+        IGetLayoutUseCase getLayoutUseCase,
+        IUpdateLayoutUseCase updateLayoutUseCase,
+        IValidator<UpdateLayoutRequest> layoutValidator,
+        IGetLocationsUseCase getLocationsUseCase,
+        IUpdateLocationsUseCase updateLocationsUseCase,
+        IPatchLocationUseCase patchLocationUseCase,
+        IGetLocationsSummaryUseCase getLocationsSummaryUseCase,
+        IValidator<UpdateLocationsRequest> updateLocationsValidator,
+        IValidator<PatchLocationRequest> patchLocationValidator)
     {
         _getGeneralInfoUseCase = getGeneralInfoUseCase;
         _updateGeneralInfoUseCase = updateGeneralInfoUseCase;
-        _validator = validator;
+        _generalInfoValidator = generalInfoValidator;
+        _getLayoutUseCase = getLayoutUseCase;
+        _updateLayoutUseCase = updateLayoutUseCase;
+        _layoutValidator = layoutValidator;
+        _getLocationsUseCase = getLocationsUseCase;
+        _updateLocationsUseCase = updateLocationsUseCase;
+        _patchLocationUseCase = patchLocationUseCase;
+        _getLocationsSummaryUseCase = getLocationsSummaryUseCase;
+        _updateLocationsValidator = updateLocationsValidator;
+        _patchLocationValidator = patchLocationValidator;
     }
 
     /// <summary>GET /v1/quotes/{folio}/general-info — Obtiene la información general de una cotización.</summary>
@@ -63,9 +90,143 @@ public class QuoteController : ControllerBase
             });
         }
 
-        await _validator.ValidateAndThrowAsync(request, ct);
+        await _generalInfoValidator.ValidateAndThrowAsync(request, ct);
 
         var dto = await _updateGeneralInfoUseCase.ExecuteAsync(folio, request, ct);
         return Ok(new { data = dto });
+    }
+
+    /// <summary>GET /v1/quotes/{folio}/locations/layout — Obtiene la configuración de layout de ubicaciones.</summary>
+    [HttpGet("{folio}/locations/layout")]
+    public async Task<IActionResult> GetLayoutAsync(string folio, CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        var dto = await _getLayoutUseCase.ExecuteAsync(folio, ct);
+        return Ok(new { data = dto });
+    }
+
+    /// <summary>PUT /v1/quotes/{folio}/locations/layout — Actualiza la configuración de layout de ubicaciones.</summary>
+    [HttpPut("{folio}/locations/layout")]
+    public async Task<IActionResult> UpdateLayoutAsync(
+        string folio,
+        [FromBody] UpdateLayoutRequest request,
+        CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        await _layoutValidator.ValidateAndThrowAsync(request, ct);
+
+        var dto = await _updateLayoutUseCase.ExecuteAsync(folio, request, ct);
+        return Ok(new { data = dto });
+    }
+
+    /// <summary>GET /v1/quotes/{folio}/locations — Obtiene las ubicaciones de riesgo de una cotización.</summary>
+    [HttpGet("{folio}/locations")]
+    public async Task<IActionResult> GetLocationsAsync(string folio, CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        var result = await _getLocationsUseCase.ExecuteAsync(folio, ct);
+        return Ok(new { data = result });
+    }
+
+    /// <summary>PUT /v1/quotes/{folio}/locations — Reemplaza el array completo de ubicaciones del folio.</summary>
+    [HttpPut("{folio}/locations")]
+    public async Task<IActionResult> UpdateLocationsAsync(
+        string folio,
+        [FromBody] UpdateLocationsRequest request,
+        CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        await _updateLocationsValidator.ValidateAndThrowAsync(request, ct);
+
+        var result = await _updateLocationsUseCase.ExecuteAsync(folio, request, ct);
+        return Ok(new { data = result });
+    }
+
+    /// <summary>PATCH /v1/quotes/{folio}/locations/{index} — Actualiza una ubicación específica del folio.</summary>
+    [HttpPatch("{folio}/locations/{index:int}")]
+    public async Task<IActionResult> PatchLocationAsync(
+        string folio,
+        int index,
+        [FromBody] PatchLocationRequest request,
+        CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        if (index < 1)
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "El índice de ubicación debe ser mayor o igual a 1",
+                field = "index"
+            });
+        }
+
+        await _patchLocationValidator.ValidateAndThrowAsync(request, ct);
+
+        var result = await _patchLocationUseCase.ExecuteAsync(folio, index, request, ct);
+        return Ok(new { data = result });
+    }
+
+    /// <summary>GET /v1/quotes/{folio}/locations/summary — Obtiene el resumen de validación de ubicaciones.</summary>
+    [HttpGet("{folio}/locations/summary")]
+    public async Task<IActionResult> GetLocationsSummaryAsync(string folio, CancellationToken ct)
+    {
+        if (!Regex.IsMatch(folio, FolioConstants.FolioPattern))
+        {
+            return BadRequest(new
+            {
+                type = "validationError",
+                message = "Formato de folio inválido. Use DAN-YYYY-NNNNN",
+                field = "folio"
+            });
+        }
+
+        var result = await _getLocationsSummaryUseCase.ExecuteAsync(folio, ct);
+        return Ok(new { data = result });
     }
 }

@@ -18,13 +18,31 @@ public class QuoteControllerTests
     private readonly Mock<IGetGeneralInfoUseCase> _mockGetGeneralInfoUseCase = new();
     private readonly Mock<IUpdateGeneralInfoUseCase> _mockUpdateGeneralInfoUseCase = new();
     private readonly Mock<IValidator<UpdateGeneralInfoRequest>> _mockValidator = new();
+    private readonly Mock<IGetLayoutUseCase> _mockGetLayoutUseCase = new();
+    private readonly Mock<IUpdateLayoutUseCase> _mockUpdateLayoutUseCase = new();
+    private readonly Mock<IValidator<UpdateLayoutRequest>> _mockLayoutValidator = new();
+    private readonly Mock<IGetLocationsUseCase> _mockGetLocationsUseCase = new();
+    private readonly Mock<IUpdateLocationsUseCase> _mockUpdateLocationsUseCase = new();
+    private readonly Mock<IPatchLocationUseCase> _mockPatchLocationUseCase = new();
+    private readonly Mock<IGetLocationsSummaryUseCase> _mockGetLocationsSummaryUseCase = new();
+    private readonly Mock<IValidator<UpdateLocationsRequest>> _mockUpdateLocationsValidator = new();
+    private readonly Mock<IValidator<PatchLocationRequest>> _mockPatchLocationValidator = new();
 
     private QuoteController CreateController()
     {
         var controller = new QuoteController(
             _mockGetGeneralInfoUseCase.Object,
             _mockUpdateGeneralInfoUseCase.Object,
-            _mockValidator.Object);
+            _mockValidator.Object,
+            _mockGetLayoutUseCase.Object,
+            _mockUpdateLayoutUseCase.Object,
+            _mockLayoutValidator.Object,
+            _mockGetLocationsUseCase.Object,
+            _mockUpdateLocationsUseCase.Object,
+            _mockPatchLocationUseCase.Object,
+            _mockGetLocationsSummaryUseCase.Object,
+            _mockUpdateLocationsValidator.Object,
+            _mockPatchLocationValidator.Object);
 
         controller.ControllerContext = new ControllerContext
         {
