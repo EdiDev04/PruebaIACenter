@@ -1,265 +1,405 @@
-# ASDD Framework — Guía de Uso (GitHub Copilot)
+# Cotizador de Seguros de Daños
 
-**ASDD** (Agent Spec Software Development) es un framework de desarrollo asistido por IA que organiza el trabajo de software en cinco fases orquestadas por agentes especializados.
+> Reto IA Center — ASDD (Agent Spec-Driven Development)
 
-```
-Requerimiento → Spec → [Backend ∥ Frontend ∥ DB] → [Tests BE ∥ Tests FE] → QA → Doc (opcional)
-```
-
-> Esta guía cubre el uso con **GitHub Copilot Chat** en VS Code.
-> Para uso con **Claude Code CLI**, ver `.claude/README.md`.
+Sistema de cotización de seguros para pólizas de daños (incendio, CAT, equipo electrónico, falla de maquinaria, etc.). Permite crear folios, registrar información general del riesgo asegurado y calcular primas en base a tarifas del core externo.
 
 ---
 
-## Requisitos
+## Arquitectura
 
-| Requisito | Detalle |
+```
+ cotizador-webapp
+ React 18 + TypeScript + Vite
+ Puerto: 5173
+       |
+       | REST (Basic Auth)
+       ↓
+ cotizador-backend
+ .NET 8 + ASP.NET Core + MongoDB
+ Puerto: 5000
+       |
+       | HTTP (HttpClient)
+       ↓
+ cotizador-core-mock
+ Node.js + Express + TypeScript
+ Puerto: 3001
+```
+
+---
+
+## Stack tecnológico
+
+| Componente | Tecnología |
+|------------|-----------|
+| Frontend | React 18 · TypeScript · Redux Toolkit · TanStack Query · Vite |
+| Backend | C# · .NET 8 · ASP.NET Core · MongoDB.Driver · FluentValidation |
+| Core mock | Node.js · Express · TypeScript · fixtures JSON |
+| Testing BE | xUnit · Moq · FluentAssertions |
+| Testing FE | Vitest · Testing Library |
+
+---
+
+## Prerrequisitos
+
+- Node.js 20+
+- .NET SDK 8
+- MongoDB 7+ (local o Docker)
+- npm 9+
+
+---
+
+## Variables de entorno
+
+### cotizador-webapp — `.env.local`
+
+Crea el archivo copiando `.env.example`:
+
+```bash
+cp cotizador-webapp/.env.example cotizador-webapp/.env.local
+```
+
+| Variable | Valor por defecto (desarrollo) | Descripción |
+|----------|-------------------------------|-------------|
+| `VITE_API_URL` | `http://localhost:5000` | URL base del backend |
+| `VITE_API_USER` | `admin` | Usuario para Basic Auth |
+| `VITE_API_PASSWORD` | `cotizador2026` | Contraseña para Basic Auth |
+| `VITE_CORE_MOCK_URL` | `http://localhost:3001` | URL del core mock (referencia) |
+
+### cotizador-backend — `appsettings.Development.json`
+
+```json
+{
+  "MongoDB": {
+    "ConnectionString": "mongodb://localhost:27017",
+    "DatabaseName": "cotizador_db"
+  },
+  "CoreOhs": {
+    "BaseUrl": "http://localhost:3001"
+  },
+  "Auth": {
+    "Username": "admin",
+    "Password": "cotizador2026"
+  },
+  "Cors": {
+    "AllowedOrigins": ["http://localhost:5173"]
+  }
+}
+```
+
+> **Importante:** el archivo `appsettings.Development.json` incluido en el repositorio tiene `AllowedOrigins: ["http://localhost:3000"]`. Actualiza ese valor a `http://localhost:5173` para que el webapp pueda llamar al backend sin errores CORS.
+
+### cotizador-core-mock
+
+| Variable | Valor por defecto | Descripción |
+|----------|------------------|-------------|
+| `PORT` | `3001` | Puerto HTTP del mock |
+
+---
+
+## Arranque del proyecto
+
+Se necesitan **3 terminales** abiertas en la raíz del repositorio.
+
+### Terminal 1 — cotizador-core-mock
+
+```bash
+cd cotizador-core-mock
+npm install
+npm run dev
+# Servicio disponible en: http://localhost:3001
+# Verificar: curl http://localhost:3001/health
+```
+
+### Terminal 2 — cotizador-backend
+
+```bash
+cd cotizador-backend
+dotnet restore
+dotnet run --project src/Cotizador.API/Cotizador.API.csproj
+# Servicio disponible en: http://localhost:5000
+```
+
+> Asegúrate de que `appsettings.Development.json` tenga las credenciales y la URL de CORS correctas antes de iniciar.
+
+### Terminal 3 — cotizador-webapp
+
+```bash
+cd cotizador-webapp
+cp .env.example .env.local   # solo la primera vez
+npm install
+npm run dev
+# Aplicación disponible en: http://localhost:5173
+```
+
+### Opción alternativa — MongoDB con Docker
+
+Si no tienes MongoDB instalado localmente:
+
+```bash
+docker run -d --name mongo-cotizador -p 27017:27017 mongo:7
+```
+
+---
+
+## Ejecutar tests
+
+### Backend
+
+```bash
+cd cotizador-backend
+dotnet test src/Cotizador.Tests/Cotizador.Tests.csproj
+```
+
+### Frontend
+
+```bash
+cd cotizador-webapp
+npm test
+```
+
+---
+
+## Endpoints disponibles
+
+Todos los endpoints requieren `Authorization: Basic <base64(user:password)>`.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/v1/folios` | Crea un nuevo folio de cotización. Requiere header `Idempotency-Key` |
+| `GET` | `/v1/quotes/{folio}` | Obtiene el resumen completo de una cotización |
+| `GET` | `/v1/quotes/{folio}/general-info` | Obtiene la información general de una cotización |
+| `PUT` | `/v1/quotes/{folio}/general-info` | Actualiza la información general de una cotización |
+| `GET` | `/v1/quotes/{folio}/state` | Estado y progreso de la cotización — pasos completados, alertas de ubicación y cobertura activa (SPEC-008) |
+
+**Formato de folio:** `DAN-YYYY-NNNNN` (ejemplo: `DAN-2026-00001`)
+
+**Autenticación:** Basic Auth — `admin` / `cotizador2026`
+
+---
+
+## Estructura del proyecto
+
+```
+cotizador-backend/
+├── src/
+│   ├── Cotizador.API/           # Controllers, middleware, auth
+│   ├── Cotizador.Application/   # Casos de uso, DTOs, interfaces
+│   ├── Cotizador.Domain/        # Entidades, value objects, reglas de dominio
+│   ├── Cotizador.Infrastructure/
+│   │   ├── Persistence/         # Repositorios MongoDB
+│   │   └── ExternalServices/    # Cliente HTTP para core-ohs
+│   └── Cotizador.Tests/         # Tests unitarios
+
+cotizador-core-mock/
+└── src/
+    ├── fixtures/                # Datos JSON estáticos (tarifas, catálogos)
+    └── routes/                  # Endpoints del mock
+
+cotizador-webapp/
+└── src/
+    ├── app/                     # Store, router, query client
+    ├── entities/                # Entidades de dominio FE (folio, catalog)
+    ├── features/                # Flujos de usuario (creación, búsqueda)
+    ├── pages/                   # Páginas enrutadas
+    └── shared/                  # httpClient, componentes compartidos
+```
+
+---
+
+## Diseño de pantallas — Google Stitch MCP
+
+El diseño UI del proyecto se generó con **Google Stitch** vía MCP, integrado directamente en el flujo ASDD como la fase de UX (`ux-designer` agent) previa a la implementación frontend.
+
+### Cómo funciona
+
+El agente `ux-designer` analiza el modelo de datos de cada spec, genera un _design spec_ (`Data → UI mapping`) y llama al MCP de Stitch para producir pantallas HTML renderizadas. Cada pantalla pasa por el design system compartido del proyecto antes de ser entregada al `frontend-developer`.
+
+```
+spec.md → Data→UI mapping → mcp_stitch_create_project
+                           → mcp_stitch_create_design_system
+                           → mcp_stitch_generate_screen_from_text  (por pantalla)
+                           → mcp_stitch_apply_design_system
+                           → HTML/CSS extraído → .github/design-specs/screens/
+```
+
+### Proyecto Stitch
+
+| Campo | Valor |
 |---|---|
-| VS Code | Cualquier versión reciente |
-| GitHub Copilot Chat | Extensión instalada y activa |
-| Setting habilitado | `github.copilot.chat.codeGeneration.useInstructionFiles: true` |
+| Modelo IA | `GEMINI_3_FLASH` |
+| Config | `.github/design-specs/.stitch-config.json` |
 
-El archivo `.vscode/settings.json` ya configura el auto-descubrimiento de agentes, skills e instructions. Si no existe, créalo con las rutas correspondientes a `.github/`.
+### Pantallas generadas (21 en total)
 
----
+| Feature | Pantalla | Archivo HTML |
+|---------|----------|--------------|
+| Creación de folio | Inicio / Home | `screens/folio-creation/home.html` |
+| Creación de folio | Confirmación de folio creado | `screens/folio-creation/confirmation.html` |
+| Datos generales | Wizard header — Paso 1 | `screens/general-info-management/wizard-header.html` |
+| Datos generales | Formulario de datos generales | `screens/general-info-management/formulario-datos-generales.html` |
+| Datos generales | Modal conflicto de versión | `screens/general-info-management/modal-conflicto-version.html` |
+| Layout de ubicaciones | Panel configuración por defecto | `screens/location-layout-configuration/panel-config-default.html` |
+| Layout de ubicaciones | Panel configuración personalizado | `screens/location-layout-configuration/panel-config-personalizado.html` |
+| Layout de ubicaciones | Panel error conflicto | `screens/location-layout-configuration/panel-error-conflicto.html` |
+| Gestión de ubicaciones | Grilla de ubicaciones | `screens/location-management/grilla-ubicaciones.html` |
+| Gestión de ubicaciones | Formulario datos del inmueble | `screens/location-management/formulario-datos-inmueble.html` |
+| Gestión de ubicaciones | Formulario de coberturas | `screens/location-management/formulario-coberturas.html` |
+| Gestión de ubicaciones | Resumen de validación | `screens/location-management/resumen-validacion.html` |
+| Opciones de cobertura | Formulario principal | `screens/coverage-options-configuration/formulario-principal.html` |
+| Opciones de cobertura | Warning deshabilitación | `screens/coverage-options-configuration/warning-deshabilitacion.html` |
+| Opciones de cobertura | Error conflicto de versión | `screens/coverage-options-configuration/error-conflicto-version.html` |
+| Estado y progreso | Wizard layout + progress bar | `screens/quote-state-progress/wizard-layout-progressbar.html` |
+| Estado y progreso | Panel alertas de ubicación | `screens/quote-state-progress/panel-location-alerts.html` |
+| Resultados | Resumen financiero | `screens/results-display/resumen-financiero.html` |
+| Resultados | Desglose por ubicación | `screens/results-display/desglose-ubicaciones.html` |
+| Resultados | Panel de alertas incompletas | `screens/results-display/panel-alertas-incompletas.html` |
+| Resultados | Estado no calculado | `screens/results-display/estado-no-calculado.html` |
 
-## Onboarding — nuevo proyecto
-
-Al copiar `.github/` y `docs/` a un proyecto nuevo, completa estos archivos **en orden** antes de usar cualquier agente:
-
-| # | Archivo | Qué escribir |
-|---|---------|-------------|
-| 1 | `README.md` (raíz del proyecto) | Stack, arquitectura, comandos (`install`, `dev`, `test`, `build`), variables de entorno |
-| 2 | `.claude/rules/backend.md + frontend.md` | Lenguaje, framework, base de datos, herramientas aprobadas |
-| 3 | `.claude/rules/backend.md + frontend.md` | Capas, módulos, bounded contexts |
-| 4 | `CLAUDE.md (Diccionario de Dominio)` | Términos canónicos del negocio (glosario) |
-| 5 | `CLAUDE.md` (DoR + DoD ya incluidos) | Criterios DoR y DoD del equipo |
-
-Una vez completados, los agentes tienen todo el contexto para operar de forma autónoma.
-
-**No modificar**: `agents/`, `skills/`, `instructions/`, `.github/docs/lineamientos/`, `copilot-instructions.md`, `AGENTS.md`
-
----
-
-## El flujo ASDD paso a paso
-
-### Paso 1 — Spec (obligatorio, siempre primero)
-
-Genera la especificación técnica antes de escribir código:
-
-```
-@Spec Generator genera la spec para: [tu requerimiento]
-```
-```
-/generate-spec <nombre-feature>
-```
-
-El agente valida el requerimiento y genera `specs/<feature>.spec.md` con estado `DRAFT`.
-Revisa y aprueba la spec (cambia a `APPROVED`) antes de continuar.
+Todos los archivos HTML son la fuente de referencia visual que el `frontend-developer` usó para implementar los componentes React. Los design specs con Data→UI mapping completo están en `.github/design-specs/`.
 
 ---
 
-### Paso 2 — Implementación (paralelo)
+## Specs ASDD generados
 
-Con la spec `APPROVED`, lanza backend, frontend y base de datos en paralelo:
+El proyecto siguió la metodología **ASDD (Agent Spec-Driven Development)**. Cada feature requirió una spec aprobada antes de cualquier implementación.
 
-```
-@backend-developer implementa specs/<feature>.spec.md
-@frontend-developer implementa specs/<feature>.spec.md
-@Database Agent diseña el modelo de datos para specs/<feature>.spec.md
-```
+| ID | Título | Estado |
+|----|--------|--------|
+| SPEC-001 | Core Reference Service (Mock) | ✅ IMPLEMENTED |
+| SPEC-002 | Quote Data Model and Persistence | ✅ IMPLEMENTED |
+| SPEC-003 | Creación y Apertura de Folio | ✅ IMPLEMENTED |
+| SPEC-004 | Gestión de Datos Generales de Cotización | ✅ IMPLEMENTED |
+| SPEC-005 | Configuración del Layout de Ubicaciones | ✅ IMPLEMENTED |
+| SPEC-006 | Gestión de Ubicaciones de Riesgo | ✅ IMPLEMENTED |
+| SPEC-007 | Configuración de Opciones de Cobertura | ✅ IMPLEMENTED |
+| SPEC-008 | Estado y Progreso de la Cotización | ✅ IMPLEMENTED |
+| SPEC-009 | Motor de Cálculo de Primas | ✅ IMPLEMENTED |
+| SPEC-010 | Visualización de Resultados y Alertas | ✅ IMPLEMENTED |
 
-O con el Orchestrator para coordinar todo automáticamente:
-```
-@Orchestrator ejecuta el flujo completo para: [tu requerimiento]
-```
-
-> **Database Agent** solo es necesario si hay cambios en el modelo de datos.
-
----
-
-### Paso 3 — Tests (paralelo)
-
-Con la implementación completa, genera los tests:
-
-```
-@Test Engineer Backend genera tests para specs/<feature>.spec.md
-@Test Engineer Frontend genera tests para specs/<feature>.spec.md
-```
-```
-/unit-testing <nombre-feature>
-```
+Los specs están en `.github/specs/`. Los requerimientos de negocio de origen están en `.github/requirements/`.
 
 ---
 
-### Paso 4 — QA
+## Supuestos y limitaciones
 
-Con tests completos, ejecuta la estrategia QA:
-
-```
-@QA Agent ejecuta QA para specs/<feature>.spec.md
-```
-
-El agente genera: casos Gherkin, matriz de riesgos y (si hay SLAs) plan de performance.
-
----
-
-### Paso 5 — Documentación *(opcional)*
-
-Al cerrar el feature:
-
-```
-@Documentation Agent documenta el feature specs/<feature>.spec.md
-```
+| # | Supuesto / Limitación |
+|---|----------------------|
+| 1 | **Autenticación simplificada**: se usa Basic Auth stateless. No hay JWT, roles ni gestión de sesiones. Credenciales configurables vía `appsettings`. |
+| 2 | **core-ohs mockeado**: `cotizador-core-mock` simula `plataforma-core-ohs` con fixtures JSON estáticos. No hay integración con el sistema real. |
+| 3 | **Tarifas simplificadas**: las coberturas `debris_removal`, `rent_loss`, `theft`, etc. usan tasas fijas documentadas en lugar de tablas actuariales completas. Cualquier fórmula simplificada está documentada en `docs/output/api/calculo-prima.md`. |
+| 4 | **Equipo electrónico**: se aplica siempre `equipmentClass = "A"` como valor por defecto (SUP-009-05 del SPEC-009). |
+| 5 | **Ubicaciones incompletas**: no bloquean el cálculo. Generan alertas visibles en el resultado pero el folio avanza a estado `calculated` si existe al menos 1 ubicación calculable. |
+| 6 | **Versionado optimista sin transacciones distribuidas**: la consistencia concurrente se garantiza por el campo `version` en MongoDB. Si dos usuarios editan el mismo folio simultáneamente, el segundo recibe HTTP 409 y debe recargar. |
+| 7 | **Sin paginación**: los endpoints de listado retornan todos los registros. En producción se requeriría paginación para folios con muchas ubicaciones. |
+| 8 | **MongoDB Atlas o local**: el sistema funciona con MongoDB local (`localhost:27017`) o Atlas. La cadena de conexión se configura en `appsettings.Development.json`. |
 
 ---
 
-### Flujo completo con Orchestrator
+## Decisiones técnicas relevantes
+
+### Regla de dependencia (Clean Architecture)
 
 ```
-@Orchestrator ejecuta el flujo completo para: [tu requerimiento]
+Cotizador.API → Cotizador.Application → Cotizador.Domain
+                      ↑
+       Cotizador.Infrastructure (Persistence + ExternalServices)
 ```
+
+`Cotizador.Domain` no referencia ningún otro proyecto. `Cotizador.API` nunca referencia `Infrastructure` directamente — solo la registra en `Program.cs` vía extension methods (`AddInfrastructure`).
+
+### Manejo de errores tipado
+
+Todas las excepciones de dominio están en `Cotizador.Domain/Exceptions/` y son capturadas por `ExceptionHandlingMiddleware`:
+
+| Excepción | HTTP | Cuándo |
+|-----------|------|--------|
+| `FolioNotFoundException` | 404 | Folio no existe en BD |
+| `VersionConflictException` | 409 | Versión desactualizada (optimistic locking) |
+| `InvalidQuoteStateException` | 422 | Operación inválida para el estado actual |
+| `CoreOhsUnavailableException` | 503 | core-mock no responde |
+| `ValidationException` (FluentValidation) | 400 | Request inválido |
+
+Formato de error estándar en todos los endpoints:
+
+```json
+{ "type": "string", "message": "string", "field": "string | null" }
 ```
-/asdd-orchestrate <nombre-feature>
-```
+
+Nunca se expone `StackTrace` ni mensajes internos en la respuesta HTTP.
+
+### Motor de cálculo — invariante de diseño
+
+Las ubicaciones incompletas **nunca bloquean** el cálculo. Si una ubicación no tiene CP válido, giro comercial o garantías con suma asegurada, se marca como `incomplete` y genera una alerta — el folio sigue siendo calculable con las ubicaciones que sí cumplen los criterios. Esto está implementado en `PremiumCalculator` (dominio puro, sin dependencias externas).
+
+### Versionado optimista
+
+Cada documento `PropertyQuote` en MongoDB tiene un campo `Version` que se incrementa en cada escritura. El cliente envía la versión que conoce; si no coincide con la de BD, el backend retorna 409. Esto previene pérdida de datos en edición concurrente sin usar transacciones distribuidas.
+
+### Consulta de tarifas en paralelo
+
+`CalculateQuoteUseCase` consulta los 4 catálogos de tarifas (incendio, CAT, FHM, equipo electrónico) al core-mock en paralelo con `Task.WhenAll`. Esto reduce la latencia del endpoint `/calculate` de forma proporcional al número de tarifas.
+
+### Autenticación Basic Auth
+
+El backend usa Basic Auth stateless con credenciales configurables vía `appsettings`. No hay sesiones ni JWT. La decisión está documentada en la spec (simplificación acordada para el reto).
 
 ---
 
-## Agentes disponibles (`@nombre` en Copilot Chat)
+## Estrategia de pruebas
 
-| Agente | Fase | Cuándo usarlo |
-|---|---|---|
-| `@Orchestrator` | Entry point | Coordinar el flujo completo (`/asdd-orchestrate status` para ver estado) |
-| `@Spec Generator` | Fase 1 | Validar un requerimiento y generar su spec técnica |
-| `@backend-developer` | Fase 2 ∥ | Implementar el backend según la spec |
-| `@frontend-developer` | Fase 2 ∥ | Implementar el frontend según la spec |
-| `@Database Agent` | Fase 2 ∥ | Diseñar modelos de datos, migrations y seeders |
-| `@Test Engineer Backend` | Fase 3 ∥ | Generar tests para el backend (paralelo con Frontend) |
-| `@Test Engineer Frontend` | Fase 3 ∥ | Generar tests para el frontend (paralelo con Backend) |
-| `@QA Agent` | Fase 4 | Gherkin, riesgos y análisis de performance |
-| `@Documentation Agent` | Fase 5 | README, API docs y ADRs |
+### Niveles de prueba
 
----
+| Nivel | Framework | Ubicación | Archivos |
+|-------|-----------|-----------|---------|
+| Unitario Backend | xUnit + Moq + FluentAssertions | `Cotizador.Tests/` | 32 archivos |
+| Unitario Frontend | Vitest + Testing Library | `cotizador-webapp/src/__tests__/` | 29 archivos |
+| E2E automatizados | Playwright | `cotizador-automatization/e2e/` | 3 flujos |
 
-## Skills disponibles (`/comando` en Copilot Chat)
+### Qué cubre cada nivel
 
-| Comando | Agente | Qué hace |
-|---|---|---|
-| `/asdd-orchestrate` | Orchestrator | Orquesta el flujo completo o muestra estado actual |
-| `/generate-spec` | Spec Generator | Genera spec técnica con validación INVEST/IEEE 830 |
-| `/implement-backend` | backend-developer | Implementa feature completo en el backend |
-| `/implement-frontend` | frontend-developer | Implementa feature completo en el frontend |
-| `/unit-testing` | Test Engineers | Genera suite de tests (backend + frontend) |
-| `/gherkin-case-generator` | QA Agent | Flujos críticos + casos Given-When-Then + datos de prueba |
-| `/risk-identifier` | QA Agent | Matriz de riesgos ASD (Alto/Medio/Bajo) |
-| `/automation-flow-proposer` | QA Agent | Propone flujos a automatizar con estimación de ROI |
-| `/performance-analyzer` | QA Agent | Planifica pruebas de carga y performance |
+**Backend (32 archivos):** casos de uso de cada SPEC, entidades de dominio (`PropertyQuote`, `Location`, `PremiumCalculator`), excepciones de dominio, repositorio MongoDB (con cliente real en memoria), validadores FluentValidation.
 
----
+**Frontend (29 archivos):** schemas Zod de formularios, hooks de TanStack Query, componentes de UI (LocationRow, FinancialSummary, CoverageAccordion), slices de Redux, integración de páginas (ResultsPage).
 
-## Prompts disponibles (`/nombre` en Copilot Chat)
+**Principio de test de dominio:** `PremiumCalculator` se prueba con datos de entrada directos sin mocks — así se valida la lógica de cálculo en aislamiento total.
 
-Alternativa rápida a invocar agentes directamente:
+### Ejecutar pruebas
 
-| Comando | Cuándo usarlo |
-|---|---|
-| `/generate-spec` | Crear una nueva spec desde un requerimiento |
-| `/backend-task` | Implementar una spec en el backend |
-| `/frontend-task` | Implementar una spec en el frontend |
-| `/db-task` | Diseñar esquema de datos, migrations y seeders |
-| `/generate-tests` | Generar tests para una spec o módulo existente |
-| `/qa-task` | Ejecutar el flujo QA (Gherkin + riesgos + performance) |
-| `/doc-task` | Generar documentación técnica del feature |
-| `/full-flow` | Orquestar todas las fases de principio a fin |
+```bash
+# Backend
+cd cotizador-backend
+dotnet test src/Cotizador.Tests/Cotizador.Tests.csproj
 
----
+# Frontend
+cd cotizador-webapp
+npm test
 
-## Instructions automáticas (sin intervención manual)
-
-Inyectadas automáticamente por Copilot cuando el archivo activo coincide:
-
-| Archivo activo | Instructions aplicadas |
-|---|---|
-| `backend/**/*.py` (o equivalente) | `instructions/backend.instructions.md` |
-| `frontend/src/**/*.{js,jsx}` (o equivalente) | `instructions/frontend.instructions.md` |
-| `backend/tests/**` / `frontend/src/__tests__/**` | `instructions/tests.instructions.md` |
-
-> Si el proyecto usa otro stack, ajusta los patrones `applyTo:` de cada archivo.
-
----
-
-## Lineamientos de referencia
-
-Cargados automáticamente por los agentes:
-
-| Documento | Contenido |
-|---|---|
-| `.github/docs/lineamientos/dev-guidelines.md` | Clean Code, SOLID, API REST, Seguridad, Observabilidad |
-| `.github/docs/lineamientos/qa-guidelines.md` | Estrategia QA, Gherkin, Riesgos, Automatización, Performance |
-| `.github/docs/lineamientos/guidelines.md` | Referencia rápida de estándares: código, tests, API, Git |
-
----
-
-## Estructura de carpetas
-
-```
-Project Root/
-│
-├── docs/output/                     ← artefactos generados por los agentes
-│   ├── qa/                          ← Gherkin, riesgos, performance
-│   ├── api/                         ← documentación de API
-│   └── adr/                         ← Architecture Decision Records
-│
-└── .github/                         ← framework Copilot (auto-contenido para compartir)
-    ├── README.md                    ← este archivo
-    ├── AGENTS.md                    ← reglas críticas para todos los agentes
-    ├── copilot-instructions.md      ← siempre activo en Copilot Chat
-    │
-    ├── agents/                      ← 9 agentes (@nombre en Copilot Chat)
-    │   ├── orchestrator.agent.md
-    │   ├── spec-generator.agent.md
-    │   ├── backend-developer.agent.md
-    │   ├── frontend-developer.agent.md
-    │   ├── database.agent.md
-    │   ├── test-engineer-backend.agent.md
-    │   ├── test-engineer-frontend.agent.md
-    │   ├── qa.agent.md
-    │   └── documentation.agent.md
-    │
-    ├── skills/                      ← 9 skills (/comando en Copilot Chat)
-    │   ├── asdd-orchestrate/
-    │   ├── generate-spec/
-    │   ├── implement-backend/
-    │   ├── implement-frontend/
-    │   ├── unit-testing/
-    │   ├── gherkin-case-generator/
-    │   ├── risk-identifier/
-    │   ├── automation-flow-proposer/
-    │   └── performance-analyzer/
-    │
-    ├── docs/lineamientos/           ← guidelines del framework (incluidos al compartir)
-    │   ├── dev-guidelines.md
-    │   └── qa-guidelines.md
-    │
-    ├── prompts/                     ← 8 prompts (/nombre en Copilot Chat)
-    │
-    ├── instructions/                ← aplicadas automáticamente por contexto de archivo
-    │   ├── backend.instructions.md  ← applyTo: backend/**
-    │   ├── frontend.instructions.md ← applyTo: frontend/src/**
-    │   └── tests.instructions.md   ← applyTo: tests/**
-    │
-    ├── requirements/                ← requerimientos de negocio (input del pipeline)
-    │   └── <feature>.md
-    │
-    └── specs/                       ← specs técnicas (fuente de verdad)
-        └── <feature>.spec.md        ← DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED
+# E2E (requiere los 3 servicios corriendo)
+cd cotizador-automatization
+npm run test:e2e
 ```
 
 ---
 
-## Reglas de Oro
+## Pruebas automatizadas E2E (Playwright)
 
-1. **No código sin spec aprobada** — siempre debe existir `specs/<feature>.spec.md` con estado `APPROVED`.
-2. **No código no autorizado** — los agentes no generan ni modifican código sin instrucción explícita.
-3. **No suposiciones** — si el requerimiento es ambiguo, el agente pregunta antes de actuar.
-4. **Transparencia** — el agente explica qué va a hacer antes de hacerlo.
+Los tests E2E están en `cotizador-automatization/` y usan el patrón **Page Object Model**.
+
+### Flujos cubiertos
+
+| Flujo | Archivo | Descripción |
+|-------|---------|-------------|
+| **Flujo 1** | `flujo1-ciclo-completo.spec.ts` | Ciclo completo: crear folio → datos generales → agregar ubicación calculable → configurar coberturas → calcular → verificar prima en pantalla de resultados |
+| **Flujo 3** | `flujo3-conflicto-version.spec.ts` | Edición concurrente con versionado optimista: dos contextos de browser editan el mismo folio; el segundo recibe 409 y se muestra modal de conflicto |
+| **Flujo 5** | `flujo5-resultados.spec.ts` | Pantalla de resultados: verifica que prima neta, prima comercial (sin IVA), prima comercial total y tabla de desglose por ubicación se renderizan correctamente |
+
+### Comandos por flujo
+
+```bash
+npm run test:e2e               # todos los flujos
+npm run test:e2e:flujo1        # ciclo completo
+npm run test:e2e:flujo3        # conflicto de versión
+npm run test:e2e:flujo5        # visualización de resultados
+npm run test:e2e:report        # abrir reporte HTML de Playwright
+```

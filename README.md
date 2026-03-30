@@ -204,3 +204,202 @@ cotizador-webapp/
     ├── pages/                   # Páginas enrutadas
     └── shared/                  # httpClient, componentes compartidos
 ```
+
+---
+
+## Diseño de pantallas — Google Stitch MCP
+
+El diseño UI del proyecto se generó con **Google Stitch** vía MCP, integrado directamente en el flujo ASDD como la fase de UX (`ux-designer` agent) previa a la implementación frontend.
+
+### Cómo funciona
+
+El agente `ux-designer` analiza el modelo de datos de cada spec, genera un _design spec_ (`Data → UI mapping`) y llama al MCP de Stitch para producir pantallas HTML renderizadas. Cada pantalla pasa por el design system compartido del proyecto antes de ser entregada al `frontend-developer`.
+
+```
+spec.md → Data→UI mapping → mcp_stitch_create_project
+                           → mcp_stitch_create_design_system
+                           → mcp_stitch_generate_screen_from_text  (por pantalla)
+                           → mcp_stitch_apply_design_system
+                           → HTML/CSS extraído → .github/design-specs/screens/
+```
+
+### Proyecto Stitch
+
+| Campo | Valor |
+|---|---|
+| Modelo IA | `GEMINI_3_FLASH` |
+| Config | `.github/design-specs/.stitch-config.json` |
+
+### Pantallas generadas (21 en total)
+
+| Feature | Pantalla | Archivo HTML |
+|---------|----------|--------------|
+| Creación de folio | Inicio / Home | `screens/folio-creation/home.html` |
+| Creación de folio | Confirmación de folio creado | `screens/folio-creation/confirmation.html` |
+| Datos generales | Wizard header — Paso 1 | `screens/general-info-management/wizard-header.html` |
+| Datos generales | Formulario de datos generales | `screens/general-info-management/formulario-datos-generales.html` |
+| Datos generales | Modal conflicto de versión | `screens/general-info-management/modal-conflicto-version.html` |
+| Layout de ubicaciones | Panel configuración por defecto | `screens/location-layout-configuration/panel-config-default.html` |
+| Layout de ubicaciones | Panel configuración personalizado | `screens/location-layout-configuration/panel-config-personalizado.html` |
+| Layout de ubicaciones | Panel error conflicto | `screens/location-layout-configuration/panel-error-conflicto.html` |
+| Gestión de ubicaciones | Grilla de ubicaciones | `screens/location-management/grilla-ubicaciones.html` |
+| Gestión de ubicaciones | Formulario datos del inmueble | `screens/location-management/formulario-datos-inmueble.html` |
+| Gestión de ubicaciones | Formulario de coberturas | `screens/location-management/formulario-coberturas.html` |
+| Gestión de ubicaciones | Resumen de validación | `screens/location-management/resumen-validacion.html` |
+| Opciones de cobertura | Formulario principal | `screens/coverage-options-configuration/formulario-principal.html` |
+| Opciones de cobertura | Warning deshabilitación | `screens/coverage-options-configuration/warning-deshabilitacion.html` |
+| Opciones de cobertura | Error conflicto de versión | `screens/coverage-options-configuration/error-conflicto-version.html` |
+| Estado y progreso | Wizard layout + progress bar | `screens/quote-state-progress/wizard-layout-progressbar.html` |
+| Estado y progreso | Panel alertas de ubicación | `screens/quote-state-progress/panel-location-alerts.html` |
+| Resultados | Resumen financiero | `screens/results-display/resumen-financiero.html` |
+| Resultados | Desglose por ubicación | `screens/results-display/desglose-ubicaciones.html` |
+| Resultados | Panel de alertas incompletas | `screens/results-display/panel-alertas-incompletas.html` |
+| Resultados | Estado no calculado | `screens/results-display/estado-no-calculado.html` |
+
+Todos los archivos HTML son la fuente de referencia visual que el `frontend-developer` usó para implementar los componentes React. Los design specs con Data→UI mapping completo están en `.github/design-specs/`.
+
+---
+
+## Specs ASDD generados
+
+El proyecto siguió la metodología **ASDD (Agent Spec-Driven Development)**. Cada feature requirió una spec aprobada antes de cualquier implementación.
+
+| ID | Título | Estado |
+|----|--------|--------|
+| SPEC-001 | Core Reference Service (Mock) | ✅ IMPLEMENTED |
+| SPEC-002 | Quote Data Model and Persistence | ✅ IMPLEMENTED |
+| SPEC-003 | Creación y Apertura de Folio | ✅ IMPLEMENTED |
+| SPEC-004 | Gestión de Datos Generales de Cotización | ✅ IMPLEMENTED |
+| SPEC-005 | Configuración del Layout de Ubicaciones | ✅ IMPLEMENTED |
+| SPEC-006 | Gestión de Ubicaciones de Riesgo | ✅ IMPLEMENTED |
+| SPEC-007 | Configuración de Opciones de Cobertura | ✅ IMPLEMENTED |
+| SPEC-008 | Estado y Progreso de la Cotización | ✅ IMPLEMENTED |
+| SPEC-009 | Motor de Cálculo de Primas | ✅ IMPLEMENTED |
+| SPEC-010 | Visualización de Resultados y Alertas | ✅ IMPLEMENTED |
+
+Los specs están en `.github/specs/`. Los requerimientos de negocio de origen están en `.github/requirements/`.
+
+---
+
+## Supuestos y limitaciones
+
+| # | Supuesto / Limitación |
+|---|----------------------|
+| 1 | **Autenticación simplificada**: se usa Basic Auth stateless. No hay JWT, roles ni gestión de sesiones. Credenciales configurables vía `appsettings`. |
+| 2 | **core-ohs mockeado**: `cotizador-core-mock` simula `plataforma-core-ohs` con fixtures JSON estáticos. No hay integración con el sistema real. |
+| 3 | **Tarifas simplificadas**: las coberturas `debris_removal`, `rent_loss`, `theft`, etc. usan tasas fijas documentadas en lugar de tablas actuariales completas. Cualquier fórmula simplificada está documentada en `docs/output/api/calculo-prima.md`. |
+| 4 | **Equipo electrónico**: se aplica siempre `equipmentClass = "A"` como valor por defecto (SUP-009-05 del SPEC-009). |
+| 5 | **Ubicaciones incompletas**: no bloquean el cálculo. Generan alertas visibles en el resultado pero el folio avanza a estado `calculated` si existe al menos 1 ubicación calculable. |
+| 6 | **Versionado optimista sin transacciones distribuidas**: la consistencia concurrente se garantiza por el campo `version` en MongoDB. Si dos usuarios editan el mismo folio simultáneamente, el segundo recibe HTTP 409 y debe recargar. |
+| 7 | **Sin paginación**: los endpoints de listado retornan todos los registros. En producción se requeriría paginación para folios con muchas ubicaciones. |
+| 8 | **MongoDB Atlas o local**: el sistema funciona con MongoDB local (`localhost:27017`) o Atlas. La cadena de conexión se configura en `appsettings.Development.json`. |
+
+---
+
+## Decisiones técnicas relevantes
+
+### Regla de dependencia (Clean Architecture)
+
+```
+Cotizador.API → Cotizador.Application → Cotizador.Domain
+                      ↑
+       Cotizador.Infrastructure (Persistence + ExternalServices)
+```
+
+`Cotizador.Domain` no referencia ningún otro proyecto. `Cotizador.API` nunca referencia `Infrastructure` directamente — solo la registra en `Program.cs` vía extension methods (`AddInfrastructure`).
+
+### Manejo de errores tipado
+
+Todas las excepciones de dominio están en `Cotizador.Domain/Exceptions/` y son capturadas por `ExceptionHandlingMiddleware`:
+
+| Excepción | HTTP | Cuándo |
+|-----------|------|--------|
+| `FolioNotFoundException` | 404 | Folio no existe en BD |
+| `VersionConflictException` | 409 | Versión desactualizada (optimistic locking) |
+| `InvalidQuoteStateException` | 422 | Operación inválida para el estado actual |
+| `CoreOhsUnavailableException` | 503 | core-mock no responde |
+| `ValidationException` (FluentValidation) | 400 | Request inválido |
+
+Formato de error estándar en todos los endpoints:
+
+```json
+{ "type": "string", "message": "string", "field": "string | null" }
+```
+
+Nunca se expone `StackTrace` ni mensajes internos en la respuesta HTTP.
+
+### Motor de cálculo — invariante de diseño
+
+Las ubicaciones incompletas **nunca bloquean** el cálculo. Si una ubicación no tiene CP válido, giro comercial o garantías con suma asegurada, se marca como `incomplete` y genera una alerta — el folio sigue siendo calculable con las ubicaciones que sí cumplen los criterios. Esto está implementado en `PremiumCalculator` (dominio puro, sin dependencias externas).
+
+### Versionado optimista
+
+Cada documento `PropertyQuote` en MongoDB tiene un campo `Version` que se incrementa en cada escritura. El cliente envía la versión que conoce; si no coincide con la de BD, el backend retorna 409. Esto previene pérdida de datos en edición concurrente sin usar transacciones distribuidas.
+
+### Consulta de tarifas en paralelo
+
+`CalculateQuoteUseCase` consulta los 4 catálogos de tarifas (incendio, CAT, FHM, equipo electrónico) al core-mock en paralelo con `Task.WhenAll`. Esto reduce la latencia del endpoint `/calculate` de forma proporcional al número de tarifas.
+
+### Autenticación Basic Auth
+
+El backend usa Basic Auth stateless con credenciales configurables vía `appsettings`. No hay sesiones ni JWT. La decisión está documentada en la spec (simplificación acordada para el reto).
+
+---
+
+## Estrategia de pruebas
+
+### Niveles de prueba
+
+| Nivel | Framework | Ubicación | Archivos |
+|-------|-----------|-----------|---------|
+| Unitario Backend | xUnit + Moq + FluentAssertions | `Cotizador.Tests/` | 32 archivos |
+| Unitario Frontend | Vitest + Testing Library | `cotizador-webapp/src/__tests__/` | 29 archivos |
+| E2E automatizados | Playwright | `cotizador-automatization/e2e/` | 3 flujos |
+
+### Qué cubre cada nivel
+
+**Backend (32 archivos):** casos de uso de cada SPEC, entidades de dominio (`PropertyQuote`, `Location`, `PremiumCalculator`), excepciones de dominio, repositorio MongoDB (con cliente real en memoria), validadores FluentValidation.
+
+**Frontend (29 archivos):** schemas Zod de formularios, hooks de TanStack Query, componentes de UI (LocationRow, FinancialSummary, CoverageAccordion), slices de Redux, integración de páginas (ResultsPage).
+
+**Principio de test de dominio:** `PremiumCalculator` se prueba con datos de entrada directos sin mocks — así se valida la lógica de cálculo en aislamiento total.
+
+### Ejecutar pruebas
+
+```bash
+# Backend
+cd cotizador-backend
+dotnet test src/Cotizador.Tests/Cotizador.Tests.csproj
+
+# Frontend
+cd cotizador-webapp
+npm test
+
+# E2E (requiere los 3 servicios corriendo)
+cd cotizador-automatization
+npm run test:e2e
+```
+
+---
+
+## Pruebas automatizadas E2E (Playwright)
+
+Los tests E2E están en `cotizador-automatization/` y usan el patrón **Page Object Model**.
+
+### Flujos cubiertos
+
+| Flujo | Archivo | Descripción |
+|-------|---------|-------------|
+| **Flujo 1** | `flujo1-ciclo-completo.spec.ts` | Ciclo completo: crear folio → datos generales → agregar ubicación calculable → configurar coberturas → calcular → verificar prima en pantalla de resultados |
+| **Flujo 3** | `flujo3-conflicto-version.spec.ts` | Edición concurrente con versionado optimista: dos contextos de browser editan el mismo folio; el segundo recibe 409 y se muestra modal de conflicto |
+| **Flujo 5** | `flujo5-resultados.spec.ts` | Pantalla de resultados: verifica que prima neta, prima comercial (sin IVA), prima comercial total y tabla de desglose por ubicación se renderizan correctamente |
+
+### Comandos por flujo
+
+```bash
+npm run test:e2e               # todos los flujos
+npm run test:e2e:flujo1        # ciclo completo
+npm run test:e2e:flujo3        # conflicto de versión
+npm run test:e2e:flujo5        # visualización de resultados
+npm run test:e2e:report        # abrir reporte HTML de Playwright
+```
