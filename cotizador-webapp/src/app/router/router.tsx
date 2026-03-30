@@ -3,8 +3,8 @@ import { FolioHomePage } from '@/pages/FolioHomePage';
 import { FolioCreatedPage } from '@/pages/FolioCreatedPage';
 import { GeneralInfoPage } from '@/pages/GeneralInfoPage';
 import { LocationsPage } from '@/pages/LocationsPage';
-import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { TechnicalInfoPage } from '@/pages/TechnicalInfoPage';
+import { ResultsPage } from '@/pages/ResultsPage';
 import { WizardLayout } from '../WizardLayout';
 
 export const router = createBrowserRouter([
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
       { path: 'general-info', element: <GeneralInfoPage /> },
       { path: 'locations', element: <LocationsPage /> },
       { path: 'technical-info', element: <TechnicalInfoPage /> },
-      { path: 'results', element: <PlaceholderPage label="Resultados" stepNumber={4} /> },
+      { path: 'results', element: <ResultsPage /> },
     ],
   },
 ]);

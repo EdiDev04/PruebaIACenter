@@ -1,6 +1,6 @@
 ---
 id: SPEC-010
-status: DRAFT
+status: IMPLEMENTED
 feature: results-display
 feature_type: full-stack
 requires_design_spec: true
@@ -9,7 +9,7 @@ affects_database: false
 consumes_core_ohs: false
 has_fe_be_integration: true
 created: 2026-03-29
-updated: 2026-03-29
+updated: 2026-03-30
 author: spec-generator
 version: "1.0"
 related-specs: ["SPEC-008", "SPEC-009"]
@@ -19,14 +19,14 @@ estimated-complexity: L
 
 # Spec: Visualización de Resultados y Alertas
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
+> **Estado:** `IMPLEMENTED` — implementación completa.
 > **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
 
 ---
 
 ## 1. RESUMEN EJECUTIVO
 
-Implementar la pantalla de resultados del cálculo de primas en el frontend (Step 4 del wizard: `/quotes/{folio}/terms-and-conditions`). Muestra prima neta total, prima comercial antes de IVA, prima comercial total, desglose por ubicación, desglose por cobertura dentro de cada ubicación, y alertas de ubicaciones incompletas. Es el entregable visual principal del cotizador — completa el flujo end-to-end. El backend ya está cubierto: consume `GET /v1/quotes/{folio}/state` (SPEC-008, que incluye `calculationResult`) y `POST /v1/quotes/{folio}/calculate` (SPEC-009).
+Implementar la pantalla de resultados del cálculo de primas en el frontend (Step 5 del wizard: `/quotes/{folio}/terms-and-conditions`). Muestra prima neta total, prima comercial antes de IVA, prima comercial total, desglose por ubicación, desglose por cobertura dentro de cada ubicación, y alertas de ubicaciones incompletas. Es el entregable visual principal del cotizador — completa el flujo end-to-end. El backend ya está cubierto: consume `GET /v1/quotes/{folio}/state` (SPEC-008, que incluye `calculationResult`) y `POST /v1/quotes/{folio}/calculate` (SPEC-009).
 
 ---
 
@@ -41,7 +41,7 @@ Implementar la pantalla de resultados del cálculo de primas en el frontend (Ste
 - **Dado** que ejecuté el cálculo con 2 ubicaciones calculables
   **Cuando** veo la pantalla de resultados (`/quotes/{folio}/terms-and-conditions`)
   **Entonces** veo 3 tarjetas de resumen: Prima Neta Total, Prima Comercial (sin IVA), Prima Comercial Total (con IVA)
-  **Y** los montos están formateados como moneda MXN con 2 decimales (ej: `$125,430.50`)
+  **Y** los montos están formateados como moneda COP con 2 decimales (ej: `$125.430,50`)
 
 - **Dado** que el folio no ha sido calculado (`quoteStatus != "calculated"`)
   **Cuando** navego a la pantalla de resultados
@@ -103,7 +103,7 @@ Implementar la pantalla de resultados del cálculo de primas en el frontend (Ste
 |---|---|---|---|---|
 | RN-010-01 | Solo mostrar resultados si `quoteStatus == "calculated"` | `calculationResult != null` en QuoteStateDto | Mostrar tarjetas y desgloses | REQ-10 |
 | RN-010-02 | Si no calculado, mostrar invitación a calcular | `calculationResult == null` | Mensaje + botón "Calcular" (si ready) o "No hay ubicaciones calculables" (si not ready) | REQ-10 |
-| RN-010-03 | Montos formateados como MXN, 2 decimales | Formateo de moneda | `$125,430.50` con `Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })` | REQ-10 |
+| RN-010-03 | Montos formateados como COP, 2 decimales | Formateo de moneda | `$125.430,50` con `Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' })` | REQ-10 |
 | RN-010-04 | Ubicaciones incompletas en sección de alertas, no junto a las calculables | Separación visual | Panel warning para incompletas, tabla principal para calculables | REQ-10 |
 | RN-010-05 | Desglose por cobertura expandible (acordeón) | Click en ubicación | Sub-tabla con guaranteeKey, insuredAmount, rate, premium | REQ-10 |
 | RN-010-06 | Alertas tienen link para editar ubicación | Click en "Editar" | Navega a `/quotes/{folio}/locations` | REQ-10 |
@@ -154,7 +154,7 @@ Flujos de usuario a diseñar:
   - Acordeón: expandir ubicación → sub-tabla de coberturas (garantía, suma, tasa, prima)
   - Panel lateral de alertas con ubicaciones incompletas
   - Botón "Recalcular" (visible si ya fue calculado)
-  - Formateo de moneda MXN
+  - Formateo de moneda COP
   - Diseño responsive
 
 Inputs de comportamiento que el ux-designer debe conocer:
@@ -235,7 +235,7 @@ cotizador-webapp/src/
 │           └── IncompleteAlerts.module.css          # CREAR
 ├── shared/
 │   └── lib/
-│       └── formatCurrency.ts                       # CREAR — Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+│       └── formatCurrency.ts                       # CREAR — Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' })
 └── app/
     └── router/
         └── router.tsx                              # MODIFICAR — agregar ruta /quotes/:folio/terms-and-conditions
@@ -298,7 +298,7 @@ N/A — sin cambios de esquema ni colecciones afectadas.
 |---|---|---|---|---|
 | SUP-010-01 | Resultados viven en Step 4 (`/quotes/{folio}/terms-and-conditions`), no en `/technical-info` (Step 3) | ADR-005 asigna Step 3 a coverage-options y Step 4 a terms/result | Si se cambia el mapping de steps, ajustar la ruta | usuario |
 | SUP-010-02 | No se crea endpoint backend nuevo — consume `GET .../state` (SPEC-008) y `POST .../calculate` (SPEC-009) | Evita duplicación de endpoints; QuoteStateDto ya incluye calculationResult optionalmente | Si se necesita un response shape diferente, considerar DTO wrapper en FE | usuario |
-| SUP-010-03 | `formatCurrency` usa `Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })` | Formato estándar para pesos mexicanos | Si el reto requiere otro formato, ajustar locale | spec-generator |
+| SUP-010-03 | `formatCurrency` usa `Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' })` | Formato estándar para pesos colombianos | Si el reto requiere otro formato, ajustar locale | spec-generator |
 | SUP-010-04 | Desglose por cobertura muestra `rate` además de `premium` para trazabilidad | El usuario puede verificar que tarifa se aplicó | Si no se quiere mostrar la tasa, el campo existe pero el diseño puede ocultarlo | spec-generator |
 
 ---
@@ -349,7 +349,7 @@ No hay tareas backend — endpoints cubiertos en SPEC-008 y SPEC-009.
 - [ ] Crear `widgets/location-breakdown/` — tabla de ubicaciones con prima neta y badge de estado
 - [ ] Crear `widgets/location-breakdown/CoverageAccordion.tsx` — sub-tabla expandible de coberturas (garantía, suma, tasa, prima)
 - [ ] Crear `widgets/incomplete-alerts/` — panel warning con campos faltantes + link "Editar ubicación"
-- [ ] Crear `shared/lib/formatCurrency.ts` — `Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })`
+- [ ] Crear `shared/lib/formatCurrency.ts` — `Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' })`
 - [ ] Agregar ruta `/quotes/:folio/terms-and-conditions` en `app/router/router.tsx` → `ResultsPage`
 - [ ] Lógica de estados:
   - `calculationResult != null` → mostrar resultados + botón "Recalcular"
@@ -363,12 +363,12 @@ No hay tareas backend — endpoints cubiertos en SPEC-008 y SPEC-009.
 - [ ] `ResultsPage.test.tsx` — folio no calculado + readyForCalculation true → muestra botón "Calcular"
 - [ ] `ResultsPage.test.tsx` — folio no calculado + readyForCalculation false → muestra "No hay ubicaciones calculables" + link a ubicaciones
 - [ ] `ResultsPage.test.tsx` — folio calculado → muestra 3 tarjetas, desglose, alertas
-- [ ] `FinancialSummary.test.tsx` — renderiza 3 tarjetas con formato MXN correcto
+- [ ] `FinancialSummary.test.tsx` — renderiza 3 tarjetas con formato COP correcto
 - [ ] `LocationBreakdown.test.tsx` — renderiza tabla con ubicaciones calculables
 - [ ] `CoverageAccordion.test.tsx` — expandir ubicación muestra sub-tabla de coberturas
 - [ ] `IncompleteAlerts.test.tsx` — renderiza alertas con campos faltantes
 - [ ] `IncompleteAlerts.test.tsx` — click en "Editar" navega a ubicaciones
-- [ ] `formatCurrency.test.ts` — formatea 125430.50 → "$125,430.50"
+- [ ] `formatCurrency.test.ts` — formatea 125430.50 → "$125.430,50"
 
 ---
 
@@ -386,7 +386,7 @@ No hay tareas backend — endpoints cubiertos en SPEC-008 y SPEC-009.
   - No calculado + ready → botón "Calcular"
   - No calculado + not ready → mensaje + link a ubicaciones
   - Calculado → tarjetas + desgloses + alertas + botón "Recalcular"
-- [ ] 3 tarjetas de resumen financiero con formato MXN
+- [ ] 3 tarjetas de resumen financiero con formato COP
 - [ ] Tabla de desglose por ubicación con prima neta y badge de estado
 - [ ] Acordeón de coberturas expandible con garantía, suma, tasa, prima
 - [ ] Panel de alertas con ubicaciones incompletas y link "Editar"

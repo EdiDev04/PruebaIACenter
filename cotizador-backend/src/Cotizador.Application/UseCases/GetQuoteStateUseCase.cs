@@ -78,7 +78,7 @@ public class GetQuoteStateUseCase : IGetQuoteStateUseCase
     private static CalculationResultDto MapCalculationResult(PropertyQuote quote) =>
         new(
             NetPremium: quote.NetPremium,
-            CommercialPremiumBeforeTax: 0m, // Campo pendiente de SPEC-009 (motor de cálculo)
+            CommercialPremiumBeforeTax: quote.CommercialPremiumBeforeTax,
             CommercialPremium: quote.CommercialPremium,
             PremiumsByLocation: quote.PremiumsByLocation
                 .Select(lp => new LocationPremiumDto(

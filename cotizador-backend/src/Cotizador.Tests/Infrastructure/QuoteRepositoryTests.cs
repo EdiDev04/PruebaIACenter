@@ -129,7 +129,7 @@ public class QuoteRepositoryTests
 
         // Act
         Func<Task> act = async () => await Sut.UpdateFinancialResultAsync(
-            folioNumber, expectedVersion, 1500m, 1800m, new List<LocationPremium>());
+            folioNumber, expectedVersion, 1500m, 1740m, 1800m, new List<LocationPremium>());
 
         // Assert
         await act.Should().ThrowAsync<VersionConflictException>()
@@ -155,7 +155,7 @@ public class QuoteRepositoryTests
 
         // Act
         Func<Task> act = async () => await Sut.UpdateFinancialResultAsync(
-            folioNumber, expectedVersion, 5000m, 6000m, new List<LocationPremium>());
+            folioNumber, expectedVersion, 5000m, 5800m, 6000m, new List<LocationPremium>());
 
         // Assert
         await act.Should().NotThrowAsync();

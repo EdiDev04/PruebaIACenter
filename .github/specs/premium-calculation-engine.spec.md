@@ -1,6 +1,6 @@
 ---
 id: SPEC-009
-status: DRAFT
+status: IMPLEMENTED
 feature: premium-calculation-engine
 feature_type: full-stack
 requires_design_spec: false
@@ -9,9 +9,9 @@ affects_database: true
 consumes_core_ohs: true
 has_fe_be_integration: true
 created: 2026-03-29
-updated: 2026-03-29
+updated: 2026-03-30
 author: spec-generator
-version: "1.0"
+version: "1.1"
 related-specs: ["SPEC-001", "SPEC-002", "SPEC-003", "SPEC-006", "SPEC-007", "SPEC-008"]
 priority: critica
 estimated-complexity: XL
@@ -19,8 +19,8 @@ estimated-complexity: XL
 
 # Spec: Motor de Cálculo de Primas
 
-> **Estado:** `DRAFT` → aprobar con `status: APPROVED` antes de iniciar implementación.
-> **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
+> **Estado:** `IN_PROGRESS` — v1.1: cruce de `enabledGuarantees` con garantías de ubicación al calcular (ref: SPEC-007 RN-007-06, SUP-007-05).
+> **Ciclo de vida:** DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → **AMENDMENT** → APPROVED → IN_PROGRESS → IMPLEMENTED
 
 ---
 
@@ -99,6 +99,7 @@ Implementar el motor de cálculo que procesa un folio completo: lee las ubicacio
 |---|---|---|---|---|
 | RN-009-01 | La cotización se identifica por `folioNumber` | — | — | bussines-context.md §8 |
 | RN-009-02 | Una ubicación NO se calcula si no tiene CP válido, `businessLine.fireKey`, o garantías tarifables | `validationStatus == "incomplete"` | `netPremium: 0` para esa ubicación | bussines-context.md §10 |
+| RN-009-02b | **[AMENDMENT v1.1]** Una ubicación NO se calcula si alguna de sus garantías está fuera de `CoverageOptions.EnabledGuarantees` | Garantía local ∉ enabledGuarantees | `netPremium: 0`, `validationStatus: "incomplete"` para esa ubicación — aunque en BD su status sea `calculable` | SPEC-007 RN-007-06, SUP-007-05 |
 | RN-009-03 | Ubicaciones incompletas generan alertas pero no bloquean el cálculo | ≥1 ubicación calculable | Cálculo procede con las calculables | bussines-context.md §1, §10 |
 | RN-009-04 | Si 0 ubicaciones son calculables → error, no se persiste nada | `calculable == 0` | `InvalidQuoteStateException` → HTTP 422 | REQ-09 |
 | RN-009-05 | `netPremium` = Σ primas netas por ubicación calculable | Cada ubicación: Σ primas por cobertura | Decimal, 2 decimales | bussines-context.md §5, §8 |
@@ -427,8 +428,10 @@ cotizador-webapp/src/
    - catTariffs   = ICoreOhsClient.GetCatTariffsAsync()
    - equipFactors = ICoreOhsClient.GetElectronicEquipmentFactorsAsync()
    - calcParams   = ICoreOhsClient.GetCalculationParametersAsync()
+4b. [AMENDMENT v1.1] Construir enabledSet = HashSet(quote.CoverageOptions.EnabledGuarantees)
 5. Para cada ubicación:
-   SI validationStatus == "incomplete":
+   hasDisabledGuarantee = ubicacion.Guarantees.ALGUNA(g => g.GuaranteeKey ∉ enabledSet)
+   SI validationStatus == "incomplete" O hasDisabledGuarantee:
      premiumsByLocation.ADD({ index, name, netPremium: 0, status: "incomplete", coverages: [] })
      CONTINUAR
    SINO:
@@ -650,6 +653,9 @@ Ninguno. Las tarifas vienen de `cotizador-core-mock` fixtures (SPEC-001).
 - [ ] `CalculateQuoteUseCaseTests` — core-ohs no disponible → throws CoreOhsUnavailableException
 - [ ] `CalculateQuoteUseCaseTests` — fireKey no encontrado → rate 0, warning logged
 - [ ] `CalculateQuoteUseCaseTests` — verifica que status pasa a "calculated" y version incrementa
+- [ ] `CalculateQuoteUseCaseTests` — **[AMENDMENT v1.1]** ubicación calculable con garantía no habilitada en CoverageOptions → treated as incomplete (netPremium 0)
+- [ ] `CalculateQuoteUseCaseTests` — **[AMENDMENT v1.1]** 2 ubicaciones calculables, 1 con garantía deshabilitada → solo 1 calculable en resultado
+- [ ] `CalculateQuoteUseCaseTests` — **[AMENDMENT v1.1]** todas las ubicaciones con garantías deshabilitadas + 0 calculables restantes → throws InvalidQuoteStateException
 - [ ] `CalculateQuoteUseCaseTests` — electronic_equipment con techLevel lookup correcto
 - [ ] Integration: POST /calculate → verificar persistencia atómica (no sobrescribir insuredData, locations)
 
@@ -679,6 +685,7 @@ Ninguno. Las tarifas vienen de `cotizador-core-mock` fixtures (SPEC-001).
 - [ ] Persistencia atómica sin sobrescribir otras secciones
 - [ ] `quoteStatus` cambia a `"calculated"`, version incrementa
 - [ ] Ubicaciones incompletas generan alertas pero no bloquean el cálculo
+- [ ] **[AMENDMENT v1.1]** Ubicaciones con garantías fuera de `EnabledGuarantees` se tratan como `incomplete` en el resultado del cálculo (RN-009-02b)
 - [ ] 0 ubicaciones calculables → HTTP 422
 - [ ] Versionado optimista funcional (409 ante conflicto)
 - [ ] Frontend: botón "Calcular" disabled si `readyForCalculation == false`

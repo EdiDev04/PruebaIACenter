@@ -16,7 +16,10 @@ export function WizardLayout() {
     <div className={styles.layout}>
       <WizardHeader />
       {quoteState && (
-        <ProgressBar progress={quoteState.progress} />
+        <ProgressBar
+          progress={quoteState.progress}
+          hasCalculation={quoteState.calculationResult !== null}
+        />
       )}
       {quoteState && (
         <div className={quoteState.readyForCalculation ? styles.bannerReady : styles.bannerPending}>

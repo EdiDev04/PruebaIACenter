@@ -7,5 +7,6 @@ export function useCoverageOptionsQuery(folio: string) {
     queryFn: () => getCoverageOptions(folio),
     select: (res) => res.data,
     enabled: !!folio,
+    staleTime: 0,
   });
 }

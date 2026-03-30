@@ -138,6 +138,7 @@ public class QuoteRepository : IQuoteRepository
         string folioNumber,
         int expectedVersion,
         decimal netPremium,
+        decimal commercialPremiumBeforeTax,
         decimal commercialPremium,
         List<LocationPremium> premiumsByLocation,
         CancellationToken ct = default)
@@ -146,6 +147,7 @@ public class QuoteRepository : IQuoteRepository
 
         UpdateDefinition<PropertyQuote> update = Builders<PropertyQuote>.Update
             .Set(q => q.NetPremium, netPremium)
+            .Set(q => q.CommercialPremiumBeforeTax, commercialPremiumBeforeTax)
             .Set(q => q.CommercialPremium, commercialPremium)
             .Set(q => q.PremiumsByLocation, premiumsByLocation)
             .Set(q => q.QuoteStatus, QuoteStatus.Calculated)

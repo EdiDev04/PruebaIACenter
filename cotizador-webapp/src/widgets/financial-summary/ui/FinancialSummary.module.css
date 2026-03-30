@@ -1,0 +1,98 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: var(--color-surface-container-lowest, #ffffff);
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--color-primary-container, #4878fd);
+  box-shadow: 0 12px 32px rgba(25, 28, 30, 0.04);
+}
+
+.cardFeatured {
+  background: #f0f9f6;
+  border-left: 4px solid var(--color-tertiary-container, #82ff99);
+  box-shadow: 0 16px 48px rgba(0, 84, 57, 0.08);
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+.cardFeatured::before {
+  content: '';
+  position: absolute;
+  top: -2rem;
+  right: -2rem;
+  width: 8rem;
+  height: 8rem;
+  background: var(--color-tertiary, #006e2e);
+  opacity: 0.03;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-on-surface-variant, #506079);
+}
+
+.badge {
+  display: inline-block;
+  background: var(--color-tertiary-fixed, #82ff99);
+  color: var(--color-on-tertiary-fixed-variant, #006c2d);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+.amount {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-on-surface, #24334a);
+  margin-top: 0.25rem;
+}
+
+.amountFeatured {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-tertiary, #006e2e);
+  margin-top: 0.25rem;
+}
+
+.description {
+  font-size: 0.75rem;
+  color: var(--color-outline, #6c7b96);
+  margin-top: 1rem;
+}
+
+.descriptionFeatured {
+  font-size: 0.75rem;
+  color: var(--color-on-tertiary-fixed-variant, #006c2d);
+  opacity: 0.7;
+  font-weight: 500;
+  margin-top: 1rem;
+}

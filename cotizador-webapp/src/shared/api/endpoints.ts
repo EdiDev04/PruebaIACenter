@@ -23,4 +23,5 @@ export const endpoints = {
     guarantees: '/v1/catalogs/guarantees',
   },
   quoteState: (folio: string) => `/v1/quotes/${folio}/state`,
+  calculate: (folio: string) => `/v1/quotes/${folio}/calculate`,
 };
