@@ -3,12 +3,12 @@ import { render, screen } from '@testing-library/react';
 import { AutoResolvedFields } from '@/features/save-locations/ui/AutoResolvedFields';
 
 describe('AutoResolvedFields', () => {
-  it('renders the "Datos resueltos automaticamente" heading', () => {
+  it('renders the "Datos resueltos automáticamente" heading', () => {
     // Arrange & Act
     render(<AutoResolvedFields />);
 
     // Assert
-    expect(screen.getByText('Datos resueltos automaticamente')).toBeInTheDocument();
+    expect(screen.getByText('Datos resueltos automáticamente')).toBeInTheDocument();
   });
 
   it('shows "auto" chip for each field', () => {

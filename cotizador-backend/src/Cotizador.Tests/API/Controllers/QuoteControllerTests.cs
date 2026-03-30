@@ -94,8 +94,9 @@ public class QuoteControllerTests
     private void SetupValidatorFailure(string propertyName = "AgentCode", string errorMessage = "Campo requerido")
     {
         _mockValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateGeneralInfoRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult(new[] { new ValidationFailure(propertyName, errorMessage) }));
+            .As<FluentValidation.IValidator>()
+            .Setup(v => v.ValidateAsync(It.IsAny<FluentValidation.IValidationContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new ValidationException(new[] { new ValidationFailure(propertyName, errorMessage) }));
     }
 
     // ─── GET /v1/quotes/{folio}/general-info ──────────────────────────────────

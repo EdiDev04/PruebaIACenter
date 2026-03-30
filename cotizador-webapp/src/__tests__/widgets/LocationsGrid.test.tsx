@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,6 +6,7 @@ import React from 'react';
 import { LocationsGrid } from '@/widgets/locations-grid/ui/LocationsGrid';
 import { useLocationsQuery } from '@/entities/location';
 import type { LocationDto } from '@/entities/location';
+import { useLayoutQuery } from '@/entities/layout';
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
 vi.mock('@/entities/location', async (importOriginal) => {
@@ -13,6 +14,14 @@ vi.mock('@/entities/location', async (importOriginal) => {
   return {
     ...actual,
     useLocationsQuery: vi.fn(),
+  };
+});
+
+vi.mock('@/entities/layout', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/entities/layout')>();
+  return {
+    ...actual,
+    useLayoutQuery: vi.fn(),
   };
 });
 
@@ -54,6 +63,18 @@ function createWrapper() {
   };
 }
 
+function mockLayoutDefault(displayMode: 'grid' | 'list' = 'list') {
+  vi.mocked(useLayoutQuery).mockReturnValue({
+    data: {
+      displayMode,
+      visibleColumns: ['index', 'locationName', 'zipCode', 'businessLine', 'validationStatus'],
+      version: 1,
+    },
+    isLoading: false,
+    isError: false,
+  } as ReturnType<typeof useLayoutQuery>);
+}
+
 function renderGrid(props?: Partial<React.ComponentProps<typeof LocationsGrid>>) {
   return render(
     <LocationsGrid
@@ -67,6 +88,10 @@ function renderGrid(props?: Partial<React.ComponentProps<typeof LocationsGrid>>)
 }
 
 describe('LocationsGrid', () => {
+  beforeEach(() => {
+    mockLayoutDefault('list');
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -161,11 +186,10 @@ describe('LocationsGrid', () => {
     } as ReturnType<typeof useLocationsQuery>);
     renderGrid({ onEdit });
 
-    // Act — open kebab menu then click Editar
+    // Act
     await userEvent.click(
-      screen.getByRole('button', { name: `Opciones para ${locationA.locationName}` }),
+      screen.getByRole('button', { name: `Editar ${locationA.locationName}` }),
     );
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Editar' }));
 
     // Assert — grid maps location.index to the onEdit prop
     expect(onEdit).toHaveBeenCalledTimes(1);
@@ -184,9 +208,8 @@ describe('LocationsGrid', () => {
 
     // Act
     await userEvent.click(
-      screen.getByRole('button', { name: `Opciones para ${locationB.locationName}` }),
+      screen.getByRole('button', { name: `Eliminar ${locationB.locationName}` }),
     );
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Eliminar' }));
 
     // Assert
     expect(onDelete).toHaveBeenCalledTimes(1);

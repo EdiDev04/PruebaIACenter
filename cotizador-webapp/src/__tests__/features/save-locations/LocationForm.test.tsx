@@ -117,18 +117,18 @@ describe('LocationForm', () => {
     renderForm();
 
     // Assert
-    expect(screen.getByLabelText(/Nombre de la ubicacion/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Nombre de la ubicación/i)).toBeInTheDocument();
   });
 
-  it('renders the "Nueva ubicacion" title for new location mode', () => {
+  it('renders the "Nueva ubicación" title for new location mode', () => {
     // Arrange & Act
     renderForm();
 
     // Assert
-    expect(screen.getByRole('heading', { name: 'Nueva ubicacion' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Nueva ubicación' })).toBeInTheDocument();
   });
 
-  it('renders the "Editar ubicacion" title when locationIndex is provided', () => {
+  it('renders the "Editar ubicación" title when locationIndex is provided', () => {
     // Arrange & Act
     renderForm({
       locationIndex: 0,
@@ -139,7 +139,7 @@ describe('LocationForm', () => {
     });
 
     // Assert
-    expect(screen.getByRole('heading', { name: 'Editar ubicacion' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Editar ubicación' })).toBeInTheDocument();
   });
 
   it('does not advance to Step 2 when locationName is empty', async () => {
@@ -157,8 +157,8 @@ describe('LocationForm', () => {
   it('advances to Step 2 after filling valid Step 1 data', async () => {
     // Arrange
     renderForm();
-    const nameInput = screen.getByLabelText(/Nombre de la ubicacion/i);
-    const addressInput = screen.getByLabelText(/Direccion/i);
+    const nameInput = screen.getByLabelText(/Nombre de la ubicación/i);
+    const addressInput = screen.getByLabelText(/Dirección/i);
 
     // Act
     await userEvent.type(nameInput, 'Bodega Norte');
@@ -182,8 +182,8 @@ describe('LocationForm', () => {
     });
 
     // Assert
-    expect(screen.getByLabelText(/Nombre de la ubicacion/i)).toHaveValue('Sucursal Centro');
-    expect(screen.getByLabelText(/Direccion/i)).toHaveValue('Calle Reforma 10');
+    expect(screen.getByLabelText(/Nombre de la ubicación/i)).toHaveValue('Sucursal Centro');
+    expect(screen.getByLabelText(/Dirección/i)).toHaveValue('Calle Reforma 10');
   });
 
   it('calls onCancel when the cancel button is clicked', async () => {
@@ -210,16 +210,16 @@ describe('LocationForm', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('navigates back to Step 1 when "← Atras" is clicked on Step 2', async () => {
+  it('navigates back to Step 1 when "← Atrás" is clicked on Step 2', async () => {
     // Arrange — advance to step 2 first
     renderForm();
-    await userEvent.type(screen.getByLabelText(/Nombre de la ubicacion/i), 'Bodega Norte');
-    await userEvent.type(screen.getByLabelText(/Direccion/i), 'Av. Industria 340');
+    await userEvent.type(screen.getByLabelText(/Nombre de la ubicación/i), 'Bodega Norte');
+    await userEvent.type(screen.getByLabelText(/Dirección/i), 'Av. Industria 340');
     await userEvent.click(screen.getByRole('button', { name: /Siguiente/i }));
     await waitFor(() => screen.getByText(/Paso 2 de 2/));
 
     // Act
-    await userEvent.click(screen.getByRole('button', { name: /Atras/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Atrás/i }));
 
     // Assert
     expect(screen.getByText(/Paso 1 de 2/)).toBeInTheDocument();

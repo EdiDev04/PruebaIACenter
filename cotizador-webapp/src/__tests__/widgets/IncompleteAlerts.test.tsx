@@ -2,20 +2,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
 import { IncompleteAlerts } from '@/widgets/incomplete-alerts';
 import type { LocationAlertDto } from '@/entities/quote-state';
-
-// ── Mock react-router-dom navigate ──────────────────────────────────────────
-const mockNavigate = vi.fn();
-
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react-router-dom')>();
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 const alert1: LocationAlertDto = {
@@ -24,11 +12,9 @@ const alert1: LocationAlertDto = {
   missingFields: ['zipCode', 'constructionType'],
 };
 
-function renderAlerts(alerts: LocationAlertDto[], folio = 'DAN-2026-00001') {
+function renderAlerts(alerts: LocationAlertDto[], onEditLocation = vi.fn()) {
   return render(
-    <MemoryRouter>
-      <IncompleteAlerts alerts={alerts} folio={folio} />
-    </MemoryRouter>,
+    <IncompleteAlerts alerts={alerts} onEditLocation={onEditLocation} />,
   );
 }
 
@@ -62,15 +48,16 @@ describe('IncompleteAlerts', () => {
     expect(screen.getByText('Tipo de Construcción')).toBeInTheDocument();
   });
 
-  it('navigates to locations on edit click', async () => {
+  it('calls onEditLocation when edit button is clicked', async () => {
     // Arrange
     const user = userEvent.setup();
-    renderAlerts([alert1], 'DAN-2026-00001');
+    const onEditLocation = vi.fn();
+    renderAlerts([alert1], onEditLocation);
 
     // Act
     await user.click(screen.getByRole('button', { name: /Editar ubicación/i }));
 
     // Assert
-    expect(mockNavigate).toHaveBeenCalledWith('/quotes/DAN-2026-00001/locations');
+    expect(onEditLocation).toHaveBeenCalledTimes(1);
   });
 });

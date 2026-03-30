@@ -108,7 +108,7 @@ describe('ZipCodeField', () => {
 
     // Assert
     expect(
-      screen.getByText(/Codigo postal no encontrado/),
+      screen.getByText(/Código postal no encontrado/),
     ).toBeInTheDocument();
   });
 
