@@ -309,19 +309,83 @@ Documentación extendida: [`docs/output/api/calculo-prima.md`](docs/output/api/c
 
 ## Endpoints disponibles
 
-Todos los endpoints requieren `Authorization: Basic <base64(user:password)>`.
+### cotizador-backend — Puerto 5001
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `POST` | `/v1/folios` | Crea un nuevo folio de cotización. Requiere header `Idempotency-Key` |
-| `GET` | `/v1/quotes/{folio}` | Obtiene el resumen completo de una cotización |
-| `GET` | `/v1/quotes/{folio}/general-info` | Obtiene la información general de una cotización |
-| `PUT` | `/v1/quotes/{folio}/general-info` | Actualiza la información general de una cotización |
-| `GET` | `/v1/quotes/{folio}/state` | Estado y progreso de la cotización — pasos completados, alertas de ubicación y cobertura activa (SPEC-008) |
+Todos los endpoints requieren `Authorization: Basic <base64(user:password)>` → `admin:cotizador2026`.
 
 **Formato de folio:** `DAN-YYYY-NNNNN` (ejemplo: `DAN-2026-00001`)
 
-**Autenticación:** Basic Auth — `admin` / `cotizador2026`
+#### Folios
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/v1/folios` | Crea un nuevo folio. Requiere header `Idempotency-Key` (UUID) |
+| `GET` | `/v1/quotes/{folio}` | Resumen completo del folio |
+
+#### Información general
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/quotes/{folio}/general-info` | Obtiene datos generales del folio |
+| `PUT` | `/v1/quotes/{folio}/general-info` | Actualiza datos generales |
+
+#### Layout de ubicaciones
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/quotes/{folio}/locations/layout` | Configuración de layout (número de ubicaciones) |
+| `PUT` | `/v1/quotes/{folio}/locations/layout` | Actualiza configuración de layout |
+
+#### Ubicaciones
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/quotes/{folio}/locations` | Lista todas las ubicaciones del folio |
+| `PUT` | `/v1/quotes/{folio}/locations` | Reemplaza ubicaciones completas |
+| `PATCH` | `/v1/quotes/{folio}/locations/{index}` | Actualiza una ubicación por índice |
+| `GET` | `/v1/quotes/{folio}/locations/summary` | Resumen de calculabilidad por ubicación |
+
+#### Opciones de cobertura
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/quotes/{folio}/coverage-options` | Garantías habilitadas para el folio |
+| `PUT` | `/v1/quotes/{folio}/coverage-options` | Actualiza garantías habilitadas |
+
+#### Estado y cálculo
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/quotes/{folio}/state` | Estado del wizard, pasos completados y alertas |
+| `POST` | `/v1/quotes/{folio}/calculate` | Ejecuta el motor de cálculo de primas |
+
+#### Catálogos (proxy al core-mock)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/subscribers` | Catálogo de suscriptores/asegurados |
+| `GET` | `/v1/agents` | Catálogo de agentes (filtrable por código) |
+| `GET` | `/v1/catalogs/risk-classification` | Clasificaciones de riesgo |
+| `GET` | `/v1/zip-codes/{zipCode}` | Información de código postal (zona + nivel técnico) |
+
+---
+
+### cotizador-core-mock — Puerto 3001
+
+Sin autenticación. Sirve datos estáticos desde fixtures JSON.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/v1/folios/next` | Genera el siguiente número de folio disponible |
+| `GET` | `/v1/subscribers` | Catálogo de suscriptores |
+| `GET` | `/v1/agents` | Catálogo de agentes (soporta query `?code=`) |
+| `GET` | `/v1/business-lines` | Giros comerciales con `fireKey` |
+| `GET` | `/v1/zip-codes/{zipCode}` | Datos del CP: zona CAT y nivel técnico |
+| `POST` | `/v1/zip-codes/validate` | Valida uno o varios códigos postales |
+| `GET` | `/v1/catalogs/risk-classification` | Clasificaciones de riesgo |
+| `GET` | `/v1/catalogs/guarantees` | Catálogo completo de garantías |
+| `GET` | `/v1/tariffs/calculation-parameters` | Parámetros globales de cálculo (gastos, IVA, etc.) |
+| `GET` | `/v1/tariffs/:type` | Tarifas por tipo: `fire`, `cat`, `fhm`, `electronic-equipment` |
 
 ### Contratos API detallados
 
