@@ -17,6 +17,7 @@ public class CatalogControllerTests
     private readonly Mock<IGetRiskClassificationsUseCase> _mockGetRiskClassificationsUseCase = new();
     private readonly Mock<IGetZipCodeUseCase> _mockGetZipCodeUseCase = new();
     private readonly Mock<IGetBusinessLinesUseCase> _mockGetBusinessLinesUseCase = new();
+    private readonly Mock<IGetGuaranteesUseCase> _mockGetGuaranteesUseCase = new();
 
     private CatalogController CreateController()
     {
@@ -25,7 +26,8 @@ public class CatalogControllerTests
             _mockGetAgentByCodeUseCase.Object,
             _mockGetRiskClassificationsUseCase.Object,
             _mockGetZipCodeUseCase.Object,
-            _mockGetBusinessLinesUseCase.Object);
+            _mockGetBusinessLinesUseCase.Object,
+            _mockGetGuaranteesUseCase.Object);
 
         controller.ControllerContext = new ControllerContext
         {

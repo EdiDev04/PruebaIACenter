@@ -170,6 +170,7 @@ Todos los endpoints requieren `Authorization: Basic <base64(user:password)>`.
 | `GET` | `/v1/quotes/{folio}` | Obtiene el resumen completo de una cotización |
 | `GET` | `/v1/quotes/{folio}/general-info` | Obtiene la información general de una cotización |
 | `PUT` | `/v1/quotes/{folio}/general-info` | Actualiza la información general de una cotización |
+| `GET` | `/v1/quotes/{folio}/state` | Estado y progreso de la cotización — pasos completados, alertas de ubicación y cobertura activa (SPEC-008) |
 
 **Formato de folio:** `DAN-YYYY-NNNNN` (ejemplo: `DAN-2026-00001`)
 

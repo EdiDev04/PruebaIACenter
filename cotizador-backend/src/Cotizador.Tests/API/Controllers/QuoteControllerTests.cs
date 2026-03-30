@@ -27,6 +27,10 @@ public class QuoteControllerTests
     private readonly Mock<IGetLocationsSummaryUseCase> _mockGetLocationsSummaryUseCase = new();
     private readonly Mock<IValidator<UpdateLocationsRequest>> _mockUpdateLocationsValidator = new();
     private readonly Mock<IValidator<PatchLocationRequest>> _mockPatchLocationValidator = new();
+    private readonly Mock<IGetCoverageOptionsUseCase> _mockGetCoverageOptionsUseCase = new();
+    private readonly Mock<IUpdateCoverageOptionsUseCase> _mockUpdateCoverageOptionsUseCase = new();
+    private readonly Mock<IValidator<UpdateCoverageOptionsRequest>> _mockCoverageOptionsValidator = new();
+    private readonly Mock<IGetQuoteStateUseCase> _mockGetQuoteStateUseCase = new();
 
     private QuoteController CreateController()
     {
@@ -42,7 +46,11 @@ public class QuoteControllerTests
             _mockPatchLocationUseCase.Object,
             _mockGetLocationsSummaryUseCase.Object,
             _mockUpdateLocationsValidator.Object,
-            _mockPatchLocationValidator.Object);
+            _mockPatchLocationValidator.Object,
+            _mockGetCoverageOptionsUseCase.Object,
+            _mockUpdateCoverageOptionsUseCase.Object,
+            _mockCoverageOptionsValidator.Object,
+            _mockGetQuoteStateUseCase.Object);
 
         controller.ControllerContext = new ControllerContext
         {

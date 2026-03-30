@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary-container": "#006127", "on-background": "#24334a", "surface-dim": "#cbdbf9", "error-container": "#f97386", "surface-container-lowest": "#ffffff", "surface-variant": "#d5e3ff", "surface-tint": "#1554d9", "inverse-on-surface": "#969dac", "surface-container-low": "#f0f3ff", "outline-variant": "#a3b3cf", "on-tertiary-fixed-variant": "#006c2d", surface: "#f9f9ff", "tertiary-dim": "#006127", error: "#a8364b", "on-primary-fixed-variant": "#fefcff", "on-surface-variant": "#506079", "tertiary-container": "#82ff99", "primary-fixed-dim": "#386bef", "on-error-container": "#6e0523", "on-surface": "#24334a", "secondary-fixed": "#ffdcc3", "error-dim": "#6b0221", "surface-bright": "#f9f9ff", "secondary-dim": "#804300", primary: "#1554d9", "on-secondary-fixed-variant": "#8c4a00", "primary-container": "#4878fd", "secondary-container": "#ffdcc3", "on-secondary-container": "#7e4200", "surface-container": "#e7eeff", "on-primary": "#faf8ff", "inverse-primary": "#638aff", "on-tertiary-fixed": "#004c1d", "tertiary-fixed": "#82ff99", "primary-fixed": "#4878fd", "inverse-surface": "#070e19", "on-primary-fixed": "#ffffff", "tertiary-fixed-dim": "#73f08c", "on-primary-container": "#000000", tertiary: "#006e2e", background: "#f9f9ff", "secondary-fixed-dim": "#ffcaa1", "on-tertiary": "#e9ffe6", "primary-dim": "#0047c6", "surface-container-highest": "#d5e3ff", secondary: "#914d00", outline: "#6c7b96", "on-error": "#fff7f7", "on-secondary-fixed": "#633300", "surface-container-high": "#dee8ff", "on-secondary": "#fff7f4"}, fontFamily: {headline: ["Inter"], body: ["Inter"], label: ["Inter"], display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="bg-slate-50 dark:bg-slate-900 shadow-sm dark:shadow-none docked full-width top-0 border-b border-slate-200/50 dark:border-slate-800/50 z-50 sticky">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">Architectural Underwriter</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-inter tracking-tight font-medium text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="#">Dashboard</a>
+<a class="font-inter tracking-tight font-medium text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="#">Policies</a>
+<a class="font-inter tracking-tight font-medium text-sm text-slate-900 dark:text-white border-b-2 border-slate-600 pb-1" href="#">Risks</a>
+<a class="font-inter tracking-tight font-medium text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant/20">
+<img alt="Underwriter Profile" data-alt="minimalist avatar of a professional male underwriter with glasses and a modern hairstyle on a soft blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB9x8VsC-I9bustESn2HHl1qQxcE8P9Ff5X6OCCBMLYm3XSk-khJEbvEpXnkREB-z0ofCdJHowHvrGiohNm251qZzZ7Nhd82Ug5diha89zHMwYr4N3wEwmkMJuflyz_XE685SgeTIgROuOkQ4E2Wvym6CU_ws5kcwofstM1EA0Cuu4lZdnThAgdI69hr7TVbM-JkqIGHliyWAZt0E0IbFxAePYeJQGA-HXCqUSGTPGZtYJiRJkJOqWuOcxDOcp0vla-ufALcA4Dv8"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-60px)]">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-[60px] h-full flex flex-col p-4 z-40 bg-white dark:bg-slate-950 h-screen w-64 border-r border-slate-200 dark:border-slate-800">
+<div class="mb-8">
+<h2 class="text-xl font-black text-slate-900 dark:text-white leading-tight">Underwriting Wizard</h2>
+<p class="text-xs text-slate-500 font-medium tracking-wide uppercase mt-1">Expediente #8829-B</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-transform duration-200 hover:translate-x-1 font-inter text-sm font-semibold uppercase tracking-wider opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>Paso 1: Cliente</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg border-l-4 border-slate-600 transition-transform duration-200 hover:translate-x-1 font-inter text-sm font-semibold uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span>Paso 2: Ubicaciones</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-transform duration-200 hover:translate-x-1 font-inter text-sm font-semibold uppercase tracking-wider opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+<span>Paso 3: Riesgos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-transform duration-200 hover:translate-x-1 font-inter text-sm font-semibold uppercase tracking-wider opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span>Paso 4: Coberturas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 transition-transform duration-200 hover:translate-x-1 font-inter text-sm font-semibold uppercase tracking-wider opacity-80 hover:opacity-100" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Paso 5: Emisión</span>
+</a>
+</nav>
+<button class="mt-auto w-full py-3 bg-primary text-on-primary rounded-lg font-bold text-sm hover:bg-primary-dim transition-all shadow-sm active:scale-95">
+                Guardar Progreso
+            </button>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 p-12 bg-surface">
+<div class="max-w-4xl mx-auto space-y-8">
+<header class="mb-12">
+<h1 class="text-3xl font-black text-on-surface tracking-tight mb-2">Panel de Control de Ubicaciones</h1>
+<p class="text-on-surface-variant max-w-2xl">Gestione y valide los datos de riesgo para las ubicaciones del asegurado. Los paneles a continuación muestran diferentes estados de validación de datos.</p>
+</header>
+<!-- STATE 1: Pending Data -->
+<section class="max-w-[800px] mx-auto bg-surface-container-lowest border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+<div class="p-4 flex items-center justify-between border-b border-slate-100">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" data-icon="warning">warning</span>
+<h2 class="text-base font-semibold text-on-surface">Ubicaciones con datos pendientes</h2>
+</div>
+<div class="flex items-center gap-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary-container text-on-secondary-container">
+                                1 pendiente
+                            </span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="p-0">
+<!-- Alerta 1 -->
+<div class="p-5 border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Local sin CP</h3>
+<p class="text-xs text-on-surface-variant mt-1 mb-3">Campos faltantes:</p>
+<div class="flex gap-2 mb-3">
+<span class="px-3 py-1 bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold rounded-full uppercase tracking-wider">Codigo postal</span>
+<span class="px-3 py-1 bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold rounded-full uppercase tracking-wider">Giro de negocio</span>
+</div>
+</div>
+<a class="text-sm font-semibold text-outline hover:text-primary transition-colors" href="#">Ir a editar &gt;</a>
+</div>
+</div>
+<!-- Alerta 2 -->
+<div class="p-5 hover:bg-slate-50/50 transition-colors">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-sm font-semibold text-on-surface">Nave Industrial Norte</h3>
+<p class="text-xs text-on-surface-variant mt-1 mb-3">Campos faltantes:</p>
+<div class="flex gap-2 mb-3">
+<span class="px-3 py-1 bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold rounded-full uppercase tracking-wider">Tipo de construccion</span>
+<span class="px-3 py-1 bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold rounded-full uppercase tracking-wider">Numero de pisos</span>
+</div>
+</div>
+<a class="text-sm font-semibold text-outline hover:text-primary transition-colors" href="#">Ir a editar &gt;</a>
+</div>
+</div>
+</div>
+</section>
+<!-- STATE 2: All Locations Complete -->
+<section class="max-w-[800px] mx-auto bg-surface-container-lowest border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle">check_circle</span>
+<h2 class="text-base font-semibold text-on-surface">Ubicaciones validadas</h2>
+</div>
+</div>
+<div class="px-4 pb-4">
+<div class="bg-[#F0FDF4] p-4 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-[#166534]" data-icon="verified">verified</span>
+<p class="text-sm font-semibold text-[#166534]">Todas las ubicaciones estan completas y listas para calcular</p>
+</div>
+</div>
+</section>
+<!-- STATE 3: No Locations Registered -->
+<section class="max-w-[800px] mx-auto bg-slate-50 border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="info">info</span>
+<h2 class="text-base font-semibold text-slate-500">Listado de ubicaciones</h2>
+</div>
+</div>
+<div class="p-8 flex flex-col items-center justify-center text-center">
+<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-slate-400 text-2xl" data-icon="location_off">location_off</span>
+</div>
+<p class="text-sm font-medium text-[#6B7280] max-w-xs">No hay ubicaciones registradas. Agregue una ubicacion para continuar.</p>
+<button class="mt-4 px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
+                            + Agregar Primera Ubicación
+                        </button>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

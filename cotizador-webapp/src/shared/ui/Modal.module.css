@@ -17,6 +17,10 @@
   max-width: 28rem;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.2s ease;
+  margin: 0;
+  padding: 0;
+  border: none;
+  position: relative;
 }
 
 @keyframes fadeIn {

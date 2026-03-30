@@ -1,6 +1,6 @@
 # Design Spec: Configuracion de Opciones de Cobertura (SPEC-007)
 
-> **Status:** DRAFT
+> **Status:** APPROVED
 > **Feature:** coverage-options-configuration
 > **Wizard Step:** 3 (Technical Info)
 > **Route:** `/quotes/{folio}/technical-info`

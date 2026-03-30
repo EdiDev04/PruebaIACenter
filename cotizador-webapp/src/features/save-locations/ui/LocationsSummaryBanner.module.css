@@ -32,13 +32,20 @@
   gap: 0.25rem;
 }
 
+.itemRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .locationName {
   font-weight: 600;
   font-size: 0.875rem;
 }
 
 .alerts {
-  margin: 0;
+  margin: 0.25rem 0 0;
   padding-left: 1rem;
   list-style: disc;
   display: flex;
@@ -49,4 +56,30 @@
 .alert {
   font-size: 0.8125rem;
   color: #92400e;
+}
+
+.editBtn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1.5px solid #d97706;
+  border-radius: 6px;
+  color: #92400e;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.editBtn:hover {
+  background: #d97706;
+  color: #fff;
+}
+
+.footer {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: #a16207;
 }

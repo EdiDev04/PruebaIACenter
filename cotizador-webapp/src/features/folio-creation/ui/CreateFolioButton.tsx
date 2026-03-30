@@ -13,7 +13,7 @@ const STEP_ROUTES: Record<number, string> = {
   0: 'general-info',
   1: 'general-info',
   2: 'locations',
-  3: 'coverages',
+  3: 'technical-info',
   4: 'results',
 };
 

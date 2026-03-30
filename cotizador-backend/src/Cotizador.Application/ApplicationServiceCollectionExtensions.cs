@@ -37,6 +37,14 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IGetZipCodeUseCase, GetZipCodeUseCase>();
         services.AddScoped<IGetBusinessLinesUseCase, GetBusinessLinesUseCase>();
 
+        // Use Cases — SPEC-007
+        services.AddScoped<IGetCoverageOptionsUseCase, GetCoverageOptionsUseCase>();
+        services.AddScoped<IUpdateCoverageOptionsUseCase, UpdateCoverageOptionsUseCase>();
+        services.AddScoped<IGetGuaranteesUseCase, GetGuaranteesUseCase>();
+
+        // Use Cases — SPEC-008
+        services.AddScoped<IGetQuoteStateUseCase, GetQuoteStateUseCase>();
+
         // Use Cases — Proxy catálogos (SPEC-004)
         services.AddScoped<IGetSubscribersUseCase, GetSubscribersUseCase>();
         services.AddScoped<IGetAgentByCodeUseCase, GetAgentByCodeUseCase>();
@@ -47,6 +55,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IValidator<UpdateLayoutRequest>, UpdateLayoutRequestValidator>();
         services.AddScoped<IValidator<UpdateLocationsRequest>, UpdateLocationsRequestValidator>();
         services.AddScoped<IValidator<PatchLocationRequest>, PatchLocationRequestValidator>();
+        services.AddScoped<IValidator<UpdateCoverageOptionsRequest>, UpdateCoverageOptionsRequestValidator>();
 
         return services;
     }
